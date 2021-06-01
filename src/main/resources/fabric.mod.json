@@ -16,8 +16,11 @@
     "main": [
       "me.bscal.betterfarming.BetterFarming"
     ],
+    "cardinal-components-chunk": [
+      "me.bscal.betterfarming.common.components.chunk.ChunkEcoProvider"
+    ],
     "cardinal-components-entity": [
-      "me.bscal.betterfarming.components.chunk.ChunkEcoProvider"
+      "me.bscal.betterfarming.common.components.entity.EntityEcoProvider"
     ]
   },
   "mixins": [
@@ -25,7 +28,8 @@
   ],
   "custom": {
     "cardinal-components": [
-      "betterfarming:chunk_eco"
+      "betterfarming:chunk_eco",
+      "betterfarming:entity_eco"
     ]
   },
   "depends": {

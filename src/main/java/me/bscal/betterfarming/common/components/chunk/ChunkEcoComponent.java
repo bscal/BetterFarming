@@ -1,8 +1,8 @@
-package me.bscal.betterfarming.components.chunk;
+package me.bscal.betterfarming.common.components.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
-import me.bscal.betterfarming.components.ClimateType;
-import me.bscal.betterfarming.components.GrowthRates;
+import me.bscal.betterfarming.common.components.ClimateType;
+import me.bscal.betterfarming.common.components.GrowthRates;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
@@ -25,6 +25,7 @@ public class ChunkEcoComponent implements IChunkEcoComponent, ServerTickingCompo
 	public ChunkEcoComponent(Chunk chunk)
 	{
 		this.chunk = (chunk instanceof WorldChunk) ? (WorldChunk) chunk : null;
+		//this.chunk.getBiomeArray().getBiomeForNoiseGen(chunk.getPos());
 	}
 
 	@Override
@@ -96,8 +97,8 @@ public class ChunkEcoComponent implements IChunkEcoComponent, ServerTickingCompo
 			fertilizer = ecoTag.getInt("fertilizer");
 			arability = ecoTag.getInt("arability");
 			growthRates.FromTag(ecoTag);
-			climateType = ClimateType.REGISTRY.getOrDefault(ecoTag.getString("climateType"),
-					ClimateType.GENERIC);
+			//climateType = ClimateType.REGISTRY.getOrDefault(ecoTag.getString("climateType"),
+					//ClimateType.GENERIC);
 		}
 	}
 
@@ -111,6 +112,6 @@ public class ChunkEcoComponent implements IChunkEcoComponent, ServerTickingCompo
 		ecoTag.putInt("fertilizer", fertilizer);
 		ecoTag.putInt("arability", arability);
 		growthRates.ToTag(ecoTag);
-		ecoTag.putString("climateType", climateType.name);
+		//ecoTag.putString("climateType", climateType.name);
 	}
 }

@@ -1,9 +1,9 @@
-package me.bscal.betterfarming.components.entity;
+package me.bscal.betterfarming.common.components.entity;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 
-public class EcoEntityComponent implements IEcoEntityComponent
+public class EntityEcoComponent implements IEntityEcoComponent
 {
 
 	public final LivingEntity entity;
@@ -13,7 +13,7 @@ public class EcoEntityComponent implements IEcoEntityComponent
 	public int overcrowdedness;
 	public int yield;
 
-	public EcoEntityComponent(LivingEntity ent)
+	public EntityEcoComponent(LivingEntity ent)
 	{
 		this.entity = ent;
 	}

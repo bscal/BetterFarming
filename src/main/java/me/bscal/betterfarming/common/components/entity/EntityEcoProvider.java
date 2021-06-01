@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.components.entity;
+package me.bscal.betterfarming.common.components.entity;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
@@ -12,12 +12,12 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EcoEntityProvider implements EntityComponentInitializer
+public final class EntityEcoProvider implements EntityComponentInitializer
 {
 
 	public static final Identifier ENTITY_ECO_ID = new Identifier(BetterFarming.MOD_ID, "entity_eco");
-	public static final ComponentKey<IEcoEntityComponent> ENTITY_ECO = ComponentRegistry.getOrCreate(
-			ENTITY_ECO_ID, IEcoEntityComponent.class);
+	public static final ComponentKey<IEntityEcoComponent> ENTITY_ECO = ComponentRegistry.getOrCreate(
+			ENTITY_ECO_ID, IEntityEcoComponent.class);
 
 	public static final List<Class<? extends LivingEntity>> MOB_ENTITY_REGISTRY = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public class EcoEntityProvider implements EntityComponentInitializer
 	{
 		for (Class<? extends LivingEntity> clazz : MOB_ENTITY_REGISTRY)
 		{
-			registry.registerFor(clazz, ENTITY_ECO, EcoEntityComponent::new);
+			registry.registerFor(clazz, ENTITY_ECO, EntityEcoComponent::new);
 		}
 	}
 }

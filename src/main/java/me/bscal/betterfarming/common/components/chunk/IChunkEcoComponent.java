@@ -1,9 +1,8 @@
-package me.bscal.betterfarming.components.chunk;
+package me.bscal.betterfarming.common.components.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import me.bscal.betterfarming.components.ClimateType;
-import me.bscal.betterfarming.components.GrowthRates;
-import net.minecraft.world.chunk.WorldChunk;
+import me.bscal.betterfarming.common.components.ClimateType;
+import me.bscal.betterfarming.common.components.GrowthRates;
 
 public interface IChunkEcoComponent extends Component
 {

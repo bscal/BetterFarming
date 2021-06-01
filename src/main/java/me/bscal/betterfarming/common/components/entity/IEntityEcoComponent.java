@@ -1,8 +1,8 @@
-package me.bscal.betterfarming.components.entity;
+package me.bscal.betterfarming.common.components.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 
-public interface IEcoEntityComponent extends Component
+public interface IEntityEcoComponent extends Component
 {
 
 	int GetGrowthRate();

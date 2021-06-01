@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.components;
+package me.bscal.betterfarming.common.components;
 
 import net.minecraft.nbt.NbtCompound;
 
