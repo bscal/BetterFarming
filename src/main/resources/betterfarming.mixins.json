@@ -1,9 +1,11 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "me.bscal.betterfarming.mixin",
+  "package": "me.bscal.betterfarming.common.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "LootManagerMixin",
+    "LootTableAccessor"
   ],
   "client": [
   ],
