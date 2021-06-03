@@ -10,6 +10,5 @@ public class ServerEntityCombatListener implements ServerEntityCombatEvents.Afte
 	@Override
 	public void afterKilledOtherEntity(ServerWorld world, Entity entity, LivingEntity killedEntity)
 	{
-
 	}
 }

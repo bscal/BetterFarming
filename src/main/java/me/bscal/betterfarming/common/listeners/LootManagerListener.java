@@ -9,8 +9,16 @@ import net.minecraft.item.Items;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.function.LootFunction;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
+import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
+import net.minecraft.loot.provider.number.LootNumberProvider;
+import net.minecraft.loot.provider.number.LootNumberProviderTypes;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
@@ -43,7 +51,10 @@ public class LootManagerListener implements LootManagerEarlyAssignCallback, Loot
 		{
 			FabricLootPoolBuilder pool = FabricLootPoolBuilder.builder()
 					.rolls(ConstantLootNumberProvider.create(1.0f))
-					.withEntry(ItemEntry.builder(Items.EGG).build());
+					.withEntry(ItemEntry.builder(Items.EGG).apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(0f, 7f))).build());
+
+
+
 			supplier = FabricLootSupplierBuilder.of(LootTable.builder().pool(pool).build());
 			setter.set(supplier.build());
 		}
