@@ -38,7 +38,7 @@ public class LootManagerListener implements LootManagerEarlyAssignCallback, Loot
 				.withEntry(ItemEntry.builder(Items.EGG).build());
 
 		LootTableAccessor lootTableAccessor = (LootTableAccessor) tables.get(COW_LOOT_TABLE_ID);
-		lootTableAccessor.SetPools(new LootPool[] {pool.build()});
+		lootTableAccessor.SetPools(new LootPool[] { pool.build() });
 
 		return TypedActionResult.success(tables);
 	}
@@ -49,14 +49,13 @@ public class LootManagerListener implements LootManagerEarlyAssignCallback, Loot
 	{
 		if (COW_LOOT_TABLE_ID.equals(id))
 		{
-			FabricLootPoolBuilder pool = FabricLootPoolBuilder.builder()
-					.rolls(ConstantLootNumberProvider.create(1.0f))
-					.withEntry(ItemEntry.builder(Items.EGG).apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(0f, 7f))).build());
-
-
-
-			supplier = FabricLootSupplierBuilder.of(LootTable.builder().pool(pool).build());
-			setter.set(supplier.build());
+			Clear(setter);
 		}
+	}
+
+	private void Clear(LootTableSetter setter)
+	{
+		setter.set(FabricLootSupplierBuilder.of(
+				LootTable.builder().pool(FabricLootPoolBuilder.builder()).build()).build());
 	}
 }
