@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LootDrops
+public class LootDrops implements ILootDrops
 {
 
 	public final int rolls;
@@ -36,28 +36,34 @@ public class LootDrops
 		return this;
 	}
 
-	public LootDropResult Roll(LootData data)
+	public List<ItemStack> Roll(LootData data)
 	{
 		currentRolls = rolls;
-		LootDropResult result = new LootDropResult();
+
+		List<ItemStack> result = new ArrayList<>();
 
 		while (currentRolls-- > 0)
 		{
-			int r = BetterFarming.RAND.nextInt(sum);
+			if (data.bonusRolls > 0)
+			{
+				currentRolls += data.bonusRolls;
+				data.bonusRolls = 0;
+			}
+
+			int random = BetterFarming.RAND.nextInt(sum);
 			int totalWeight = 0;
 			for (int i = 0; i < weights.size(); i++)
 			{
 				totalWeight += weights.get(i);
-				if (r < totalWeight)
+				if (random < totalWeight)
 				{
-					LootEntry entry = entries.get(i);
-					LootPool pool = entry.pool;
+					LootPool pool = entries.get(i).pool;
 					data.CopyItems(pool.items);
 					if (pool.condition == null || pool.condition.test(data))
 					{
 						if (pool.onSuccess != null)
 							pool.onSuccess.accept(data);
-						result.items.addAll(data.items);
+						result.addAll(data.items);
 						break;
 					}
 				}
@@ -83,11 +89,6 @@ public class LootDrops
 	public boolean HasRolls()
 	{
 		return currentRolls > 0;
-	}
-
-	public static class LootDropResult
-	{
-		public List<ItemStack> items = new ArrayList<>();
 	}
 
 }
