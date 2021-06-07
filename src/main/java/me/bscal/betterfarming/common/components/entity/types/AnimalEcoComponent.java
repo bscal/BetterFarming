@@ -39,8 +39,6 @@ public class AnimalEcoComponent extends EntityEcoComponent
 	@Override
 	public void serverTick()
 	{
-		// canImmediatelyDespawn(d) implementations don't generally use distanceSquared. (AnimalEntity is always false)
-		// I check these because a random animal entity does not really need to be updated.
 		if (m_internalTimer++ % BetterFarming.UPDATE_DELAY == 0)
 		{
 			hunger -= 1;
@@ -48,31 +46,33 @@ public class AnimalEcoComponent extends EntityEcoComponent
 			if (growthStage > maxGrowth && animal.age > ticksForGrowth)
 				growthStage++;
 
-			Box box = Box.of(animal.getPos(), 8, 8, 8);
+			Box box = Box.from(animal.getPos()).expand(8);
 			List<AnimalEntity> list = animal.world.getEntitiesByClass(AnimalEntity.class, box,
 					(animalClass) -> true);
 
 			overcrowded = list.size() > 7;
 
 			List<BlockPos> hayBlocks = new ArrayList<>();
-			List<BlockPos> grassBlocks = BlockPos.stream(box).filter((blockPos) -> {
+			List<BlockPos> grassBlocks = new ArrayList<>();
+			BlockPos.stream(box).forEach((blockPos) -> {
 				BlockState state = animal.world.getBlockState(blockPos);
 				if (state.isOf(Blocks.HAY_BLOCK))
-					hayBlocks.add(blockPos);
-				return state.isIn(FARM_FOOD);
-			}).toList();
+					hayBlocks.add(blockPos.toImmutable());
+				else if (state.isIn(FARM_FOOD))
+					grassBlocks.add(blockPos.toImmutable());
+			});
 
 			if (hunger < 90)
 			{
 				if (hayBlocks.size() > 0)
 				{
 					TryEat(this, 25);
-					EcoUtils.RandomElementToAir(animal.world, hayBlocks);
+					EcoUtils.RandomElementSetToAir(animal.world, hayBlocks);
 				}
 				else if (grassBlocks.size() > 0)
 				{
 					TryEat(this, 15);
-					EcoUtils.RandomElementToAir(animal.world, grassBlocks);
+					EcoUtils.RandomElementSetToAir(animal.world, grassBlocks);
 				}
 			}
 
