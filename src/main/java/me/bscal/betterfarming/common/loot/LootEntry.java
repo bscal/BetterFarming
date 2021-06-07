@@ -18,4 +18,5 @@ public class LootEntry
 		this.chance = chance;
 		this.pool = lootPool;
 	}
+
 }

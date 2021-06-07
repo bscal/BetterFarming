@@ -1,7 +1,6 @@
 package me.bscal.betterfarming.common.listeners;
 
 import me.bscal.betterfarming.common.loot.LootData;
-import me.bscal.betterfarming.common.loot.LootDrops;
 import me.bscal.betterfarming.common.loot.LootRegister;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.minecraft.entity.Entity;
@@ -19,8 +18,7 @@ public class ServerEntityCombatListener implements ServerEntityCombatEvents.Afte
 
 		if (killedEntity instanceof CowEntity)
 		{
-			LootRegister.COW_DROP.Roll(new LootData((LivingEntity)entity, killedEntity, world)).items.forEach(
-					killedEntity::dropStack);
+			LootRegister.COW_TABLE.RollAndDrop(new LootData(killedEntity, (LivingEntity) entity, world));
 		}
 	}
 }

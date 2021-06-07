@@ -1,25 +1,49 @@
 package me.bscal.betterfarming.common.components.entity;
 
+import me.bscal.betterfarming.BetterFarming;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Box;
+
+import java.util.List;
 
 public class EntityEcoComponent implements IEntityEcoComponent
 {
 
 	public final LivingEntity entity;
+
 	public int growthStage;
 	public int happiness;
-	public int hunger;
-	public int overcrowdedness;
-	public int yield;
+	public int condition;
 
-	public EntityEcoComponent(LivingEntity ent)
+	public int fatness;
+	public int hunger;
+	public int thirst;
+	public boolean overcrowded;
+	public int ticksForGrowth;
+	public int maxGrowth;
+
+	public EntityEcoComponent(LivingEntity entity)
 	{
-		this.entity = ent;
+		this.entity = entity;
+		if (entity.age < 1)
+		{
+			growthStage = (entity.isBaby()) ? 0 : 2;
+			happiness = 2;
+			fatness = 1;
+			hunger = 50;
+			thirst = 50;
+		}
 	}
 
 	@Override
-	public int GetGrowthRate()
+	public void serverTick()
+	{
+	}
+
+	@Override
+	public float GetGrowthRate()
 	{
 		return 1;
 	}
@@ -37,9 +61,21 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	}
 
 	@Override
-	public int GetOvercrowdedness()
+	public int GetCondition()
 	{
-		return overcrowdedness;
+		return condition;
+	}
+
+	@Override
+	public boolean IsOvercrowded()
+	{
+		return overcrowded;
+	}
+
+	@Override
+	public int GetFatness()
+	{
+		return fatness;
 	}
 
 	@Override
@@ -49,9 +85,9 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	}
 
 	@Override
-	public int GetYieldGrade()
+	public int GetThirst()
 	{
-		return yield;
+		return thirst;
 	}
 
 	@Override
@@ -59,9 +95,11 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	{
 		growthStage = tag.getInt("growthStage");
 		happiness = tag.getInt("happiness");
+		condition = tag.getInt("condition");
+		fatness = tag.getInt("fatness");
 		hunger = tag.getInt("hunger");
-		overcrowdedness = tag.getInt("overcrowdedness");
-		yield = tag.getInt("yield");
+		thirst = tag.getInt("thirst");
+		overcrowded = tag.getBoolean("overcrowdedness");
 	}
 
 	@Override
@@ -69,8 +107,10 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	{
 		tag.putInt("growthStage", growthStage);
 		tag.putInt("happiness", happiness);
+		tag.putInt("condition", condition);
+		tag.putInt("fatness", fatness);
 		tag.putInt("hunger", hunger);
-		tag.putInt("overcrowdedness", overcrowdedness);
-		tag.putInt("yield", yield);
+		tag.putInt("thirst", thirst);
+		tag.putBoolean("overcrowded", overcrowded);
 	}
 }
