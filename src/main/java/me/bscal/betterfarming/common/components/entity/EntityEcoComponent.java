@@ -3,6 +3,7 @@ package me.bscal.betterfarming.common.components.entity;
 import me.bscal.betterfarming.common.components.entity.types.AnimalEcoComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundEvents;
 
 public class EntityEcoComponent implements IEntityEcoComponent
 {
@@ -22,6 +23,8 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	public int ticksForGrowth;
 	public int maxGrowth;
 
+	protected int eatingTimer;
+
 	public EntityEcoComponent(LivingEntity entity)
 	{
 		this.entity = entity;
@@ -38,11 +41,17 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	@Override
 	public void serverTick()
 	{
+		if (eatingTimer-- > 0 && eatingTimer % 5 == 0)
+		{
+			entity.playSound(SoundEvents.ENTITY_GENERIC_EAT, 1.0f,
+					(entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.2F + 1.0F);
+		}
 	}
 
 	@Override
 	public void EatFood(int value)
 	{
+		eatingTimer = 30;
 		AnimalEcoComponent.TryEat(this, value);
 	}
 

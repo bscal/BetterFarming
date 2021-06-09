@@ -17,7 +17,6 @@ public class MoveToFoodAndEat extends MoveToTargetPosGoal
 {
 
 	private final IEntityEcoComponent m_ecoComponent;
-	private boolean m_hasTarget;
 
 	public MoveToFoodAndEat(PathAwareEntity entity, double speed, int range)
 	{
@@ -28,11 +27,17 @@ public class MoveToFoodAndEat extends MoveToTargetPosGoal
 	@Override
 	public boolean canStart()
 	{
-		if (m_ecoComponent == null && !super.canStart())
+		if (m_ecoComponent == null)
 			return false;
 
-		m_hasTarget = false;
-		return IsHungry();
+		return IsHungry() && super.canStart();
+	}
+
+	@Override
+	public void start()
+	{
+		super.start();
+
 	}
 
 	@Override
@@ -40,7 +45,7 @@ public class MoveToFoodAndEat extends MoveToTargetPosGoal
 	{
 		super.tick();
 
-		if (this.hasReached() && m_hasTarget)
+		if (this.hasReached())
 		{
 			World world = this.mob.world;
 			BlockState state = world.getBlockState(this.targetPos);
@@ -49,8 +54,6 @@ public class MoveToFoodAndEat extends MoveToTargetPosGoal
 				world.sendEntityStatus(this.mob, (byte) 10);
 				m_ecoComponent.EatFood(10);
 				world.setBlockState(this.targetPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
-				this.mob.playSound(SoundEvents.ENTITY_GENERIC_EAT, 1.0f, (this.mob.getRandom().nextFloat() - this.mob.getRandom().nextFloat()) * 0.2F + 1.0F);
-				m_hasTarget = false;
 			}
 		}
 	}
@@ -58,7 +61,7 @@ public class MoveToFoodAndEat extends MoveToTargetPosGoal
 	@Override
 	public boolean shouldContinue()
 	{
-		return m_hasTarget && super.shouldContinue();
+		return super.shouldContinue();
 	}
 
 	@Override
@@ -87,9 +90,8 @@ public class MoveToFoodAndEat extends MoveToTargetPosGoal
 	private boolean IsAnEatableBlock(WorldView world, BlockPos pos)
 	{
 		BlockState state = world.getBlockState(pos);
-		if (!m_hasTarget && state.isOf(Blocks.HAY_BLOCK))
+		if (state.isOf(Blocks.HAY_BLOCK))
 		{
-			m_hasTarget = true;
 			return true;
 		}
 		return false;

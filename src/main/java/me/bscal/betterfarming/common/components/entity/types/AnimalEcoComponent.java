@@ -39,7 +39,7 @@ public class AnimalEcoComponent extends EntityEcoComponent
 	@Override
 	public void serverTick()
 	{
-
+		super.serverTick();
 		if (m_internalTimer++ % BetterFarming.UPDATE_DELAY == 0)
 		{
 			hunger -= 1;
