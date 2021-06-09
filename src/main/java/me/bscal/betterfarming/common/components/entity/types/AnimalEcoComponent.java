@@ -39,10 +39,14 @@ public class AnimalEcoComponent extends EntityEcoComponent
 	@Override
 	public void serverTick()
 	{
+
 		if (m_internalTimer++ % BetterFarming.UPDATE_DELAY == 0)
 		{
 			hunger -= 1;
 			thirst -= 1;
+
+			if (true)
+				return;
 			if (growthStage > maxGrowth && animal.age > ticksForGrowth)
 				growthStage++;
 
@@ -68,6 +72,7 @@ public class AnimalEcoComponent extends EntityEcoComponent
 				{
 					TryEat(this, 25);
 					EcoUtils.RandomElementSetToAir(animal.world, hayBlocks);
+
 				}
 				else if (grassBlocks.size() > 0)
 				{
@@ -79,7 +84,7 @@ public class AnimalEcoComponent extends EntityEcoComponent
 		}
 	}
 
-	public static void TryEat(AnimalEcoComponent component, int foodValue)
+	public static void TryEat(EntityEcoComponent component, int foodValue)
 	{
 		component.hunger += foodValue;
 		component.happiness++;

@@ -1,15 +1,13 @@
 package me.bscal.betterfarming.common.components.entity;
 
-import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.common.components.entity.types.AnimalEcoComponent;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.Box;
-
-import java.util.List;
 
 public class EntityEcoComponent implements IEntityEcoComponent
 {
+
+	public static final int MAX_DEFAULT_VALUE = 20;
 
 	public final LivingEntity entity;
 
@@ -32,14 +30,20 @@ public class EntityEcoComponent implements IEntityEcoComponent
 			growthStage = (entity.isBaby()) ? 0 : 2;
 			happiness = 2;
 			fatness = 1;
-			hunger = 50;
-			thirst = 50;
+			hunger = 10;
+			thirst = 20;
 		}
 	}
 
 	@Override
 	public void serverTick()
 	{
+	}
+
+	@Override
+	public void EatFood(int value)
+	{
+		AnimalEcoComponent.TryEat(this, value);
 	}
 
 	@Override
