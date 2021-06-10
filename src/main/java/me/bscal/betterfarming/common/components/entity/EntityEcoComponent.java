@@ -1,9 +1,15 @@
 package me.bscal.betterfarming.common.components.entity;
 
+import me.bscal.betterfarming.common.BFConstants;
 import me.bscal.betterfarming.common.components.entity.types.AnimalEcoComponent;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldView;
 
 public class EntityEcoComponent implements IEntityEcoComponent
 {
@@ -34,7 +40,7 @@ public class EntityEcoComponent implements IEntityEcoComponent
 			happiness = 2;
 			fatness = 1;
 			hunger = 10;
-			thirst = 20;
+			thirst = 10;
 		}
 	}
 
@@ -46,6 +52,31 @@ public class EntityEcoComponent implements IEntityEcoComponent
 			entity.playSound(SoundEvents.ENTITY_GENERIC_EAT, 1.0f,
 					(entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.2F + 1.0F);
 		}
+	}
+
+	@Override
+	public boolean GetEatableBlocks(WorldView world, BlockPos pos, BlockState state)
+	{
+		return state.isIn(BFConstants.FARM_FOOD);
+	}
+
+	@Override
+	public int GetConsumablesPriority(BlockPos blockPos)
+	{
+
+		return (entity.world.getBlockState(blockPos).getBlock() == Blocks.HAY_BLOCK) ? 0 : 1;
+	}
+
+	@Override
+	public boolean IsHungry()
+	{
+		return hunger < 20 - entity.getRandom().nextInt(6) + 2;
+	}
+
+	@Override
+	public boolean IsThirsty()
+	{
+		return thirst < 20 - entity.getRandom().nextInt(6) + 2;
 	}
 
 	@Override

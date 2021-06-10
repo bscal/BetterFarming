@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.common.mixin.entities;
 
-import me.bscal.betterfarming.common.ai.goals.MoveToFoodAndEat;
+import me.bscal.betterfarming.common.ai.goals.MoveToAndConsumeGoal;
+import me.bscal.betterfarming.common.ai.goals.MoveToAndEatGoal;
 import me.bscal.betterfarming.common.mixin.accessors.MobEntityAccessor;
 import net.minecraft.entity.passive.CowEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +19,7 @@ public class CowEntityMixin
 		CowEntity cow = (CowEntity) (Object) this;
 		MobEntityAccessor accessor = (MobEntityAccessor) cow;
 
-		accessor.GetGoalSelector().add(4, new MoveToFoodAndEat(cow, 1, 16));
+		accessor.GetGoalSelector().add(4, new MoveToAndEatGoal(cow, 1, 16));
 	}
 
 }

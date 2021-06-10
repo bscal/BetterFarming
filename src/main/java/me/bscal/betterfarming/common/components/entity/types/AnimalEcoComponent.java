@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.common.components.entity.types;
 
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.common.BFConstants;
 import me.bscal.betterfarming.common.components.entity.EntityEcoComponent;
 import me.bscal.betterfarming.common.utils.EcoUtils;
 import net.minecraft.block.Block;
@@ -8,24 +9,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.tag.Tag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class AnimalEcoComponent extends EntityEcoComponent
 {
-	public static final Tag<Block> FARM_FOOD = Tag.of(new HashSet<>()
-	{{
-		add(Blocks.GRASS_BLOCK);
-		add(Blocks.GRASS);
-		add(Blocks.TALL_GRASS);
-		add(Blocks.HAY_BLOCK);
-	}});
-
 	private final AnimalEntity animal;
 
 	private int m_internalTimer;
@@ -62,7 +53,7 @@ public class AnimalEcoComponent extends EntityEcoComponent
 				BlockState state = animal.world.getBlockState(blockPos);
 				if (state.isOf(Blocks.HAY_BLOCK))
 					hayBlocks.add(blockPos.toImmutable());
-				else if (state.isIn(FARM_FOOD))
+				else if (state.isIn(BFConstants.FARM_FOOD))
 					grassBlocks.add(blockPos.toImmutable());
 			});
 
@@ -90,6 +81,19 @@ public class AnimalEcoComponent extends EntityEcoComponent
 		component.happiness++;
 		if (component.hunger > 100 && BetterFarming.RAND.nextInt(100) < component.hunger - 100)
 			component.fatness++;
+	}
+
+
+
+	@Override
+	public int GetConsumablesPriority(BlockPos blockPos)
+	{
+		Block block = entity.world.getBlockState(blockPos).getBlock();
+		if (block == Blocks.HAY_BLOCK)
+			return 0;
+		else if (block == Blocks.GRASS || block == Blocks.TALL_GRASS)
+			return 1;
+		return 2;
 	}
 
 }
