@@ -12,13 +12,15 @@ public interface IEntityEcoComponent extends ComponentV3, ServerTickingComponent
 
 	boolean GetEatableBlocks(WorldView world, BlockPos pos, BlockState state);
 
-	int GetConsumablesPriority(BlockPos blockPos);
+	int GetConsumablesPriority(BlockPos blockPos, BlockState state);
 
 	boolean IsHungry();
 
 	boolean IsThirsty();
 
 	void EatFood(int value);
+
+	void Drink(int value);
 
 	float GetGrowthRate();
 

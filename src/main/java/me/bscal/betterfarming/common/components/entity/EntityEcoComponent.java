@@ -2,7 +2,6 @@ package me.bscal.betterfarming.common.components.entity;
 
 import me.bscal.betterfarming.common.BFConstants;
 import me.bscal.betterfarming.common.components.entity.types.AnimalEcoComponent;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
@@ -61,10 +60,10 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	}
 
 	@Override
-	public int GetConsumablesPriority(BlockPos blockPos)
+	public int GetConsumablesPriority(BlockPos blockPos, BlockState state)
 	{
 
-		return (entity.world.getBlockState(blockPos).getBlock() == Blocks.HAY_BLOCK) ? 0 : 1;
+		return (state.getBlock() == Blocks.HAY_BLOCK) ? 0 : 1;
 	}
 
 	@Override
@@ -84,6 +83,12 @@ public class EntityEcoComponent implements IEntityEcoComponent
 	{
 		eatingTimer = 30;
 		AnimalEcoComponent.TryEat(this, value);
+	}
+
+	@Override
+	public void Drink(int value)
+	{
+		thirst += value;
 	}
 
 	@Override

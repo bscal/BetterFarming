@@ -86,9 +86,9 @@ public class AnimalEcoComponent extends EntityEcoComponent
 
 
 	@Override
-	public int GetConsumablesPriority(BlockPos blockPos)
+	public int GetConsumablesPriority(BlockPos blockPos, BlockState state)
 	{
-		Block block = entity.world.getBlockState(blockPos).getBlock();
+		Block block = state.getBlock();
 		if (block == Blocks.HAY_BLOCK)
 			return 0;
 		else if (block == Blocks.GRASS || block == Blocks.TALL_GRASS)
