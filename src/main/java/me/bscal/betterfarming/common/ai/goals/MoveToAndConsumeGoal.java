@@ -15,15 +15,26 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 	protected final IEntityEcoComponent m_ecoComponent;
 	protected final int m_range;
 	protected final int m_maxYDifference;
+	protected final boolean m_checkPriority;
+	protected BlockState m_cachedState;
 	private boolean m_shouldStop;
+	private int m_cantReachTicks;
 
-	public MoveToAndConsumeGoal(PathAwareEntity entity, double speed, int range, int maxYDifference)
+	public MoveToAndConsumeGoal(PathAwareEntity entity, double speed, int range, int maxYDifference,
+			boolean checkPriority)
 	{
 		super(entity, speed, range, maxYDifference);
 		this.m_range = range;
 		this.m_maxYDifference = maxYDifference;
+		this.m_checkPriority = checkPriority;
 		this.m_ecoComponent = EntityEcoProvider.ENTITY_ECO.get(entity);
 	}
+
+	protected abstract void OnConsumedSuccess(World world, BlockPos pos, BlockState state);
+
+	protected abstract boolean CanStartConsume();
+
+	protected abstract boolean IsTargetPosConsumable(WorldView world, BlockPos pos, BlockState state);
 
 	@Override
 	public boolean canStart()
@@ -41,7 +52,8 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 	@Override
 	public boolean shouldContinue()
 	{
-		return !m_shouldStop && super.shouldContinue();
+		return !m_shouldStop && IsTargetPosConsumable(this.mob.world, this.targetPos,
+				m_cachedState) && super.shouldContinue();
 	}
 
 	@Override
@@ -52,29 +64,35 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 		this.mob.getLookControl()
 				.lookAt((double) this.targetPos.getX() + 0.5D, this.targetPos.getY() + 1,
 						(double) this.targetPos.getZ() + 0.5D, 10.0F, (float) this.mob.getLookPitchSpeed());
-		if (this.hasReached())
-		{
-			World world = this.mob.world;
-			BlockState state = world.getBlockState(this.targetPos);
-			if (IsTargetPosConsumable(world, this.targetPos, state))
-			{
-				OnConsumedSuccess(world, this.targetPos, state);
-			}
-		}
+
+		if (this.hasReached() && IsTargetPosConsumable(this.mob.world, this.targetPos, m_cachedState))
+			Success();
 
 		if (this.mob.getNavigation().getCurrentPath() == null || !this.mob.getNavigation()
 				.getCurrentPath()
-				.reachesTarget())
+				.reachesTarget() && m_cantReachTicks++ > 60)
 		{
+			// Checks for floating blocks before stopping.
+			for (int i = 0; i < m_maxYDifference; i++)
+			{
+				if (this.targetPos.down(1 + i).isWithinDistance(this.mob.getPos(), getDesiredSquaredDistanceToTarget()))
+				{
+					Success();
+					return;
+				}
+			}
+
+			// Stops the goal from running since target is unreachable
+			m_cantReachTicks = 0;
+			this.cooldown = 60;
 			m_shouldStop = true;
-			this.cooldown = 40;
 		}
 	}
 
 	@Override
 	public double getDesiredSquaredDistanceToTarget()
 	{
-		return 1.0D;
+		return 2.0D;
 	}
 
 	@Override
@@ -84,20 +102,31 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 		BlockPos blockPos = this.mob.getBlockPos();
 		BlockPos posResult = null;
 		int currentPriority = Integer.MAX_VALUE;
+		double currentDistance = Integer.MAX_VALUE;
 		int halfRange = m_range / 2;
-		for (BlockPos pos : BlockPos.iterateRandomly(this.mob.getRandom(), 32, blockPos.getX() - halfRange,
-				blockPos.getY() - 2, blockPos.getZ() - halfRange, blockPos.getX() + halfRange,
-				blockPos.getY() + 2, blockPos.getZ() + halfRange))
+		for (BlockPos pos : BlockPos.iterateRandomly(this.mob.getRandom(),
+				m_range * m_range * m_maxYDifference, blockPos.getX() - halfRange,
+				blockPos.getY() - m_maxYDifference, blockPos.getZ() - halfRange, blockPos.getX() + halfRange,
+				blockPos.getY() + m_maxYDifference, blockPos.getZ() + halfRange))
 		{
+			m_cachedState = this.mob.world.getBlockState(pos);
 			if (this.mob.isInWalkTargetRange(pos) && this.isTargetPos(this.mob.world, pos))
 			{
-				// TODO Cache the blockstate? Have basic distance var to eat closest of prio?
-				int prio = m_ecoComponent.GetConsumablesPriority(pos);
-				if (prio < currentPriority)
+				int prio = m_ecoComponent.GetConsumablesPriority(pos, m_cachedState);
+				double newDist = blockPos.getSquaredDistance(pos);
+
+				if (m_checkPriority && prio < currentPriority)
 				{
 					currentPriority = prio;
 					posResult = pos.toImmutable();
 					if (prio < 1)
+						break;
+				}
+				else if (newDist < currentDistance)
+				{
+					currentDistance = newDist;
+					posResult = pos.toImmutable();
+					if (currentDistance < 1.0)
 						break;
 				}
 			}
@@ -105,6 +134,7 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 		if (posResult != null)
 		{
 			this.targetPos = posResult;
+			m_cachedState = this.mob.world.getBlockState(posResult);
 			return true;
 		}
 		return false;
@@ -113,13 +143,13 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 	@Override
 	protected boolean isTargetPos(WorldView world, BlockPos pos)
 	{
-		return IsTargetPosConsumable(world, pos, world.getBlockState(pos));
+		return IsTargetPosConsumable(world, pos, m_cachedState);
 	}
 
-	protected abstract void OnConsumedSuccess(World world, BlockPos pos, BlockState state);
-
-	protected abstract boolean CanStartConsume();
-
-	protected abstract boolean IsTargetPosConsumable(WorldView world, BlockPos pos, BlockState state);
+	private void Success()
+	{
+		OnConsumedSuccess(this.mob.world, this.targetPos, m_cachedState);
+		m_shouldStop = true;
+	}
 
 }

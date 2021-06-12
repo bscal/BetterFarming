@@ -12,15 +12,18 @@ public class MoveToAndEatGoal extends MoveToAndConsumeGoal
 {
 	public MoveToAndEatGoal(PathAwareEntity entity, double speed, int range)
 	{
-		super(entity, speed, range, 2);
+		super(entity, speed, range, 2, true);
 	}
 
 	@Override
 	protected void OnConsumedSuccess(World world, BlockPos pos, BlockState state)
 	{
 		world.sendEntityStatus(this.mob, (byte) 10);
-		world.setBlockState(this.targetPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
-		m_ecoComponent.EatFood(10);
+		if (state.isOf(Blocks.GRASS_BLOCK))
+			world.setBlockState(this.targetPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_ALL);
+		else
+			world.setBlockState(this.targetPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+		m_ecoComponent.EatFood(0);
 	}
 
 	@Override
