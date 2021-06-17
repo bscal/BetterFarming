@@ -1,6 +1,6 @@
 package me.bscal.betterfarming.common.components.entity;
 
-import me.bscal.betterfarming.common.BFConstants;
+import me.bscal.betterfarming.common.utils.BFConstants;
 import me.bscal.betterfarming.common.components.entity.types.AnimalEcoComponent;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

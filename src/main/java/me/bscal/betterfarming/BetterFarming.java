@@ -1,6 +1,5 @@
 package me.bscal.betterfarming;
 
-import me.bscal.betterfarming.common.events.LootManagerEarlyAssignCallback;
 import me.bscal.betterfarming.common.listeners.LootManagerListener;
 import me.bscal.betterfarming.common.listeners.PlayerBlockBreakListener;
 import me.bscal.betterfarming.common.listeners.ServerEntityCombatListener;
@@ -27,7 +26,6 @@ public class BetterFarming implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-
 
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());

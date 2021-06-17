@@ -1,7 +1,7 @@
 package me.bscal.betterfarming.common.components.entity.types;
 
 import me.bscal.betterfarming.BetterFarming;
-import me.bscal.betterfarming.common.BFConstants;
+import me.bscal.betterfarming.common.utils.BFConstants;
 import me.bscal.betterfarming.common.components.entity.EntityEcoComponent;
 import me.bscal.betterfarming.common.utils.EcoUtils;
 import net.minecraft.block.Block;

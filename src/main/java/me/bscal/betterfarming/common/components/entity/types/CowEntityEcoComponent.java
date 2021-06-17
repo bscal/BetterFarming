@@ -1,6 +1,6 @@
 package me.bscal.betterfarming.common.components.entity.types;
 
-import me.bscal.betterfarming.common.BFConstants;
+import me.bscal.betterfarming.common.utils.BFConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
