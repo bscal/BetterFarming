@@ -1,5 +1,6 @@
 package me.bscal.betterfarming;
 
+import me.bscal.betterfarming.common.database.BetterFarmingDatabase;
 import me.bscal.betterfarming.common.listeners.LootManagerListener;
 import me.bscal.betterfarming.common.listeners.PlayerBlockBreakListener;
 import me.bscal.betterfarming.common.listeners.ServerEntityCombatListener;
@@ -20,12 +21,12 @@ public class BetterFarming implements ModInitializer
 	public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 	public static final boolean DEBUG = true;
 	public static final Random RAND = new Random();
-
 	public static final int UPDATE_DELAY = 20 * 30;
 
 	@Override
 	public void onInitialize()
 	{
+		//BetterFarmingDatabase.CreateTables();
 
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());
@@ -34,5 +35,7 @@ public class BetterFarming implements ModInitializer
 		//LootManagerEarlyAssignCallback.EARLY_ASSIGN.register(LMListener);
 		LootTableLoadingCallback.EVENT.register(LMListener);
 
+
 	}
+
 }

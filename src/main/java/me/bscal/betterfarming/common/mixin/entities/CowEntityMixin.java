@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 		MobEntityAccessor accessor = (MobEntityAccessor) cow;
 
 		accessor.GetGoalSelector().add(4, new MoveToAndEatGoal(cow, 1.2, 16));
-		accessor.GetGoalSelector().add(4, new MoveToAndDrinkGoal(cow, 1, 16, false));
+		accessor.GetGoalSelector().add(4, new MoveToAndDrinkGoal(cow, 1.2, 16, false));
 	}
 
 }

@@ -1,9 +1,11 @@
 package me.bscal.betterfarming.common.mixin.blocks;
 
+import me.bscal.betterfarming.common.utils.BFConstants;
 import net.minecraft.block.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,8 +17,7 @@ import java.util.Random;
 
 @Mixin(SpreadableBlock.class) public abstract class SpreadableBlockMixin extends SnowyBlock
 {
-
-	private static final IntProperty SPREAD_AMOUNT = IntProperty.of("spread", 0, 255);
+	private static final IntProperty AGE_7;
 
 	protected SpreadableBlockMixin(Settings settings)
 	{
@@ -35,7 +36,7 @@ import java.util.Random;
 	@Inject(method = "appendProperties(Lnet/minecraft/state/StateManager$Builder;)V", at = @At(value = "HEAD"))
 	protected void OnAppendProperties(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci)
 	{
-		builder.add(SPREAD_AMOUNT);
+		builder.add(AGE_7);
 	}
 
 	// Prolongs grass spreading.
@@ -43,12 +44,20 @@ import java.util.Random;
 	public void OnRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random,
 			CallbackInfo ci)
 	{
-		int spread = state.get(SPREAD_AMOUNT);
+		int spread = state.get(AGE_7);
 		// TODO configurable amount
 		if (spread < 7)
 		{
-			world.setBlockState(pos, state.with(SPREAD_AMOUNT, spread + 1));
+			world.setBlockState(pos, state.with(AGE_7, spread + 1));
 			ci.cancel();
 		}
+		else
+			state.with(AGE_7, 0);
+
+	}
+
+	static
+	{
+		AGE_7 = Properties.AGE_7;
 	}
 }
