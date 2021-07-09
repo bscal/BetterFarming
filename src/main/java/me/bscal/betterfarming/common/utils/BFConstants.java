@@ -2,6 +2,7 @@ package me.bscal.betterfarming.common.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.tag.Tag;
 
@@ -35,10 +36,13 @@ public final class BFConstants
 	 */
 	public static final int REAL_DAY_TICKS = 1728000;
 
+	public static final BooleanProperty BOOLEAN_PROPERTY;
+
 	public static final Tag<Block> FARM_FOOD;
 
 	static
 	{
+		BOOLEAN_PROPERTY = BooleanProperty.of("boolean");
 
 		FARM_FOOD = Tag.of(new HashSet<>()
 		{{

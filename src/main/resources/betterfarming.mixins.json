@@ -7,8 +7,7 @@
     "LootManagerMixin",
     "LootTableAccessor",
     "accessors.MobEntityAccessor",
-    "blocks.PlantBlockMixin",
-    "blocks.SaplingBlockMixin",
+    "blocks.SaplingBlockScheduleMixin",
     "blocks.SpreadableBlockMixin",
     "entities.CowEntityMixin"
   ],

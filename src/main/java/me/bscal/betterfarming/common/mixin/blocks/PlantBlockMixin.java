@@ -6,22 +6,15 @@ import net.minecraft.block.PlantBlock;
 import net.minecraft.state.StateManager;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlantBlock.class)
-public abstract class PlantBlockMixin extends Block
+public abstract class PlantBlockMixin extends BlockMixin
 {
 
 	public PlantBlockMixin(Settings settings)
 	{
 		super(settings);
-	}
-
-	// Should allow us to inject into super.appendProperties without actually overriding it
-	@Override
-	@Intrinsic
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder)
-	{
-		super.appendProperties(builder);
 	}
 
 }

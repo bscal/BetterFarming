@@ -26,7 +26,7 @@ public class BetterFarming implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-		//BetterFarmingDatabase.CreateTables();
+		BetterFarmingDatabase.CreateTables();
 
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());
