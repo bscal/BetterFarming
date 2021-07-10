@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -74,7 +75,7 @@ public abstract class SaplingBlockScheduleMixin extends PlantBlock implements Sc
 				Scheduler.Builder(this, world)
 						.pos(pos)
 						.additionalData(additionalData)
-						.schedule(1);
+						.schedule(10 * 20);
 			}
 		}
 	}
@@ -86,9 +87,9 @@ public abstract class SaplingBlockScheduleMixin extends PlantBlock implements Sc
 		BetterFarming.LOGGER.info("RandomTick = " + state.get(STARTED));
 		if (!state.get(STARTED))
 		{
-			state.with(STARTED, true);
+			world.setBlockState(pos, state.with(STARTED, true).cycle(Properties.STAGE));
 
-			Scheduler.Builder(this, world).pos(pos).schedule(1);
+			Scheduler.Builder(this, world).pos(pos).schedule(20 * 10);
 			BetterFarming.LOGGER.info("Tick called.");
 		}
 

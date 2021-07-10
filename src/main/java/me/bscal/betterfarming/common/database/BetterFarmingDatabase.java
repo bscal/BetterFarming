@@ -38,7 +38,7 @@ public final class BetterFarmingDatabase
 
 	public static void CreateTables()
 	{
-		String sql = "CREATE TABLE " + TABLE_GROWABLE_BLOCKS +" ("
+		String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_GROWABLE_BLOCKS +" ("
 				+ "id                   integer   NOT NULL,"
 				+ "world                varchar(64)   NOT NULL,"
 				+ "x                    integer   NOT NULL,"
