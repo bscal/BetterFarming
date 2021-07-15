@@ -9,7 +9,8 @@
     "accessors.MobEntityAccessor",
     "blocks.SaplingBlockScheduleMixin",
     "blocks.SpreadableBlockMixin",
-    "entities.CowEntityMixin"
+    "entities.CowEntityMixin",
+    "world.ServerWorldMixin"
   ],
   "client": [
   ],
