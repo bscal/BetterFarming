@@ -2,24 +2,35 @@ package me.bscal.betterfarming.common.events;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.util.ActionResult;
 
 public interface SeasonEvents
 {
 
-	Event<SeasonEvents> NEW_DAY = EventFactory.createArrayBacked(SeasonEvents.class,
-			(listeners) -> (ticks, day, fromTimePass) -> {
-				for (SeasonEvents listener : listeners)
+	Event<NewDay> NEW_DAY = EventFactory.createArrayBacked(NewDay.class,
+			(listeners) -> (ticks, day) -> {
+				for (NewDay listener : listeners)
 				{
-					ActionResult result = listener.NewDay(ticks, day, fromTimePass);
-					if (result != ActionResult.PASS)
-					{
-						return result;
-					}
+					listener.OnNewDay(ticks, day);
 				}
-				return ActionResult.PASS;
 			});
 
-	ActionResult NewDay(long ticks, long day, boolean fromTimePass);
+	Event<SeasonChanged> SEASON_CHANGED = EventFactory.createArrayBacked(SeasonChanged.class, listeners -> (newSeason, currentDay) ->
+	{
+		for (SeasonChanged listener : listeners)
+		{
+			listener.OnSeasonChanged(newSeason, currentDay);
+		}
+	});
+
+
+	@FunctionalInterface interface NewDay
+	{
+		void OnNewDay(long ticks, long day);
+	}
+
+	@FunctionalInterface interface SeasonChanged
+	{
+		void OnSeasonChanged(int newSeason, long currentDay);
+	}
 
 }

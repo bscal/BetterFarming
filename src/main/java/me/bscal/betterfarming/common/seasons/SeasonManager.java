@@ -21,7 +21,7 @@ public class SeasonManager extends PersistentState
 	private ServerWorld m_world;
 	private int m_numOfDaysPerSeason;
 	private int m_maxSeasons = 4;
-	private boolean m_isSkippingTime;
+	private long m_lastTimeChecked;
 
 	public SeasonManager()
 	{
@@ -54,24 +54,34 @@ public class SeasonManager extends PersistentState
 		return nbt;
 	}
 
-	public void Tick()
+	/**
+	 *	Updates the season, season time, and will trigger new day event. Does not work if you try to go back in time.
+	 */
+	public void Update(long timeOfDay)
 	{
-		ticksSinceCreation++;
-		if (!m_isSkippingTime && ticksSinceCreation % 24000 == 0)
+		// TODO actually i might not need this
+		if (m_lastTimeChecked != timeOfDay)
 		{
-			long days = GetDays();
-			SeasonEvents.NEW_DAY.invoker().NewDay(ticksSinceCreation, days, false);
-			if (days >= m_numOfDaysPerSeason)
-				currentSeason = (currentSeason > m_maxSeasons) ? 1 : currentSeason + 1;
-		}
-		m_isSkippingTime = false;
-	}
+			// Gets the difference of the time of day to the new time of day.
+			// Not sure if this is the best method but this is called on every tick, set time command, player sleeping.
+			// So I didnt want to calculate 2 ticks and since max time of day is 24000, this was the best way I could come up with.
+			// 23001 (timeOfDay) - 23000 (m_lastTimeChecked) = 1
+			// 4000 (timeOfDay) - (23000 (m_lastTimeChecked) - 24000) = 5000 -> also a new day
+			boolean newDay = timeOfDay < m_lastTimeChecked;
+			ticksSinceCreation += timeOfDay - (newDay ?  m_lastTimeChecked : m_lastTimeChecked - 24000);
+			if (newDay)
+			{
+				long days = GetDays();
+				SeasonEvents.NEW_DAY.invoker().OnNewDay(ticksSinceCreation, days);
+				if (days >= m_numOfDaysPerSeason)
+				{
+					currentSeason = (currentSeason > m_maxSeasons) ? 1 : currentSeason + 1;
+					SeasonEvents.SEASON_CHANGED.invoker().OnSeasonChanged(currentSeason, days);
+				}
 
-	public void PassTime()
-	{
-		m_isSkippingTime = true;
-		ticksSinceCreation += MinecraftDate.TICKS_PER_DAY - (m_world.getTime() % MinecraftDate.TICKS_PER_DAY);
-		SeasonEvents.NEW_DAY.invoker().NewDay(ticksSinceCreation, GetDays(), true);
+			}
+		}
+		m_lastTimeChecked = timeOfDay;
 	}
 
 	public long GetDays()
