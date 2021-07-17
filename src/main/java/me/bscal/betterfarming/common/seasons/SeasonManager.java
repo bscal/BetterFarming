@@ -4,6 +4,9 @@ import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.common.events.SeasonEvents;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 
 public class SeasonManager extends PersistentState
@@ -78,7 +81,6 @@ public class SeasonManager extends PersistentState
 					currentSeason = (currentSeason > m_maxSeasons) ? 1 : currentSeason + 1;
 					SeasonEvents.SEASON_CHANGED.invoker().OnSeasonChanged(currentSeason, days);
 				}
-
 			}
 		}
 		m_lastTimeChecked = timeOfDay;
