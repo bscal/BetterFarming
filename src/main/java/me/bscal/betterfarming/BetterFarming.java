@@ -22,6 +22,7 @@ public class BetterFarming implements ModInitializer
 	public static final String MOD_NAME = "BetterFarming";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 	public static final boolean DEBUG = true;
+	public static final Random RAND = new Random();
 	public static final int UPDATE_DELAY = 20 * 30;
 
 	@Override

@@ -10,6 +10,6 @@ public class ServerTickListener implements ServerTickEvents.EndTick
 	@Override
 	public void onEndTick(MinecraftServer server)
 	{
-		SeasonManager.GetOrCreate(server.getOverworld()).Tick();
+		//SeasonManager.GetOrCreate(server.getOverworld()).Update();
 	}
 }
