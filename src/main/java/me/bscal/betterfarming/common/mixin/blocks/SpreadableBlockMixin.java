@@ -1,7 +1,9 @@
 package me.bscal.betterfarming.common.mixin.blocks;
 
-import me.bscal.betterfarming.common.utils.BFConstants;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.SnowyBlock;
+import net.minecraft.block.SpreadableBlock;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;

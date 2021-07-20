@@ -31,6 +31,19 @@ public class Color
 
 	public Color(int color)
 	{
+		this(color, false);
+	}
+
+	public Color(int color, boolean hasAlpha)
+	{
+		a = (hasAlpha) ? (color >> 24) & 0xff : 0;
+		r = (color >> 16) & 0xff;
+		g = (color >> 8) & 0xff;
+		b = color & 0xff;
+	}
+
+	public void setRgbFromInt(int color)
+	{
 		a = (color >> 24) & 0xff;
 		r = (color >> 16) & 0xff;
 		g = (color >> 8) & 0xff;
@@ -59,7 +72,14 @@ public class Color
 	public int getHue()
 	{
 		double[] hsv = toHsv(r, g, b);
-		return (int)Math.round(hsv[0] * 360D);
+		return (int) Math.round(hsv[0] * 360D);
+	}
+
+	public void saturate(int amount)
+	{
+		double[] hsv = toHsv(r, g, b);
+		hsv[1] = Math.max(0D, Math.min(1D, hsv[1] + amount / 100D));
+		setRgbFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
 	}
 
 	public void setSaturation(int saturation)
@@ -72,20 +92,27 @@ public class Color
 	public int getSaturation()
 	{
 		double[] hsv = toHsv(r, g, b);
-		return (int)Math.round(hsv[1] * 100);
+		return (int) Math.round(hsv[1] * 100);
+	}
+
+	public void lighten(int amount)
+	{
+		double[] hsl = toHsl(r, g, b);
+		hsl[2] = hsl[2] + amount / 100D;
+		setRgbFromColor(fromHsl(hsl[0], hsl[1], hsl[2]));
 	}
 
 	public void setLightness(int lightness)
 	{
 		double[] hsl = toHsl(r, g, b);
-		hsl[2] = lightness / 100D;
+		hsl[2] = Math.max(0D, Math.min(1D, lightness / 100D));
 		setRgbFromColor(fromHsl(hsl[0], hsl[1], hsl[2]));
 	}
 
 	public int getLightness()
 	{
 		double[] hsl = toHsl(r, g, b);
-		return (int)Math.round(hsl[2] * 100);
+		return (int) Math.round(hsl[2] * 100);
 	}
 
 	public double[] toHsv()
@@ -175,6 +202,8 @@ public class Color
 		return getIntFromColor(r, g, b, a);
 	}
 
+	public int toIntWithoutAlpha() { return getIntFromColor(r, g, b, false); }
+
 	@Override
 	public String toString()
 	{
@@ -187,9 +216,9 @@ public class Color
 		return obj instanceof Color && ((Color) obj).r == r && ((Color) obj).g == g && ((Color) obj).b == b && ((Color) obj).a == a;
 	}
 
-	public static int getIntFromColor(int r, int g, int b)
+	public static int getIntFromColor(int r, int g, int b, boolean hasAlpha)
 	{
-		return getIntFromColor(r, g, b, 255);
+		return getIntFromColor(r, g, b, (hasAlpha) ? 255 : 0);
 	}
 
 	public static int getIntFromColor(int r, int g, int b, int a)
@@ -245,13 +274,38 @@ public class Color
 		p = v * (1 - s);
 		q = v * (1 - f * s);
 		t = v * (1 - (1 - f) * s);
-		switch (i % 6) {
-		case 0: r = v; g = t; b = p; break;
-		case 1: r = q; g = v; b = p; break;
-		case 2: r = p; g = v; b = t; break;
-		case 3: r = p; g = q; b = v; break;
-		case 4: r = t; g = p; b = v; break;
-		case 5: r = v; g = p; b = q; break;
+		switch (i % 6)
+		{
+		case 0:
+			r = v;
+			g = t;
+			b = p;
+			break;
+		case 1:
+			r = q;
+			g = v;
+			b = p;
+			break;
+		case 2:
+			r = p;
+			g = v;
+			b = t;
+			break;
+		case 3:
+			r = p;
+			g = q;
+			b = v;
+			break;
+		case 4:
+			r = t;
+			g = p;
+			b = v;
+			break;
+		case 5:
+			r = v;
+			g = p;
+			b = q;
+			break;
 		}
 
 		r = Math.round(r * 255);

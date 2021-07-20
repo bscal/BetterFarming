@@ -1,36 +1,31 @@
 package me.bscal.betterfarming.common.seasons;
 
+import io.netty.buffer.Unpooled;
 import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.common.events.SeasonEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 
 public class SeasonManager extends PersistentState
 {
-
-	public static final int ALL = 0;
-	public static final int SPRING = 1;
-	public static final int SUMMER = 2;
-	public static final int AUTUMN = 3;
-	public static final int WINTER = 4;
-
-	public int currentSeason;
-	public long ticksSinceCreation;
-
+	private final SeasonClock m_seasonClock = new SeasonClock();
 	private ServerWorld m_world;
-	private int m_numOfDaysPerSeason;
+	private int m_numOfDaysPerSeason = 30;
 	private int m_maxSeasons = 4;
 	private long m_lastTimeChecked;
 
+	private final PacketByteBuf m_bufCache;
+
 	public SeasonManager()
 	{
-
+		m_bufCache = new PacketByteBuf(Unpooled.buffer(12));
 	}
-
 
 	public static SeasonManager GetOrCreate(ServerWorld world)
 	{
@@ -44,21 +39,21 @@ public class SeasonManager extends PersistentState
 	private static SeasonManager LoadFromNbt(NbtCompound tag)
 	{
 		SeasonManager seasons = new SeasonManager();
-		tag.putInt("season", seasons.currentSeason);
-		tag.putLong("ticks", seasons.ticksSinceCreation);
+		tag.putInt("season", seasons.m_seasonClock.currentSeason);
+		tag.putLong("ticks", seasons.m_seasonClock.ticksSinceCreation);
 		return seasons;
 	}
 
 	@Override
 	public NbtCompound writeNbt(NbtCompound nbt)
 	{
-		currentSeason = nbt.getInt("season");
-		ticksSinceCreation = nbt.getLong("ticks");
+		m_seasonClock.currentSeason = nbt.getInt("season");
+		m_seasonClock.ticksSinceCreation = nbt.getLong("ticks");
 		return nbt;
 	}
 
 	/**
-	 *	Updates the season, season time, and will trigger new day event. Does not work if you try to go back in time.
+	 * Updates the season, season time, and will trigger new day event. Does not work if you try to go back in time.
 	 */
 	public void Update(long timeOfDay)
 	{
@@ -71,22 +66,47 @@ public class SeasonManager extends PersistentState
 			// 23001 (timeOfDay) - 23000 (m_lastTimeChecked) = 1
 			// 4000 (timeOfDay) - (23000 (m_lastTimeChecked) - 24000) = 5000 -> also a new day
 			boolean newDay = timeOfDay < m_lastTimeChecked;
-			ticksSinceCreation += timeOfDay - (newDay ?  m_lastTimeChecked : m_lastTimeChecked - 24000);
-			if (newDay)
+			m_seasonClock.ticksSinceCreation += timeOfDay - (newDay ?
+					m_lastTimeChecked - 24000 :
+					m_lastTimeChecked);
+
+			if (BetterFarming.DEBUG && m_seasonClock.ticksSinceCreation % 10 == 0)
 			{
-				long days = GetDays();
-				SeasonEvents.NEW_DAY.invoker().OnNewDay(ticksSinceCreation, days);
-				if (days >= m_numOfDaysPerSeason)
-				{
-					currentSeason = (currentSeason > m_maxSeasons) ? 1 : currentSeason + 1;
-					SeasonEvents.SEASON_CHANGED.invoker().OnSeasonChanged(currentSeason, days);
-				}
+				BetterFarming.LOGGER.info(
+						String.format("Time Updated to %d : season %d. --- timeday(%d)/lastday(%d) | diff(%d)",
+								m_seasonClock.ticksSinceCreation, m_seasonClock.currentSeason, timeOfDay,
+								m_lastTimeChecked,
+								timeOfDay - (newDay ? m_lastTimeChecked - 24000 : m_lastTimeChecked)));
 			}
+
+			m_bufCache.clear();
+			m_bufCache.writeLong(m_seasonClock.ticksSinceCreation);
+			m_bufCache.writeInt(m_seasonClock.currentSeason);
+			for (ServerPlayerEntity player : PlayerLookup.all(BetterFarming.GetServer().get()))
+				ServerPlayNetworking.send(player, BetterFarming.SYNC_PACKET, m_bufCache);
+
+			long days = GetDays(m_seasonClock.ticksSinceCreation);
+			if (newDay)
+				SeasonEvents.NEW_DAY.invoker().OnNewDay(m_seasonClock.ticksSinceCreation, days);
+
+			int newSeason = (int) (Math.floorDiv(days, m_numOfDaysPerSeason) % m_maxSeasons);
+			if (newSeason != m_seasonClock.currentSeason)
+			{
+				m_seasonClock.currentSeason = newSeason;
+				for (ServerPlayerEntity player : PlayerLookup.all(BetterFarming.GetServer().get()))
+					ServerPlayNetworking.send(player, BetterFarming.SEASON_PACKET,
+							(PacketByteBuf) PacketByteBufs.create()
+									.writeInt(m_seasonClock.currentSeason));
+				SeasonEvents.SEASON_CHANGED.invoker()
+						.OnSeasonChanged(m_seasonClock.currentSeason,
+								SeasonManager.GetDays(m_seasonClock.ticksSinceCreation));
+			}
+
 		}
 		m_lastTimeChecked = timeOfDay;
 	}
 
-	public long GetDays()
+	public static long GetDays(long ticksSinceCreation)
 	{
 		return Math.floorDiv(ticksSinceCreation, 24000);
 	}

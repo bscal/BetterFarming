@@ -42,7 +42,7 @@ public class ColorTests
 		int cInt = color.toInt();
 		System.out.println(cInt);
 		assertEquals(-5360588, cInt);
-		Color intColor = new Color(cInt);
+		Color intColor = new Color(cInt, true);
 		assertEquals(color, intColor);
 	}
 
@@ -64,10 +64,12 @@ public class ColorTests
 	public void TestColorSaturation()
 	{
 		// If this tests fails by a small amout it is prob from rounding/doubles -> ints
-		Color c = new Color(44, 255, 79);
-		assertEquals(83, c.getSaturation());
+		Color c = new Color(40, 212, 54);
+		assertEquals(81, c.getSaturation());
 		c.setSaturation(30);
-		assertEquals(new Color(179, 255, 191), c);
+		assertEquals(new Color(148, 212, 154), c);
+		c.saturate(23);
+		assertEquals(new Color(99, 212, 110), c);
 	}
 
 }
