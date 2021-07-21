@@ -7,7 +7,6 @@
     "LootManagerMixin",
     "LootTableAccessor",
     "accessors.MobEntityAccessor",
-    "biome.BiomeInvoker",
     "blocks.SaplingBlockScheduleMixin",
     "blocks.SpreadableBlockMixin",
     "entities.CowEntityMixin",
@@ -15,6 +14,8 @@
     "world.ServerWorldMixin"
   ],
   "client": [
+    "biome.BiomeMixin",
+    "biome.BiomeInvoker"
   ],
   "injectors": {
     "defaultRequire": 1
