@@ -1,27 +1,23 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
-import me.bscal.betterfarming.common.mixin.biome.BiomeInvoker;
+import me.bscal.betterfarming.mixin.client.biome.BiomeInvoker;
 import me.bscal.betterfarming.common.utils.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.biome.BiomeKeys;
 
 @Environment(EnvType.CLIENT)
-public class BiomeChangers
+public final class BiomeChangers
 {
 
-	public static final BiomeEffectHandler.BiomeEffectChanger PLAINS_CHANGER;
-
-	static
+	public static class PlainsChanger extends BiomeChanger
 	{
-		PLAINS_CHANGER = new PlainsChanger();
-	}
-
-	public static class PlainsChanger extends BiomeEffectHandler.BiomeEffectChanger
-	{
-		public PlainsChanger()
+		public PlainsChanger(ClientWorld world)
 		{
-			super(BiomeKeys.PLAINS);
+			super(BiomeKeys.PLAINS, world);
+
+
 			grassColors = new int[4];
 
 			int tmpInt = biome.getEffects()

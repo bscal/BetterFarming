@@ -1,39 +1,40 @@
 package me.bscal.betterfarming.client;
 
 import me.bscal.betterfarming.BetterFarming;
-import me.bscal.betterfarming.client.seasons.biome.BiomeEffectHandler;
+import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
+import me.bscal.betterfarming.common.events.ClientWorldEvent;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.block.BlockColorProvider;
-import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.color.world.GrassColors;
 
 @Environment(EnvType.CLIENT) public class BetterFarmingClient implements ClientModInitializer
 {
 
-	public static BiomeEffectHandler m_effectHandler;
+	private static final BiomeSeasonHandler m_seasonHandler = new BiomeSeasonHandler();
 
 	@Override
 	public void onInitializeClient()
 	{
-		ClientPlayNetworking.registerGlobalReceiver(BetterFarming.SYNC_PACKET, m_effectHandler.SyncTime());
-		//ClientPlayNetworking.registerGlobalReceiver(BetterFarming.SEASON_PACKET,
-		//m_effectHandler.SyncSeasonChange());
-		//m_effectHandler.UpdateSeasonColors();
+		ClientPlayNetworking.registerGlobalReceiver(BetterFarming.SYNC_PACKET,
+				BiomeSeasonHandler.SyncTimeS2CPacketHandler());
+
+		ClientWorldEvent.CLIENT_JOIN_WORLD_EVENT.register(((client, world) -> m_seasonHandler.RegisterBiomeChangers(world)));
 
 		ClientTickEvents.END_WORLD_TICK.register((world -> {
-			if (m_effectHandler.reloadWorld)
-			{
-				m_effectHandler.UpdateSeasonColors();
-				MinecraftClient.getInstance().worldRenderer.reload();
-				m_effectHandler.reloadWorld = false;
-			}
+			if (!m_seasonHandler.recievedSyncPacket) // Instead of sending packet every we tick we can simulate time passing.
+				m_seasonHandler.seasonClock.ticksSinceCreation++;
 		}));
+	}
+
+	public static int GetSeason()
+	{
+		return m_seasonHandler.seasonClock.currentSeason;
+	}
+
+	public static BiomeSeasonHandler GetBiomeSeasonHandler()
+	{
+		return m_seasonHandler;
 	}
 }

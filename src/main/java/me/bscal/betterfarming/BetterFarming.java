@@ -39,7 +39,6 @@ public class BetterFarming implements ModInitializer
 	public static final int UPDATE_DELAY = 20 * 30;
 
 	public static final Identifier SYNC_PACKET = new Identifier(MOD_ID, "sync_time");
-	public static final Identifier SEASON_PACKET = new Identifier(MOD_ID, "season_change");
 
 	private static MinecraftServer m_server;
 
