@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.common.mixin;
+package me.bscal.betterfarming.mixin.common;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;

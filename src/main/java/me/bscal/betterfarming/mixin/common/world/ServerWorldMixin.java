@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.common.mixin.world;
+package me.bscal.betterfarming.mixin.common.world;
 
 import me.bscal.betterfarming.common.seasons.SeasonManager;
 import net.minecraft.server.world.ServerWorld;

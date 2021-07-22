@@ -1,7 +1,7 @@
 package me.bscal.betterfarming.common.listeners;
 
 import me.bscal.betterfarming.common.events.LootManagerEarlyAssignCallback;
-import me.bscal.betterfarming.common.mixin.LootTableAccessor;
+import me.bscal.betterfarming.mixin.common.LootTableAccessor;
 import net.fabricmc.fabric.api.loot.v1.FabricLootPoolBuilder;
 import net.fabricmc.fabric.api.loot.v1.FabricLootSupplierBuilder;
 import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
@@ -9,16 +9,8 @@ import net.minecraft.item.Items;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctionType;
-import net.minecraft.loot.function.LootFunctionTypes;
-import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.loot.provider.number.LootNumberProvider;
-import net.minecraft.loot.provider.number.LootNumberProviderTypes;
-import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;

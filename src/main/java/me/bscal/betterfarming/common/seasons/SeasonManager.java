@@ -3,7 +3,6 @@ package me.bscal.betterfarming.common.seasons;
 import io.netty.buffer.Unpooled;
 import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.common.events.SeasonEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
@@ -93,10 +92,6 @@ public class SeasonManager extends PersistentState
 			if (newSeason != m_seasonClock.currentSeason)
 			{
 				m_seasonClock.currentSeason = newSeason;
-				for (ServerPlayerEntity player : PlayerLookup.all(BetterFarming.GetServer().get()))
-					ServerPlayNetworking.send(player, BetterFarming.SEASON_PACKET,
-							(PacketByteBuf) PacketByteBufs.create()
-									.writeInt(m_seasonClock.currentSeason));
 				SeasonEvents.SEASON_CHANGED.invoker()
 						.OnSeasonChanged(m_seasonClock.currentSeason,
 								SeasonManager.GetDays(m_seasonClock.ticksSinceCreation));

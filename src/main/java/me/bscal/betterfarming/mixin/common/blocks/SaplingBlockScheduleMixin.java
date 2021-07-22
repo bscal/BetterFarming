@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.common.mixin.blocks;
+package me.bscal.betterfarming.mixin.common.blocks;
 
 import me.bscal.betterfarming.BetterFarming;
 import net.minecraft.block.*;

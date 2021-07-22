@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.common.mixin;
+package me.bscal.betterfarming.mixin.common;
 
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;

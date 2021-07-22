@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.common.mixin.accessors;
+package me.bscal.betterfarming.mixin.common.accessors;
 
 import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.mob.MobEntity;

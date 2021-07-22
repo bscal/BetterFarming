@@ -1,11 +1,10 @@
-package me.bscal.betterfarming.common.mixin.blocks;
+package me.bscal.betterfarming.mixin.common.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SaplingBlock;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import scheduler.Scheduleable;

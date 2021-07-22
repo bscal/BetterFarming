@@ -1,21 +1,21 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "me.bscal.betterfarming.common.mixin",
+  "package": "me.bscal.betterfarming.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "LootManagerMixin",
-    "LootTableAccessor",
-    "accessors.MobEntityAccessor",
-    "blocks.SaplingBlockScheduleMixin",
-    "blocks.SpreadableBlockMixin",
-    "entities.CowEntityMixin",
-    "world.ClientWorldAccessor",
-    "world.ServerWorldMixin"
+    "client.world.MinecraftClientMixin",
+    "common.LootManagerMixin",
+    "common.LootTableAccessor",
+    "common.accessors.MobEntityAccessor",
+    "common.blocks.SaplingBlockScheduleMixin",
+    "common.blocks.SpreadableBlockMixin",
+    "common.entities.CowEntityMixin",
+    "common.world.ServerWorldMixin"
   ],
   "client": [
-    "biome.BiomeMixin",
-    "biome.BiomeInvoker"
+    "client.biome.BiomeInvoker",
+    "client.biome.BiomeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

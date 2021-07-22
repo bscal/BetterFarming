@@ -1,8 +1,8 @@
-package me.bscal.betterfarming.common.mixin.entities;
+package me.bscal.betterfarming.mixin.common.entities;
 
 import me.bscal.betterfarming.common.ai.goals.MoveToAndDrinkGoal;
 import me.bscal.betterfarming.common.ai.goals.MoveToAndEatGoal;
-import me.bscal.betterfarming.common.mixin.accessors.MobEntityAccessor;
+import me.bscal.betterfarming.mixin.common.accessors.MobEntityAccessor;
 import net.minecraft.entity.passive.CowEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
