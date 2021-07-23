@@ -1,5 +1,6 @@
 package me.bscal.betterfarming;
 
+import me.bscal.betterfarming.common.commands.SeasonCommand;
 import me.bscal.betterfarming.common.database.BetterFarmingDatabase;
 import me.bscal.betterfarming.common.events.SeasonEvents;
 import me.bscal.betterfarming.common.listeners.LootManagerListener;
@@ -9,6 +10,7 @@ import me.bscal.betterfarming.common.listeners.ServerTickListener;
 import me.bscal.betterfarming.common.seasons.SeasonClock;
 import me.bscal.betterfarming.common.seasons.SeasonManager;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -47,6 +49,8 @@ public class BetterFarming implements ModInitializer
 	public void onInitialize()
 	{
 		BetterFarmingDatabase.CreateTables();
+
+		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> m_server = server);
 		ServerWorldEvents.LOAD.register(((server, world) -> SeasonManager.GetOrCreate(world)));
