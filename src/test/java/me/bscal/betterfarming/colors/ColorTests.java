@@ -72,4 +72,29 @@ public class ColorTests
 		assertEquals(new Color(99, 212, 110), c);
 	}
 
+	@Test
+	public void TestColorLerp()
+	{
+		Color from = new Color(255, 100, 0, 255);
+		Color to = new Color(255, 200, 100, 255);
+		from.lerp(to, .5f);
+		assertEquals(new Color(255,150,50), from);
+	}
+
+	@Test
+	public void TestColorBlend()
+	{
+		Color a = new Color(200, 50, 10, 255);
+		Color b = new Color(20, 50, 150, 255);
+		a.blend(b);
+		assertEquals(new Color(110, 50, 80), a);
+
+		Color c = new Color(100, 100, 100, 200);
+		Color d = new Color(30, 30, 30, 100);
+		c.blend(d);
+		assertEquals(new Color(77, 77, 77, 200), c);
+	}
+
+
+
 }

@@ -1,7 +1,8 @@
 package me.bscal.betterfarming.common.utils;
 
-import java.util.Arrays;
-
+/**
+ * rgba Color utility class
+ */
 public class Color
 {
 	public static Color BLACK = new Color(0, 0, 0);
@@ -15,116 +16,163 @@ public class Color
 
 	public Color(double r, double g, double b)
 	{
-		this.r = (int) Math.round(r);
-		this.g = (int) Math.round(g);
-		this.b = (int) Math.round(b);
-		this.a = 255;
+		this((int) Math.round(r), (int) Math.round(g), (int) Math.round(b), 255);
 	}
 
+	/**
+	 * Class represting a rgba color. Values between 0-255
+	 */
 	public Color(int r, int g, int b, int a)
 	{
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
+		this.r = Math.min(255, Math.max(0, r));
+		this.g = Math.min(255, Math.max(0, g));
+		this.b = Math.min(255, Math.max(0, b));
+		this.a = Math.min(255, Math.max(0, a));
 	}
 
 	public Color(int color)
 	{
-		this(color, false);
+		this(color, true);
 	}
 
+	/**
+	 * If hasAlpha is true get the alpha channel, if false a = 255
+	 */
 	public Color(int color, boolean hasAlpha)
 	{
-		a = (hasAlpha) ? (color >> 24) & 0xff : 0;
+		a = (hasAlpha) ? (color >> 24) & 0xff : 255;
 		r = (color >> 16) & 0xff;
 		g = (color >> 8) & 0xff;
 		b = color & 0xff;
+		clampRgbaValues();
 	}
 
-	public void setRgbFromInt(int color)
+	public void clampRgbaValues()
 	{
-		a = (color >> 24) & 0xff;
-		r = (color >> 16) & 0xff;
-		g = (color >> 8) & 0xff;
-		b = color & 0xff;
+		this.r = Math.min(255, Math.max(0, this.r));
+		this.g = Math.min(255, Math.max(0, this.g));
+		this.b = Math.min(255, Math.max(0, this.b));
+		this.a = Math.min(255, Math.max(0, this.a));
 	}
 
-	public void setRgbFromColor(Color color)
+	public void setRgbaFromInt(int color)
 	{
-		this.r = color.r;
-		this.g = color.g;
-		this.b = color.b;
-		this.a = color.a;
+		a = Math.min(255, Math.max(0, (color >> 24) & 0xff));
+		r = Math.min(255, Math.max(0, (color >> 16) & 0xff));
+		g = Math.min(255, Math.max(0, (color >> 8) & 0xff));
+		b = Math.min(255, Math.max(0, color & 0xff));
 	}
 
+	public void setRgbaFromColor(Color color)
+	{
+		this.r = Math.min(255, Math.max(0, color.r));
+		this.g = Math.min(255, Math.max(0, color.g));
+		this.b = Math.min(255, Math.max(0, color.b));
+		this.a = Math.min(255, Math.max(0, color.a));
+	}
+
+	/**
+	 * Blends 2 `Color`'s together. Weight of the color is determinded by the alpha.
+	 */
 	public void blend(Color other)
 	{
 		double totalAlpha = a + other.a;
 		double weight0 = a / totalAlpha;
 		double weight1 = other.a / totalAlpha;
-
-		double newR = weight0 * r + weight1 * other.a;
-		double newG = weight0 * g + weight1 * other.r;
-		double newB = weight0 * b + weight1 * other.b;
-		double newA = Math.max(a, other.a);
-		r = (int) Math.round(newR);
-		g = (int) Math.round(newG);
-		b = (int) Math.round(newB);
-		a = (int) Math.round(newA);
+		r = (int) Math.round(weight0 * r + weight1 * other.r);
+		g = (int) Math.round(weight0 * g + weight1 * other.g);
+		b = (int) Math.round(weight0 * b + weight1 * other.b);
+		a = Math.max(a, other.a);
 	}
 
+	/**
+	 * Linearly interpolates between current `Color` this -> the `to` `Color`
+	 */
+	public void lerp(Color to, float progress)
+	{
+		progress = Math.min(1f, Math.max(0f, progress));
+		r = Math.round(r + (to.r - r) * progress);
+		g = Math.round(g + (to.g - g) * progress);
+		b = Math.round(b + (to.b - b) * progress);
+		a = Math.round(a + (to.a - a) * progress);
+		clampRgbaValues();
+	}
+
+	/**
+	 * Value ranges from 0-360;
+	 */
 	public void setHue(int hue)
 	{
 		hue = Math.max(hue, 0);
 		hue = Math.min(hue, 360);
 		double[] hsv = toHsv(r, g, b);
-		System.out.println(Arrays.toString(hsv));
 		hsv[0] = hue / 360D;
-		System.out.println(Arrays.toString(hsv));
-		setRgbFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
+		setRgbaFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
 	}
 
+	/**
+	 * Values ranges from 0-360
+	 */
 	public int getHue()
 	{
 		double[] hsv = toHsv(r, g, b);
 		return (int) Math.round(hsv[0] * 360D);
 	}
 
+	/**
+	 * Will add saturation to the Color. Values range from 0-100
+	 */
 	public void saturate(int amount)
 	{
 		double[] hsv = toHsv(r, g, b);
 		hsv[1] = Math.max(0D, Math.min(1D, hsv[1] + amount / 100D));
-		setRgbFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
+		setRgbaFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
 	}
 
+	/**
+	 * Values ranges from 0-100
+	 */
 	public void setSaturation(int saturation)
 	{
 		double[] hsv = toHsv(r, g, b);
 		hsv[1] = saturation / 100D;
-		setRgbFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
+		setRgbaFromColor(fromHsv(hsv[0], hsv[1], hsv[2]));
 	}
 
+	/**
+	 * Values ranges from 0-100
+	 */
 	public int getSaturation()
 	{
 		double[] hsv = toHsv(r, g, b);
 		return (int) Math.round(hsv[1] * 100);
 	}
 
+	/**
+	 * Modifies the lightness of the Color. Values ranges from 0-100.
+	 *
+	 * @param amount
+	 */
 	public void lighten(int amount)
 	{
 		double[] hsl = toHsl(r, g, b);
 		hsl[2] = hsl[2] + amount / 100D;
-		setRgbFromColor(fromHsl(hsl[0], hsl[1], hsl[2]));
+		setRgbaFromColor(fromHsl(hsl[0], hsl[1], hsl[2]));
 	}
 
+	/**
+	 * Values ranges from 0-100
+	 */
 	public void setLightness(int lightness)
 	{
 		double[] hsl = toHsl(r, g, b);
 		hsl[2] = Math.max(0D, Math.min(1D, lightness / 100D));
-		setRgbFromColor(fromHsl(hsl[0], hsl[1], hsl[2]));
+		setRgbaFromColor(fromHsl(hsl[0], hsl[1], hsl[2]));
 	}
 
+	/**
+	 * Values ranges from 0-100
+	 */
 	public int getLightness()
 	{
 		double[] hsl = toHsl(r, g, b);
@@ -136,6 +184,9 @@ public class Color
 		return toHsv(r, g, b);
 	}
 
+	/**
+	 * returns a double[] of size 3 containing hsv values. All values range from 0.0 - 1.0;
+	 */
 	public double[] toHsv(double r, double g, double b)
 	{
 		r /= 255;
@@ -173,6 +224,9 @@ public class Color
 		return toHsl(r, g, b);
 	}
 
+	/**
+	 * returns a double[] of size 3 containing hsl values. All values range from 0.0 - 1.0;
+	 */
 	public double[] toHsl(double r, double g, double b)
 	{
 		r /= 255D;
@@ -218,8 +272,6 @@ public class Color
 		return getIntFromColor(r, g, b, a);
 	}
 
-	public int toIntWithoutAlpha() { return getIntFromColor(r, g, b, false); }
-
 	@Override
 	public String toString()
 	{
@@ -256,6 +308,9 @@ public class Color
 		return fromHsl(hsl[0], hsl[1], hsl[2]);
 	}
 
+	/**
+	 * returns a new `Color` from hsv values. Expected hsl values to be between 0.0-1.0
+	 */
 	public static Color fromHsl(double h, double s, double l)
 	{
 		double r, g, b;
@@ -281,6 +336,9 @@ public class Color
 		return fromHsv(hsv[0], hsv[1], hsv[2]);
 	}
 
+	/**
+	 * returns a new `Color` from hsv values. Expected hsv values to be between 0.0-1.0
+	 */
 	public static Color fromHsv(double h, double s, double v)
 	{
 		double r, g, b, f, p, q, t;
@@ -292,36 +350,36 @@ public class Color
 		t = v * (1 - (1 - f) * s);
 		switch (i % 6)
 		{
-		case 0:
+		case 0 -> {
 			r = v;
 			g = t;
 			b = p;
-			break;
-		case 1:
+		}
+		case 1 -> {
 			r = q;
 			g = v;
 			b = p;
-			break;
-		case 2:
+		}
+		case 2 -> {
 			r = p;
 			g = v;
 			b = t;
-			break;
-		case 3:
+		}
+		case 3 -> {
 			r = p;
 			g = q;
 			b = v;
-			break;
-		case 4:
+		}
+		case 4 -> {
 			r = t;
 			g = p;
 			b = v;
-			break;
-		case 5:
+		}
+		case 5 -> {
 			r = v;
 			g = p;
 			b = q;
-			break;
+		}
 		}
 
 		r = Math.round(r * 255);
