@@ -20,7 +20,7 @@ public class Color
 	}
 
 	/**
-	 * Class represting a rgba color. Values between 0-255
+	 * Class representing a rgba color. Values between 0-255
 	 */
 	public Color(int r, int g, int b, int a)
 	{
@@ -72,7 +72,7 @@ public class Color
 	}
 
 	/**
-	 * Blends 2 `Color`'s together. Weight of the color is determinded by the alpha.
+	 * Blends 2 `Color`'s together. Weight of the color is determined by the alpha.
 	 */
 	public void blend(Color other)
 	{
@@ -150,8 +150,6 @@ public class Color
 
 	/**
 	 * Modifies the lightness of the Color. Values ranges from 0-100.
-	 *
-	 * @param amount
 	 */
 	public void lighten(int amount)
 	{
