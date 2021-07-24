@@ -17,19 +17,20 @@ import net.minecraft.world.biome.BiomeKeys;
 		public SimpleBiomeChanger(RegistryKey<Biome> key, ClientWorld world)
 		{
 			super(key, world);
+			grassColors = new int[4];
+
 			int defaultColor = biome.getEffects()
 					.getGrassColor()
 					.orElse(((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor());
 
 			Color spring = new Color(defaultColor);
-			spring.saturate(20);
-			spring.lighten(20);
+			spring.saturate(40);
 			grassColors[0] = spring.toInt();
 
 			grassColors[1] = defaultColor;
 
 			Color fall = new Color(defaultColor);
-			fall.saturate(-5);
+			fall.saturate(-20);
 			fall.lighten(-20);
 			grassColors[2] = fall.toInt();
 

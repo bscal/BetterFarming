@@ -67,4 +67,9 @@ public class BetterFarming implements ModInitializer
 	{
 		return (m_server == null) ? Optional.empty() : Optional.of(m_server);
 	}
+
+	public static void Log(String msg)
+	{
+		LOGGER.info(msg);
+	}
 }

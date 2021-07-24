@@ -1,15 +1,11 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
-import me.bscal.betterfarming.BetterFarming;
-import me.bscal.betterfarming.common.utils.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.mixin.biome.modification.BiomeEffectsAccessor;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeEffects;
 
 import java.util.Optional;
 
@@ -34,7 +30,8 @@ import java.util.Optional;
 
 	public int GetColor(int season)
 	{
-		return new Color(BetterFarming.RAND.nextInt(255), BetterFarming.RAND.nextInt(255), 0, 255).toInt();
+		return grassColors[season];
+		//return new Color(BetterFarming.RAND.nextInt(255), BetterFarming.RAND.nextInt(255), 0, 255).toInt();
 	}
 
 	private Optional<Integer> CreateOptionalFromArray(int[] array, int season)

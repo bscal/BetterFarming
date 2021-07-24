@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map;
 	public void RegisterBiomeChangers(ClientWorld world)
 	{
 		haveBiomeChangersLoaded = true;
-		Register(new BiomeChangers.PlainsChanger(world));
+		Register(new BiomeChangers.SimpleBiomeChanger(BiomeKeys.PLAINS, world));
 	}
 
 	public void Register(BiomeChanger changer)
@@ -50,7 +51,7 @@ import java.util.Map;
 		seasonClock.ticksSinceCreation = ticks;
 		seasonClock.currentSeason = season;
 
-		if (seasonClock.ticksSinceCreation % 100 == 0)
+		if (seasonClock.ticksSinceCreation % 200 == 0)
 		{
 			UpdateSeasonColors();
 			MinecraftClient.getInstance().worldRenderer.reload();

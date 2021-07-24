@@ -58,6 +58,22 @@ public class Color
 		this.a = color.a;
 	}
 
+	public void blend(Color other)
+	{
+		double totalAlpha = a + other.a;
+		double weight0 = a / totalAlpha;
+		double weight1 = other.a / totalAlpha;
+
+		double newR = weight0 * r + weight1 * other.a;
+		double newG = weight0 * g + weight1 * other.r;
+		double newB = weight0 * b + weight1 * other.b;
+		double newA = Math.max(a, other.a);
+		r = (int) Math.round(newR);
+		g = (int) Math.round(newG);
+		b = (int) Math.round(newB);
+		a = (int) Math.round(newA);
+	}
+
 	public void setHue(int hue)
 	{
 		hue = Math.max(hue, 0);
