@@ -6,6 +6,7 @@ package me.bscal.betterfarming.common.utils;
 public class Color
 {
 	public static Color BLACK = new Color(0, 0, 0);
+	public static Color WHITE = new Color(255, 255, 255);
 
 	public int r, g, b, a;
 
@@ -82,6 +83,20 @@ public class Color
 		r = (int) Math.round(weight0 * r + weight1 * other.r);
 		g = (int) Math.round(weight0 * g + weight1 * other.g);
 		b = (int) Math.round(weight0 * b + weight1 * other.b);
+		a = Math.max(a, other.a);
+	}
+
+	/**
+	 * Blends 2 `Color`'s together using a weight. Weight value between 0-1.
+	 * If otherWeight is 0 `Color` is unchanged. If otherWeight is 1 the new `Color` will complete replace the originals.
+	 */
+	public void blend(Color other, double otherWeight)
+	{
+		otherWeight = Math.min(1.0, Math.max(0.0, otherWeight));
+		double weight0 = 1.0 - otherWeight;
+		r = (int) Math.round(weight0 * r + otherWeight * other.r);
+		g = (int) Math.round(weight0 * g + otherWeight * other.g);
+		b = (int) Math.round(weight0 * b + otherWeight * other.b);
 		a = Math.max(a, other.a);
 	}
 
@@ -393,6 +408,14 @@ public class Color
 		int green = Integer.parseInt(hex.substring(3, 5), 16);
 		int blue = Integer.parseInt(hex.substring(5, 7), 16);
 		return new Color(red, green, blue);
+	}
+
+	public static Color fromHex(String hex, int alpha)
+	{
+		int red = Integer.parseInt(hex.substring(1, 3), 16);
+		int green = Integer.parseInt(hex.substring(3, 5), 16);
+		int blue = Integer.parseInt(hex.substring(5, 7), 16);
+		return new Color(red, green, blue, alpha);
 	}
 
 	private static String pad(String s)
