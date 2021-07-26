@@ -24,6 +24,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,8 +53,11 @@ public class BetterFarming implements ModInitializer
 
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
 
-		ServerLifecycleEvents.SERVER_STARTED.register((server) -> m_server = server);
-		ServerWorldEvents.LOAD.register(((server, world) -> SeasonManager.GetOrCreate(world)));
+		ServerLifecycleEvents.SERVER_STARTING.register((server) -> m_server = server);
+		ServerWorldEvents.LOAD.register(((server, world) -> {
+			if (world.getRegistryKey().equals(World.OVERWORLD))
+				SeasonManager.GetOrCreate(world);
+		}));
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());
 		ServerTickEvents.END_SERVER_TICK.register(new ServerTickListener());
@@ -63,9 +67,9 @@ public class BetterFarming implements ModInitializer
 		LootTableLoadingCallback.EVENT.register(LMListener);
 	}
 
-	public static Optional<MinecraftServer> GetServer()
+	public static MinecraftServer GetServer()
 	{
-		return (m_server == null) ? Optional.empty() : Optional.of(m_server);
+		return m_server;
 	}
 
 	public static void Log(String msg)

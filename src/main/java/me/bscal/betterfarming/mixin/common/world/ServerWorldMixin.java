@@ -2,6 +2,7 @@ package me.bscal.betterfarming.mixin.common.world;
 
 import me.bscal.betterfarming.common.seasons.SeasonManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 	@Inject(method = "setTimeOfDay(J)V", at = @At("HEAD"))
 	public void OnSetTimeOfDay(long timeOfDay, CallbackInfo ci)
 	{
-		SeasonManager.GetOrCreate((ServerWorld) (Object) this).Update(timeOfDay);
+		SeasonManager.GetOrCreate().Update(timeOfDay);
 	}
 
 	//	@Inject(method = "tick(Ljava/util/function/BooleanSupplier;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;setTimeOfDay(J)V"))

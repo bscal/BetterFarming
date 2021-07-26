@@ -8,6 +8,7 @@ import me.bscal.betterfarming.common.seasons.SeasonManager;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.*;
 import static net.minecraft.server.command.CommandManager.*;
@@ -25,7 +26,7 @@ public class SeasonCommand implements Command<ServerCommandSource>, CommandRegis
 	public int run(CommandContext<ServerCommandSource> context)
 	{
 		int season = context.getArgument("season", int.class);
-		SeasonManager.GetOrCreate(context.getSource().getWorld()).SetSeason(season);
+		SeasonManager.GetOrCreate().SetSeason(season);
 		return 0;
 	}
 }

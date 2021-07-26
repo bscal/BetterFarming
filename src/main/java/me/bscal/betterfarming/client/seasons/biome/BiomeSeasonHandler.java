@@ -8,6 +8,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 
@@ -28,7 +29,11 @@ import java.util.Map;
 	public void RegisterBiomeChangers(ClientWorld world)
 	{
 		haveBiomeChangersLoaded = true;
-		Register(new BiomeChangers.SimpleBiomeChanger(BiomeKeys.PLAINS, world));
+		world.getRegistryManager().get(Registry.BIOME_KEY).getEntries().forEach((key) ->
+		{
+			Register(new BiomeChangers.SimpleBiomeChanger(key.getKey(), world));
+		});
+
 	}
 
 	public void Register(BiomeChanger changer)
@@ -40,18 +45,19 @@ import java.util.Map;
 	{
 		for (BiomeChanger changer : biomeEffectChangerMap.values())
 		{
-			BetterFarming.LOGGER.info(changer.key.toString() + " Has updated.");
+			//BetterFarming.LOGGER.info(changer.key.toString() + " Has updated.");
 			changer.GetColor(seasonClock.currentSeason);
 		}
 	}
 
-	private void SyncTime(long ticks, int season)
+	private void SyncTime(int season, int ticksInCurrentSeason, long ticks)
 	{
 		recievedSyncPacket = true;
-		seasonClock.ticksSinceCreation = ticks;
+		boolean seasonChanged = seasonClock.currentSeason != season;
 		seasonClock.currentSeason = season;
-
-		if (seasonClock.ticksSinceCreation % 200 == 0)
+		seasonClock.ticksInCurrentSeason = ticksInCurrentSeason;
+		seasonClock.ticksSinceCreation = ticks;
+		if (seasonChanged)
 		{
 			UpdateSeasonColors();
 			MinecraftClient.getInstance().worldRenderer.reload();
@@ -61,12 +67,13 @@ import java.util.Map;
 	public static ClientPlayNetworking.PlayChannelHandler SyncTimeS2CPacketHandler()
 	{
 		return (client, handler, buf, responseSender) -> {
-			long ticks = buf.readLong();
 			int season = buf.readInt();
+			int ticksInCurrentSeason = buf.readInt();
+			long ticks = buf.readLong();
 
 			client.execute(() -> {
 				if (BetterFarmingClient.GetBiomeSeasonHandler() != null)
-					BetterFarmingClient.GetBiomeSeasonHandler().SyncTime(ticks, season);
+					BetterFarmingClient.GetBiomeSeasonHandler().SyncTime(season, ticksInCurrentSeason, ticks);
 			});
 		};
 	}

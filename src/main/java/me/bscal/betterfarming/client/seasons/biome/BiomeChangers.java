@@ -12,6 +12,9 @@ import net.minecraft.world.biome.BiomeKeys;
 @Environment(EnvType.CLIENT) public final class BiomeChangers
 {
 
+	public static Color FALL_BROWNISH_ORANGE = Color.fromHex("#c2660a");
+	public static Color WINTER_DEAD_BLUE = Color.fromHex("#b3b3b3");
+
 	public static class SimpleBiomeChanger extends BiomeChanger
 	{
 		public SimpleBiomeChanger(RegistryKey<Biome> key, ClientWorld world)
@@ -30,13 +33,11 @@ import net.minecraft.world.biome.BiomeKeys;
 			grassColors[1] = defaultColor;
 
 			Color fall = new Color(defaultColor);
-			fall.saturate(-20);
-			fall.lighten(-20);
+			fall.blend(FALL_BROWNISH_ORANGE, .35);
 			grassColors[2] = fall.toInt();
 
 			Color winter = new Color(defaultColor);
-			winter.saturate(-30);
-			winter.lighten(-30);
+			winter.blend(WINTER_DEAD_BLUE);
 			grassColors[3] = winter.toInt();
 		}
 	}
