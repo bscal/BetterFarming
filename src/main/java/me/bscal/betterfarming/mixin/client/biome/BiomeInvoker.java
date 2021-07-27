@@ -11,4 +11,7 @@ public interface BiomeInvoker
 	@Invoker
 	int invokeGetDefaultGrassColor();
 
+	@Invoker
+	int invokeGetDefaultFoliageColor();
+
 }

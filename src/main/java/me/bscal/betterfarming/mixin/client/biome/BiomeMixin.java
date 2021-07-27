@@ -23,7 +23,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 			if (changer != null)
 				cir.setReturnValue(changer.GetColor(BetterFarmingClient.GetSeason()));
 		}
-
 	}
+
+	@Inject(method = "getFoliageColor", at = @At(value = "HEAD"), cancellable = true)
+	public void OnGetFoliageColor(CallbackInfoReturnable<Integer> cir)
+	{
+		Biome biome = (Biome) (Object) this;
+		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
+		if (seasonHandler.haveBiomeChangersLoaded)
+		{
+			BiomeChanger changer = seasonHandler.biomeEffectChangerMap.get(biome);
+			if (changer != null)
+				cir.setReturnValue(changer.GetFoliageColor(BetterFarmingClient.GetSeason()));
+		}
+	}
+
+	//@Inject(method = "getTemperature()F", at = @At(value = "RETURN"))
+	//public void OnGetTemperature(CallbackInfoReturnable<Float> cir)
+	//{
+	//
+	//}
 
 }
