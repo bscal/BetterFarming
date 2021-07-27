@@ -1,6 +1,5 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
-import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.common.seasons.SeasonClock;
 import net.fabricmc.api.EnvType;
@@ -10,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,16 +22,24 @@ import java.util.Map;
 
 	private ClientWorld m_world;
 
-	public BiomeSeasonHandler() { }
+	public BiomeSeasonHandler()
+	{
+	}
 
 	public void RegisterBiomeChangers(ClientWorld world)
 	{
 		haveBiomeChangersLoaded = true;
-		world.getRegistryManager().get(Registry.BIOME_KEY).getEntries().forEach((key) ->
-		{
+		world.getRegistryManager().get(Registry.BIOME_KEY).getEntries().forEach((key) -> {
 			Register(new BiomeChangers.SimpleBiomeChanger(key.getKey(), world));
 		});
 
+	}
+
+	public void Reload(ClientWorld world)
+	{
+		biomeEffectChangerMap.clear();
+		RegisterBiomeChangers(world);
+		MinecraftClient.getInstance().worldRenderer.reload();
 	}
 
 	public void Register(BiomeChanger changer)
@@ -46,7 +52,7 @@ import java.util.Map;
 		for (BiomeChanger changer : biomeEffectChangerMap.values())
 		{
 			//BetterFarming.LOGGER.info(changer.key.toString() + " Has updated.");
-			changer.GetColor(seasonClock.currentSeason);
+			//changer.GetColor(seasonClock.currentSeason);
 		}
 	}
 
@@ -59,7 +65,7 @@ import java.util.Map;
 		seasonClock.ticksSinceCreation = ticks;
 		if (seasonChanged)
 		{
-			UpdateSeasonColors();
+			//UpdateSeasonColors();
 			MinecraftClient.getInstance().worldRenderer.reload();
 		}
 	}
