@@ -53,14 +53,12 @@ public class SeasonManager extends PersistentState
 		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(seasons.m_numOfTicksPerSeason - 1,
 				Math.max(0, nbt.getInt("ticksInCurrentSeason")));
 		seasons.m_seasonClock.ticksSinceCreation = nbt.getLong("ticks");
-		BetterFarming.LOGGER.info("read = " + seasons.m_seasonClock.ticksSinceCreation);
 		return seasons;
 	}
 
 	@Override
 	public NbtCompound writeNbt(NbtCompound nbt)
 	{
-		BetterFarming.LOGGER.info("write = " + m_seasonClock.ticksSinceCreation);
 		nbt.putInt("season", m_seasonClock.currentSeason);
 		nbt.putInt("ticksInCurrentSeason", m_seasonClock.ticksInCurrentSeason);
 		nbt.putLong("ticks", m_seasonClock.ticksSinceCreation);
@@ -90,7 +88,7 @@ public class SeasonManager extends PersistentState
 			if (newDay)
 				SeasonEvents.NEW_DAY.invoker().OnNewDay(m_seasonClock.ticksSinceCreation, days);
 
-			if (this.m_seasonClock.ticksInCurrentSeason > m_numOfTicksPerSeason)
+			if (m_seasonClock.ticksInCurrentSeason > m_numOfTicksPerSeason)
 			{
 				ProgessSeason();
 				SeasonEvents.SEASON_CHANGED.invoker()
