@@ -9,6 +9,7 @@ import me.bscal.betterfarming.common.listeners.ServerEntityCombatListener;
 import me.bscal.betterfarming.common.listeners.ServerTickListener;
 import me.bscal.betterfarming.common.seasons.SeasonClock;
 import me.bscal.betterfarming.common.seasons.SeasonManager;
+import me.bscal.betterfarming.common.seasons.SeasonSettings;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -40,11 +41,11 @@ public class BetterFarming implements ModInitializer
 	public static final boolean DEBUG = true;
 	public static final Random RAND = new Random();
 	public static final int UPDATE_DELAY = 20 * 30;
+	public static final SeasonSettings SEASON_SETTINGS = new SeasonSettings();
 
 	public static final Identifier SYNC_PACKET = new Identifier(MOD_ID, "sync_time");
 
 	private static MinecraftServer m_server;
-
 
 	@Override
 	public void onInitialize()

@@ -73,7 +73,7 @@ import java.util.Map;
 	public static ClientPlayNetworking.PlayChannelHandler SyncTimeS2CPacketHandler()
 	{
 		return (client, handler, buf, responseSender) -> {
-			int season = buf.readInt();
+			int season = buf.readByte();
 			int ticksInCurrentSeason = buf.readInt();
 			long ticks = buf.readLong();
 

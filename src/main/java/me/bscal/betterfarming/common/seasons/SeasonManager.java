@@ -16,8 +16,6 @@ public class SeasonManager extends PersistentState
 {
 	private final SeasonClock m_seasonClock = new SeasonClock();
 	private ServerWorld m_world;
-	private int m_numOfTicksPerSeason = 30 * 24000;
-	private int m_maxSeasons = 4;
 	private long m_lastTimeChecked;
 
 	private final PacketByteBuf m_bufCache;
@@ -25,7 +23,7 @@ public class SeasonManager extends PersistentState
 	public SeasonManager()
 	{
 		// TODO loading from configs
-		m_bufCache = new PacketByteBuf(Unpooled.buffer(4 + 4 + 8));
+		m_bufCache = new PacketByteBuf(Unpooled.buffer(1 + 4 + 8));
 	}
 
 	public static SeasonManager GetOrCreate()
@@ -48,9 +46,9 @@ public class SeasonManager extends PersistentState
 	private static SeasonManager LoadFromNbt(NbtCompound nbt)
 	{
 		SeasonManager seasons = new SeasonManager();
-		seasons.m_seasonClock.currentSeason = Math.min(seasons.m_maxSeasons - 1,
+		seasons.m_seasonClock.currentSeason = Math.min(Seasons.MAX_SEASONS - 1,
 				Math.max(0, nbt.getInt("season")));
-		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(seasons.m_numOfTicksPerSeason - 1,
+		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(SeasonSettings.Root.ticksPerSeason.getValue() - 1,
 				Math.max(0, nbt.getInt("ticksInCurrentSeason")));
 		seasons.m_seasonClock.ticksSinceCreation = nbt.getLong("ticks");
 		return seasons;
@@ -88,7 +86,7 @@ public class SeasonManager extends PersistentState
 			if (newDay)
 				SeasonEvents.NEW_DAY.invoker().OnNewDay(m_seasonClock.ticksSinceCreation, days);
 
-			if (m_seasonClock.ticksInCurrentSeason > m_numOfTicksPerSeason)
+			if (m_seasonClock.ticksInCurrentSeason > SeasonSettings.Root.ticksPerSeason.getValue())
 			{
 				ProgessSeason();
 				SeasonEvents.SEASON_CHANGED.invoker()
@@ -116,7 +114,7 @@ public class SeasonManager extends PersistentState
 	protected void SyncSeasonTimeS2C()
 	{
 		m_bufCache.clear();
-		m_bufCache.writeInt(m_seasonClock.currentSeason);
+		m_bufCache.writeByte(m_seasonClock.currentSeason);
 		m_bufCache.writeInt(m_seasonClock.ticksInCurrentSeason);
 		m_bufCache.writeLong(m_seasonClock.ticksSinceCreation);
 		for (ServerPlayerEntity player : PlayerLookup.all(BetterFarming.GetServer()))
@@ -132,12 +130,12 @@ public class SeasonManager extends PersistentState
 	public void ProgessSeason()
 	{
 		int nextSeason = m_seasonClock.currentSeason + 1;
-		SetSeason((nextSeason > m_maxSeasons) ? 0 : nextSeason);
+		SetSeason((nextSeason > Seasons.MAX_SEASONS) ? 0 : nextSeason);
 	}
 
 	public void SetSeason(int season)
 	{
-		season = Math.min(m_maxSeasons - 1, Math.max(0, season));
+		season = Math.min(Seasons.MAX_SEASONS - 1, Math.max(0, season));
 		m_seasonClock.ticksInCurrentSeason = 0;
 		if (season != m_seasonClock.currentSeason)
 		{
