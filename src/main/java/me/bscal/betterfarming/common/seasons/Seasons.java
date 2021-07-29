@@ -1,5 +1,8 @@
 package me.bscal.betterfarming.common.seasons;
 
+import me.bscal.betterfarming.BetterFarming;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Language;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -17,16 +20,16 @@ public final class Seasons
 	public static final int AUTUMN = 2;
 	public static final int WINTER = 3;
 
-	public static final int WET = 4;
-	public static final int DRY = 5;
+	public static final int WET = 0;
+	public static final int DRY = 1;
 
-	public static final SeasonType DESERT = new SeasonType(DRY, DRY, DRY, DRY);
-	public static final SeasonType JUNGLE = new SeasonType(WET, WET, WET, WET);
-	public static final SeasonType SAVANNA = new SeasonType(WET, WET, DRY, DRY);
-	public static final SeasonType BADLANDS = new SeasonType(DRY, DRY, DRY, WET);
-	public static final SeasonType BAMBOO_JUNGLE = new SeasonType(WET, WET, WET, DRY);
-	public static final SeasonType TUNDRA = new SeasonType(SUMMER, SUMMER, WINTER, WINTER);
-	public static final SeasonType SWAMP = new SeasonType(WET, DRY, WET, DRY);
+	public static final SeasonType DESERT = new SeasonType(DRY, DRY, DRY, DRY, true);
+	public static final SeasonType JUNGLE = new SeasonType(WET, WET, WET, WET, true);
+	public static final SeasonType SAVANNA = new SeasonType(WET, WET, DRY, DRY, true);
+	public static final SeasonType BADLANDS = new SeasonType(DRY, DRY, DRY, WET, true);
+	public static final SeasonType BAMBOO_JUNGLE = new SeasonType(WET, WET, WET, DRY, true);
+	public static final SeasonType TUNDRA = new SeasonType(SUMMER, SUMMER, WINTER, WINTER, false);
+	public static final SeasonType SWAMP = new SeasonType(WET, DRY, WET, DRY, true);
 
 	public static final int MAX_SEASONS = 4;
 	public static final Map<RegistryKey<Biome>, SeasonType> SPECIAL_SEASONS = new HashMap<>();
@@ -44,16 +47,35 @@ public final class Seasons
 		return season;
 	}
 
+	public static String GetNameOfSeason(int season)
+	{
+		return new TranslatableText(BetterFarming.MOD_ID + ".season" + season).getString();
+
+	}
+
+	public static String GetNameOfSeasonByBiome(RegistryKey<Biome> key, int season)
+	{
+		if (SPECIAL_SEASONS.containsKey(key))
+		{
+			SeasonType type = SPECIAL_SEASONS.get(key);
+			if (type.isTropical)
+				return new TranslatableText(BetterFarming.MOD_ID + ((type.seasonValues[season] == WET) ? ".wet" : ".dry")).getString();
+		}
+		return GetNameOfSeason(season);
+	}
+
 	public static class SeasonType
 	{
-		byte[] seasonValues = new byte[4];
+		public final boolean isTropical;
+		public final byte[] seasonValues = new byte[4];
 
-		public SeasonType(int spring, int summer, int autumn, int fall)
+		public SeasonType(int spring, int summer, int autumn, int fall, boolean isTropical)
 		{
 			seasonValues[0] = (byte) spring;
 			seasonValues[1] = (byte) summer;
 			seasonValues[2] = (byte) autumn;
 			seasonValues[3] = (byte) fall;
+			this.isTropical = isTropical;
 		}
 
 		public int GetSeason(int season)

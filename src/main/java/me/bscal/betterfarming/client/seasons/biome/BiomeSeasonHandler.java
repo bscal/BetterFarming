@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
 import java.util.HashMap;
@@ -15,24 +16,32 @@ import java.util.Map;
 
 @Environment(EnvType.CLIENT) public class BiomeSeasonHandler
 {
-	public final Map<Biome, BiomeChanger> biomeEffectChangerMap = new HashMap<>();
+	public final Map<RegistryKey<Biome>, BiomeChanger> biomeEffectChangerMap = new HashMap<>();
 	public final SeasonClock seasonClock = new SeasonClock();
 	public boolean recievedSyncPacket;
 	public boolean haveBiomeChangersLoaded;
-
-	private ClientWorld m_world;
 
 	public BiomeSeasonHandler()
 	{
 	}
 
+	/**
+	 * This is loaded when the world is loaded to access the dynamic registry for biomes.
+	 */
 	public void RegisterBiomeChangers(ClientWorld world)
 	{
 		haveBiomeChangersLoaded = true;
-		world.getRegistryManager().get(Registry.BIOME_KEY).getEntries().forEach((key) -> {
-			Register(new BiomeChangers.SimpleBiomeChanger(key.getKey(), world));
-		});
+		world.getRegistryManager()
+				.get(Registry.BIOME_KEY)
+				.getEntries()
+				.forEach((key) -> Register(new BiomeChangers.SimpleBiomeChanger(key.getKey()),
+						key.getValue()));
+	}
 
+	public void Register(BiomeChanger changer, Biome biome)
+	{
+		biomeEffectChangerMap.put(changer.key, changer);
+		changer.InitChanger(biome);
 	}
 
 	public void Reload(ClientWorld world)
@@ -40,11 +49,6 @@ import java.util.Map;
 		biomeEffectChangerMap.clear();
 		RegisterBiomeChangers(world);
 		MinecraftClient.getInstance().worldRenderer.reload();
-	}
-
-	public void Register(BiomeChanger changer)
-	{
-		biomeEffectChangerMap.put(changer.biome, changer);
 	}
 
 	public void UpdateSeasonColors()

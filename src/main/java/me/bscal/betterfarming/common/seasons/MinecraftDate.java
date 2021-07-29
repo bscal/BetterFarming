@@ -53,7 +53,7 @@ public class MinecraftDate
 	{
 		TranslatableText dateText = new TranslatableText(LANG_PATH + "date", GetMonthString(month), day,
 				year);
-		return (includeAge) ? dateText.asString() + GetAgeString(age) : dateText.asString();
+		return (includeAge) ? dateText.getString() + GetAgeString(age) : dateText.getString();
 	}
 
 	/**

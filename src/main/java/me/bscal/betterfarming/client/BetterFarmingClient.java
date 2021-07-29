@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.client;
 
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.client.commands.BiomeInfoCommand;
 import me.bscal.betterfarming.client.commands.ColorDumpCommand;
 import me.bscal.betterfarming.client.commands.ReloadColorsCommand;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
@@ -32,6 +33,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 		ColorDumpCommand.Register(m_seasonHandler);
 		ReloadColorsCommand.Register(m_seasonHandler);
+		BiomeInfoCommand.Register(m_seasonHandler);
 	}
 
 	public static int GetSeason()
