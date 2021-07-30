@@ -6,6 +6,7 @@ import me.bscal.betterfarming.client.commands.ColorDumpCommand;
 import me.bscal.betterfarming.client.commands.ReloadColorsCommand;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
 import me.bscal.betterfarming.common.events.ClientWorldEvent;
+import me.bscal.betterfarming.common.seasons.Seasons;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,7 +25,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 				BiomeSeasonHandler.SyncTimeS2CPacketHandler());
 
 		ClientWorldEvent.CLIENT_JOIN_WORLD_EVENT.register(
-				((client, world) -> m_seasonHandler.RegisterBiomeChangers(world)));
+				((client, world) -> {
+					Seasons.InitSeasonsMap(world);
+					m_seasonHandler.RegisterBiomeChangers(world);
+				}));
 
 		ClientTickEvents.END_WORLD_TICK.register((world -> {
 			if (!m_seasonHandler.recievedSyncPacket) // Instead of sending packet every we tick we can simulate time passing.

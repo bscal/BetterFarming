@@ -10,6 +10,7 @@ import me.bscal.betterfarming.common.listeners.ServerTickListener;
 import me.bscal.betterfarming.common.seasons.SeasonClock;
 import me.bscal.betterfarming.common.seasons.SeasonManager;
 import me.bscal.betterfarming.common.seasons.SeasonSettings;
+import me.bscal.betterfarming.common.seasons.Seasons;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -57,7 +58,10 @@ public class BetterFarming implements ModInitializer
 		ServerLifecycleEvents.SERVER_STARTING.register((server) -> m_server = server);
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (world.getRegistryKey().equals(World.OVERWORLD))
+			{
+				Seasons.InitSeasonsMap(world);
 				SeasonManager.GetOrCreate(world);
+			}
 		}));
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());

@@ -1,9 +1,13 @@
 package me.bscal.betterfarming.common.seasons;
 
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.common.utils.RegistryMapToObject;
+import net.minecraft.block.Block;
+import net.minecraft.tag.Tag;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Language;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 
@@ -13,7 +17,9 @@ import java.util.Map;
 public final class Seasons
 {
 
-	private Seasons() {}
+	private Seasons()
+	{
+	}
 
 	public static final int SPRING = 0;
 	public static final int SUMMER = 1;
@@ -34,10 +40,23 @@ public final class Seasons
 	public static final int MAX_SEASONS = 4;
 	public static final Map<RegistryKey<Biome>, SeasonType> SPECIAL_SEASONS = new HashMap<>();
 
+	public static RegistryMapToObject<Biome, SeasonType> SEASONS_MAP;
+
 	static
 	{
 		SPECIAL_SEASONS.put(BiomeKeys.DESERT, DESERT);
 		SPECIAL_SEASONS.put(BiomeKeys.JUNGLE, JUNGLE);
+	}
+
+	/**
+	 * Initilizes the season map. This is done because we need to access World instance.
+	 * Ran on both server and clients
+	 */
+	public static void InitSeasonsMap(World world)
+	{
+		SEASONS_MAP = new RegistryMapToObject<>(world, Registry.BIOME_KEY);
+		SEASONS_MAP.putFromRegistryKey(BiomeKeys.DESERT, DESERT);
+		SEASONS_MAP.putFromRegistryKey(BiomeKeys.JUNGLE, JUNGLE);
 	}
 
 	public static int GetSeasonForBiome(RegistryKey<Biome> key, int season)
@@ -59,7 +78,9 @@ public final class Seasons
 		{
 			SeasonType type = SPECIAL_SEASONS.get(key);
 			if (type.isTropical)
-				return new TranslatableText(BetterFarming.MOD_ID + ((type.seasonValues[season] == WET) ? ".wet" : ".dry")).getString();
+				return new TranslatableText(BetterFarming.MOD_ID + ((type.seasonValues[season] == WET) ?
+						".wet" :
+						".dry")).getString();
 		}
 		return GetNameOfSeason(season);
 	}
@@ -68,6 +89,7 @@ public final class Seasons
 	{
 		public final boolean isTropical;
 		public final byte[] seasonValues = new byte[4];
+		public Tag<Block> growables;
 
 		public SeasonType(int spring, int summer, int autumn, int fall, boolean isTropical)
 		{

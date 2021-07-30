@@ -4,8 +4,6 @@
   "package": "me.bscal.betterfarming.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "client.biome.FoliageColorsMixin",
-    "client.world.MinecraftClientMixin",
     "common.LootManagerMixin",
     "common.LootTableAccessor",
     "common.accessors.MobEntityAccessor",
@@ -15,6 +13,8 @@
     "common.world.ServerWorldMixin"
   ],
   "client": [
+    "client.biome.FoliageColorsMixin",
+    "client.world.MinecraftClientMixin",
     "client.biome.BiomeInvoker",
     "client.biome.BiomeMixin"
   ],
