@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 /**
  * An <code>Int2ObjectOpenHashMap</code> that uses the rawId from minecraft Registry's.
  * Contains various wrapper functions that help getting and putting from rawIds
+ *
  * @param <T> The type (T) of <code>Registry T</code> used for keys.
  * @param <V> The value of the <code>Object</code> in the map.
  */
@@ -26,11 +27,32 @@ public class RegistryMapToObject<T, V> extends Int2ObjectOpenHashMap<V>
 		m_registry = world.getRegistryManager().get(registryReference);
 	}
 
-	public RegistryMapToObject(final World world, final RegistryKey<Registry<T>> registryReference, int expected)
+	public RegistryMapToObject(final World world, final RegistryKey<Registry<T>> registryReference,
+			int expected)
 	{
 		super(expected);
 		m_world = world;
 		m_registry = world.getRegistryManager().get(registryReference);
+	}
+
+	public int getRawId(T t)
+	{
+		return m_registry.getRawId(t);
+	}
+
+	public int getRawId(RegistryKey<T> t)
+	{
+		return m_registry.getRawId(m_registry.get(t));
+	}
+
+	public T getTypeByRawId(int id)
+	{
+		return m_registry.get(id);
+	}
+
+	public T getTypeByKey(RegistryKey<T> key)
+	{
+		return m_registry.get(key);
 	}
 
 	public boolean containsFromRegistryType(T t)

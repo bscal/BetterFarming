@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
+import me.bscal.betterfarming.BetterFarming;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -11,6 +12,7 @@ import net.minecraft.world.biome.Biome;
 {
 
 	public final RegistryKey<Biome> key;
+	public int rawId = -1;
 	public int[] grassColors;
 	public int[] foliageColor;
 
@@ -24,6 +26,7 @@ import net.minecraft.world.biome.Biome;
 	@Override
 	public void InitChanger(Biome biome)
 	{
+		rawId = BetterFarming.SEASONS_REGISTRY.seasonDataMap.getRawId(biome);
 	}
 
 	@Override

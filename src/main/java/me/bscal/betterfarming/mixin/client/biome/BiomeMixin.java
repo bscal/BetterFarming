@@ -3,6 +3,7 @@ package me.bscal.betterfarming.mixin.client.biome;
 import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.client.seasons.biome.BiomeChanger;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
+import me.bscal.betterfarming.common.seasons.Seasons;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -27,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 					.ifPresent((key) -> {
 						BiomeChanger changer = seasonHandler.biomeEffectChangerMap.get(key);
 						if (changer != null)
-							cir.setReturnValue(changer.GetColor(BetterFarmingClient.GetSeason()));
+							cir.setReturnValue(changer.GetColor(Seasons.GetSeason()));
 					});
 
 		}
@@ -46,7 +47,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 					.ifPresent((key) -> {
 						BiomeChanger changer = seasonHandler.biomeEffectChangerMap.get(key);
 						if (changer != null)
-							cir.setReturnValue(changer.GetFoliageColor(BetterFarmingClient.GetSeason()));
+							cir.setReturnValue(changer.GetFoliageColor(Seasons.GetSeason()));
 					});
 		}
 	}

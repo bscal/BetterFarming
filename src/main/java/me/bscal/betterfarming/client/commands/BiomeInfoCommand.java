@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.client.commands;
 
+import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
 import me.bscal.betterfarming.common.seasons.MinecraftDate;
@@ -36,7 +37,7 @@ public class BiomeInfoCommand
 						return 1;
 					}
 
-					int season = BetterFarmingClient.GetSeason();
+					int season = Seasons.GetSeason();
 
 					chatHud.addMessage(Text.of("[ Biome Info ]"));
 					chatHud.addMessage(Text.of(String.format("Season: %d, %s", season,
@@ -45,8 +46,8 @@ public class BiomeInfoCommand
 							Seasons.GetSeasonForBiome(key.get(), season),
 							Seasons.GetNameOfSeasonByBiome(key.get(), season))));
 					chatHud.addMessage(
-							Text.of("Biome Type: " + ((Seasons.SPECIAL_SEASONS.containsKey(key.get()) ?
-									Seasons.SPECIAL_SEASONS.get(key.get()).getClass().getSimpleName() :
+							Text.of("Biome Type: " + ((BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(biome) ?
+									BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(biome).getClass().getSimpleName() :
 									"NULL"))));
 					chatHud.addMessage(Text.of("Date: " + new MinecraftDate(
 							handler.seasonClock.ticksSinceCreation).AsDate(true)));

@@ -1,18 +1,21 @@
 package me.bscal.betterfarming.common.seasons;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.common.utils.RegistryMapToObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class Seasons
 {
@@ -38,31 +41,27 @@ public final class Seasons
 	public static final SeasonType SWAMP = new SeasonType(WET, DRY, WET, DRY, true);
 
 	public static final int MAX_SEASONS = 4;
-	public static final Map<RegistryKey<Biome>, SeasonType> SPECIAL_SEASONS = new HashMap<>();
 
-	public static RegistryMapToObject<Biome, SeasonType> SEASONS_MAP;
-
-	static
+	public static int GetSeasonForBiome(Biome key, int season)
 	{
-		SPECIAL_SEASONS.put(BiomeKeys.DESERT, DESERT);
-		SPECIAL_SEASONS.put(BiomeKeys.JUNGLE, JUNGLE);
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))
+			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(key).GetSeason(season);
+		return season;
 	}
 
-	/**
-	 * Initilizes the season map. This is done because we need to access World instance.
-	 * Ran on both server and clients
-	 */
-	public static void InitSeasonsMap(World world)
+	public static int GetSeason()
 	{
-		SEASONS_MAP = new RegistryMapToObject<>(world, Registry.BIOME_KEY);
-		SEASONS_MAP.putFromRegistryKey(BiomeKeys.DESERT, DESERT);
-		SEASONS_MAP.putFromRegistryKey(BiomeKeys.JUNGLE, JUNGLE);
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER || !MinecraftClient.getInstance().world.isClient)
+		{
+			return SeasonManager.GetOrCreate().GetSeasonClock().currentSeason;
+		}
+		return BetterFarmingClient.GetBiomeSeasonHandler().seasonClock.currentSeason;
 	}
 
 	public static int GetSeasonForBiome(RegistryKey<Biome> key, int season)
 	{
-		if (SPECIAL_SEASONS.containsKey(key))
-			return SPECIAL_SEASONS.get(key).GetSeason(season);
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryKey(key))
+			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryKey(key).GetSeason(season);
 		return season;
 	}
 
@@ -74,9 +73,9 @@ public final class Seasons
 
 	public static String GetNameOfSeasonByBiome(RegistryKey<Biome> key, int season)
 	{
-		if (SPECIAL_SEASONS.containsKey(key))
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryKey(key))
 		{
-			SeasonType type = SPECIAL_SEASONS.get(key);
+			SeasonType type = BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryKey(key);
 			if (type.isTropical)
 				return new TranslatableText(BetterFarming.MOD_ID + ((type.seasonValues[season] == WET) ?
 						".wet" :

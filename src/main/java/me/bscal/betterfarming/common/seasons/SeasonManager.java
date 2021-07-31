@@ -15,9 +15,7 @@ import net.minecraft.world.World;
 public class SeasonManager extends PersistentState
 {
 	private final SeasonClock m_seasonClock = new SeasonClock();
-	private ServerWorld m_world;
 	private long m_lastTimeChecked;
-
 	private final PacketByteBuf m_bufCache;
 
 	public SeasonManager()
@@ -39,7 +37,6 @@ public class SeasonManager extends PersistentState
 		SeasonManager seasons = world.getPersistentStateManager()
 				.getOrCreate(SeasonManager::LoadFromNbt, SeasonManager::new,
 						BetterFarming.MOD_ID + "_seasons");
-		seasons.m_world = world;
 		return seasons;
 	}
 
@@ -48,7 +45,8 @@ public class SeasonManager extends PersistentState
 		SeasonManager seasons = new SeasonManager();
 		seasons.m_seasonClock.currentSeason = Math.min(Seasons.MAX_SEASONS - 1,
 				Math.max(0, nbt.getInt("season")));
-		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(SeasonSettings.Root.ticksPerSeason.getValue() - 1,
+		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(
+				SeasonSettings.Root.ticksPerSeason.getValue() - 1,
 				Math.max(0, nbt.getInt("ticksInCurrentSeason")));
 		seasons.m_seasonClock.ticksSinceCreation = nbt.getLong("ticks");
 		return seasons;
@@ -143,5 +141,10 @@ public class SeasonManager extends PersistentState
 			SyncSeasonTimeS2C();
 		}
 		markDirty();
+	}
+
+	public SeasonClock GetSeasonClock()
+	{
+		return m_seasonClock;
 	}
 }
