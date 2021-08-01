@@ -6,9 +6,11 @@ import me.bscal.betterfarming.common.listeners.LootManagerListener;
 import me.bscal.betterfarming.common.listeners.PlayerBlockBreakListener;
 import me.bscal.betterfarming.common.listeners.ServerEntityCombatListener;
 import me.bscal.betterfarming.common.listeners.ServerTickListener;
+import me.bscal.betterfarming.common.seasons.SeasonCropManager;
 import me.bscal.betterfarming.common.seasons.SeasonManager;
 import me.bscal.betterfarming.common.seasons.SeasonSettings;
 import me.bscal.betterfarming.common.seasons.SeasonsRegistry;
+import me.bscal.betterfarming.common.utils.Utils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -35,7 +37,8 @@ public class BetterFarming implements ModInitializer
 	public static final Random RAND = new Random();
 	public static final int UPDATE_DELAY = 20 * 30;
 	public static final SeasonSettings SEASON_SETTINGS = new SeasonSettings();
-	public static SeasonsRegistry SEASONS_REGISTRY;
+	public static final SeasonsRegistry SEASONS_REGISTRY = new SeasonsRegistry();
+	public static final SeasonCropManager CROP_MANAGER = new SeasonCropManager();
 
 	public static final Identifier SYNC_PACKET = new Identifier(MOD_ID, "sync_time");
 
@@ -45,6 +48,9 @@ public class BetterFarming implements ModInitializer
 	public void onInitialize()
 	{
 		BetterFarmingDatabase.CreateTables();
+
+		SeasonCropManager.GenerateDefaults(Utils.GetPathInConfig("seasonal_crops.json").toString());
+		CROP_MANAGER.Load(Utils.GetPathInConfig("seasonal_crops.json").toString());
 
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
 		ServerLifecycleEvents.SERVER_STARTING.register((server) -> m_server = server);

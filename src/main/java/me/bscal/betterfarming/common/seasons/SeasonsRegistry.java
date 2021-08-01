@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.common.seasons;
 
+import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.common.utils.RegistryMapToObject;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -16,6 +17,7 @@ public class SeasonsRegistry
 			return;
 		seasonDataMap = new RegistryMapToObject<>(world, Registry.BIOME_KEY);
 		Register();
+		BetterFarming.LOGGER.info("Registered Seasons.");
 	}
 
 	/**

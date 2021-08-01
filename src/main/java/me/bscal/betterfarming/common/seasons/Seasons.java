@@ -42,13 +42,6 @@ public final class Seasons
 
 	public static final int MAX_SEASONS = 4;
 
-	public static int GetSeasonForBiome(Biome key, int season)
-	{
-		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))
-			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(key).GetSeason(season);
-		return season;
-	}
-
 	public static int GetSeason()
 	{
 		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER || !MinecraftClient.getInstance().world.isClient)
@@ -56,6 +49,13 @@ public final class Seasons
 			return SeasonManager.GetOrCreate().GetSeasonClock().currentSeason;
 		}
 		return BetterFarmingClient.GetBiomeSeasonHandler().seasonClock.currentSeason;
+	}
+
+	public static int GetSeasonForBiome(Biome key, int season)
+	{
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))
+			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(key).GetSeason(season);
+		return season;
 	}
 
 	public static int GetSeasonForBiome(RegistryKey<Biome> key, int season)

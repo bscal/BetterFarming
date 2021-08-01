@@ -17,6 +17,7 @@ public class SeasonManager extends PersistentState
 	private final SeasonClock m_seasonClock = new SeasonClock();
 	private long m_lastTimeChecked;
 	private final PacketByteBuf m_bufCache;
+	private int m_counter;
 
 	public SeasonManager()
 	{
@@ -80,10 +81,6 @@ public class SeasonManager extends PersistentState
 			m_seasonClock.ticksSinceCreation += ticksPassed;
 			m_seasonClock.ticksInCurrentSeason += ticksPassed;
 
-			long days = GetDays(m_seasonClock.ticksSinceCreation);
-			if (newDay)
-				SeasonEvents.NEW_DAY.invoker().OnNewDay(m_seasonClock.ticksSinceCreation, days);
-
 			if (m_seasonClock.ticksInCurrentSeason > SeasonSettings.Root.ticksPerSeason.getValue())
 			{
 				ProgessSeason();
@@ -92,9 +89,13 @@ public class SeasonManager extends PersistentState
 								SeasonManager.GetDays(m_seasonClock.ticksSinceCreation));
 			}
 
+			if (newDay)
+				SeasonEvents.NEW_DAY.invoker().OnNewDay(m_seasonClock.ticksSinceCreation, GetDays(m_seasonClock.ticksSinceCreation));
+
 			// So we dont send a packet ever tick
-			if (m_seasonClock.ticksSinceCreation % 20 == 0)
+			if (m_counter++ > 20)
 			{
+				m_counter = 0;
 				SyncSeasonTimeS2C();
 
 				if (BetterFarming.DEBUG)

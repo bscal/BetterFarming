@@ -24,6 +24,7 @@ import net.minecraft.world.biome.BiomeKeys;
 		@Override
 		public void InitChanger(Biome biome)
 		{
+			super.InitChanger(biome);
 			int defaultColor = biome.getEffects()
 					.getGrassColor()
 					.orElse(((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor());

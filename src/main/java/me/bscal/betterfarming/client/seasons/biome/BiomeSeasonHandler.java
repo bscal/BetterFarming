@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
+import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.common.seasons.SeasonClock;
 import net.fabricmc.api.EnvType;
@@ -36,6 +37,7 @@ import java.util.Map;
 				.getEntries()
 				.forEach((key) -> Register(new BiomeChangers.SimpleBiomeChanger(key.getKey()),
 						key.getValue()));
+		BetterFarming.LOGGER.info("Registered BiomeChangers.");
 	}
 
 	public void Register(BiomeChanger changer, Biome biome)
