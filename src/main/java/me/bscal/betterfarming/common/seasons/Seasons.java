@@ -1,21 +1,15 @@
 package me.bscal.betterfarming.common.seasons;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.BetterFarmingClient;
-import me.bscal.betterfarming.common.utils.RegistryMapToObject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.registry.BuiltinRegistries;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
 
 public final class Seasons
 {
@@ -44,7 +38,8 @@ public final class Seasons
 
 	public static int GetSeason()
 	{
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER || !MinecraftClient.getInstance().world.isClient)
+		if (FabricLoader.getInstance()
+				.getEnvironmentType() == EnvType.SERVER || !MinecraftClient.getInstance().world.isClient)
 		{
 			return SeasonManager.GetOrCreate().GetSeasonClock().currentSeason;
 		}
