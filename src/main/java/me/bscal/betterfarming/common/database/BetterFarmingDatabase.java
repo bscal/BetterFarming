@@ -1,3 +1,4 @@
+/*
 package me.bscal.betterfarming.common.database;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -45,7 +46,9 @@ public final class BetterFarmingDatabase
 	{
 		String sql =
 				"CREATE TABLE IF NOT EXISTS " + TABLE_GROWABLE_BLOCKS + " (" + "id integer NOT NULL, " + "worldId varchar(64) NOT " +
-						"NULL, " + "x integer NOT NULL, " + "y integer NOT NULL, " + "z integer NOT NULL, " + "start_ticks bigint NOT NULL, " + "current_growth_ticks integer NOT NULL, " + "current_age integer NOT NULL, " + "blockId varchar(64) NOT NULL, " + "CONSTRAINT " + "pk_growable_blocks_id + PRIMARY KEY ( id ));";
+						"NULL, " + "x integer NOT NULL, " + "y integer NOT NULL, " + "z integer NOT NULL, " + "start_ticks bigint NOT " +
+						"NULL, " + "current_growth_ticks integer NOT NULL, " + "current_age integer NOT NULL, " + "blockId varchar(64) NOT" +
+						" NULL, " + "CONSTRAINT " + "pk_growable_blocks_id + PRIMARY KEY ( id ));";
 		try
 		{
 			Connection conn = DATA_SOURCE.getConnection();
@@ -90,8 +93,8 @@ public final class BetterFarmingDatabase
 
 	public static void UpdateBlock(World world, Block block, BlockPos pos, BlockState state, int currentAgesTick, int currentAge)
 	{
-		String sql = "UPDATE " + TABLE_GROWABLE_BLOCKS + " SET current_growth_ticks = ?, current_age = ? WHERE worldId = ? AND x = ? AND y "
-				+ "= ? AND z = ?";
+		String sql = "UPDATE " + TABLE_GROWABLE_BLOCKS + " SET current_growth_ticks = ?, current_age = ? WHERE worldId = ? AND x = ? AND y" +
+				" " + "= ? AND z = ?";
 		try
 		{
 			Connection conn = DATA_SOURCE.getConnection();
@@ -187,3 +190,4 @@ public final class BetterFarmingDatabase
 	}
 
 }
+*/

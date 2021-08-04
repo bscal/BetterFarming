@@ -20,6 +20,15 @@ import java.util.Map;
 public final class Utils
 {
 
+	/**
+	 * Returns the average time it takes for randomTick() to be called.
+	 * Uses tickRate setting from the GameRules and 4096 are the number of blocks per chunk.
+	 */
+	public static float GeometricDistributionMeanForRandomTicks(int tickRate)
+	{
+		return 1f/(tickRate/4096f);
+	}
+
 	public static File GetFileInConfig(String fileName, String... subDirs)
 	{
 		StringBuilder sb = new StringBuilder();

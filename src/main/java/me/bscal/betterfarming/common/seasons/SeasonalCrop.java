@@ -1,6 +1,11 @@
 package me.bscal.betterfarming.common.seasons;
 
+import me.bscal.betterfarming.common.database.blockdata.BlockData;
+import net.minecraft.block.BlockState;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
@@ -14,6 +19,12 @@ public class SeasonalCrop
 	public float growthRate[];
 	public List<String> climates;
 	public List<Identifier> biomes;
+
+	public boolean CheckConditions(BlockState state, ServerWorld world, BlockPos pos, Biome blockBiome, BlockData data)
+	{
+		// TODO
+		return true;
+	}
 
 	public static class Builder
 	{

@@ -44,16 +44,16 @@ public class WorldPos
 	@Override
 	public String toString()
 	{
-		return worldId + "+" + pos.toShortString();
+		return worldId + "|" + pos.toShortString();
 	}
 
-	public static class Serialize implements JsonSerializer<WorldPos>, JsonDeserializer<WorldPos>
+	public static class Serializer implements JsonSerializer<WorldPos>, JsonDeserializer<WorldPos>
 	{
 		@Override
 		public WorldPos deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 		{
 			String strJson = json.getAsString();
-			String[] split = strJson.split("/+");
+			String[] split = strJson.split("\\|");
 			return new WorldPos(new Identifier(split[0]), new BlockPos(Utils.Vec3iFromShortString(split[1])));
 		}
 

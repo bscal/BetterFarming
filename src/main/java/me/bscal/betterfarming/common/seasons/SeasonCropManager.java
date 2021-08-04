@@ -1,9 +1,9 @@
 package me.bscal.betterfarming.common.seasons;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class SeasonCropManager
 {
 
-	public Map<Identifier, SeasonalCrop> seasonalCrops = new HashMap<>();
+	public Map<Block, SeasonalCrop> seasonalCrops = new HashMap<>();
 
 	public SeasonCropManager()
 	{
@@ -26,9 +26,8 @@ public class SeasonCropManager
 
 	public void Load(String path)
 	{
-		Gson gson = new GsonBuilder().registerTypeAdapter(Identifier.class, new Identifier.Serializer())
-				.create();
-		Type type = new TypeToken<Map<Identifier, SeasonalCrop>>()
+		Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Block.class, new BlockSerializer()).create();
+		Type type = new TypeToken<Map<Block, SeasonalCrop>>()
 		{
 		}.getType();
 		try
@@ -45,19 +44,21 @@ public class SeasonCropManager
 
 	public static void GenerateDefaults(String path)
 	{
-		Map<Identifier, SeasonalCrop> tempCropMap = new HashMap<>();
+		Map<Block, SeasonalCrop> tempCropMap = new HashMap<>();
 
-		tempCropMap.put(Registry.BLOCK.getId(Blocks.WHEAT),
-				new SeasonalCrop.Builder().SetGrowRates(1f, 1f, .5f, 0f).Build());
-		tempCropMap.put(Registry.BLOCK.getId(Blocks.CARROTS),
-				new SeasonalCrop.Builder().SetGrowRates(0f, 1f, 0f, 0f).Build());
-		tempCropMap.put(Registry.BLOCK.getId(Blocks.SUGAR_CANE),
-				new SeasonalCrop.Builder().SetGrowRates(1f, 0f).Build());
+		tempCropMap.put(Blocks.WHEAT, new SeasonalCrop.Builder().SetGrowRates(1f, 1f, .5f, 0f).Build());
+		tempCropMap.put(Blocks.CARROTS, new SeasonalCrop.Builder().SetGrowRates(0f, 1f, 0f, 0f).Build());
+		tempCropMap.put(Blocks.SUGAR_CANE, new SeasonalCrop.Builder().SetGrowRates(1f, 0f).Build());
 
 		Gson gson = new GsonBuilder().setPrettyPrinting()
-				.registerTypeAdapter(Identifier.class, new Identifier.Serializer())
+				.enableComplexMapKeySerialization()
+				.registerTypeHierarchyAdapter(Block.class, new BlockSerializer())
 				.create();
-		String json = gson.toJson(tempCropMap);
+
+		Type type = new TypeToken<Map<Block, SeasonalCrop>>()
+		{
+		}.getType();
+		String json = gson.toJson(tempCropMap, type);
 		try
 		{
 			FileWriter writer = new FileWriter(path);
@@ -67,6 +68,21 @@ public class SeasonCropManager
 		catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	public static class BlockSerializer implements JsonSerializer<Block>, JsonDeserializer<Block>
+	{
+		@Override
+		public Block deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+		{
+			return Registry.BLOCK.get(Identifier.tryParse(json.getAsString()));
+		}
+
+		@Override
+		public JsonElement serialize(Block src, Type typeOfSrc, JsonSerializationContext context)
+		{
+			return new JsonPrimitive(Registry.BLOCK.getId(src).toString());
 		}
 	}
 }

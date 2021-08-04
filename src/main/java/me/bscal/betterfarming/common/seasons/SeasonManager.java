@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 
 public class SeasonManager extends PersistentState
 {
-	private final SeasonClock m_seasonClock = new SeasonClock();
+	private final SeasonClock m_seasonClock;
 	private long m_lastTimeChecked;
 	private final PacketByteBuf m_bufCache;
 	private int m_counter;
@@ -22,6 +22,7 @@ public class SeasonManager extends PersistentState
 	public SeasonManager()
 	{
 		// TODO loading from configs
+		m_seasonClock = BetterFarming.SEASON_CLOCK;
 		m_bufCache = new PacketByteBuf(Unpooled.buffer(1 + 4 + 8));
 	}
 

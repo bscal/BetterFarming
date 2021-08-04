@@ -7,16 +7,17 @@
     "common.LootManagerMixin",
     "common.LootTableAccessor",
     "common.accessors.MobEntityAccessor",
+    "common.blocks.CropBlockMixin",
     "common.blocks.SaplingBlockScheduleMixin",
     "common.blocks.SpreadableBlockMixin",
     "common.entities.CowEntityMixin",
     "common.world.ServerWorldMixin"
   ],
   "client": [
-    "client.biome.FoliageColorsMixin",
-    "client.world.MinecraftClientMixin",
     "client.biome.BiomeInvoker",
-    "client.biome.BiomeMixin"
+    "client.biome.BiomeMixin",
+    "client.biome.FoliageColorsMixin",
+    "client.world.MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

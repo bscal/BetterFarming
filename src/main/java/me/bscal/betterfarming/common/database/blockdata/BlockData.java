@@ -1,9 +1,9 @@
 package me.bscal.betterfarming.common.database.blockdata;
 
 import com.google.gson.*;
-import me.bscal.betterfarming.common.utils.Utils;
+import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 
 import java.lang.reflect.Type;
 
@@ -13,25 +13,40 @@ public class BlockData
 	public long creationTime;
 	public int growthTime;
 	public int age;
+	public Block block;
+	public boolean grow;
+	public boolean destroy;
 
 	public BlockData()
 	{
 	}
 
-	public BlockData(long creationTime, int growthTime, int age)
+	public BlockData(long creationTime, int growthTime, int age, Block block)
 	{
 		this.creationTime = creationTime;
 		this.growthTime = growthTime;
 		this.age = age;
+		this.block = block;
 	}
 
-	public static class Serialize implements JsonSerializer<BlockData>, JsonDeserializer<BlockData>
+	private BlockData SetFlags(int bits)
+	{
+		grow = (bits & 1) != 0;
+		destroy = (bits & 1 << 1) != 0;
+		return this;
+	}
+
+	public static class Serializer implements JsonSerializer<BlockData>, JsonDeserializer<BlockData>
 	{
 		@Override
 		public BlockData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 		{
 			if (json instanceof JsonArray array)
-				return new BlockData(array.get(0).getAsLong(), array.get(1).getAsInt(), array.get(2).getAsInt());
+			{
+				Block block = Registry.BLOCK.get(Identifier.tryParse(array.get(3).getAsString()));
+				return new BlockData(array.get(0).getAsLong(), array.get(1).getAsInt(), array.get(2).getAsInt(), block).SetFlags(
+						array.get(4).getAsInt());
+			}
 			return new BlockData();
 		}
 
@@ -42,6 +57,13 @@ public class BlockData
 			array.add(src.creationTime);
 			array.add(src.growthTime);
 			array.add(src.age);
+			array.add(String.valueOf(Registry.BLOCK.getId(src.block)));
+
+			int bits = 0x00000000;
+			bits |= ((src.grow) ? 1 : 0);
+			bits |= ((src.destroy) ? 1 : 0) << 1;
+			array.add(bits);
+
 			return array;
 		}
 	}
