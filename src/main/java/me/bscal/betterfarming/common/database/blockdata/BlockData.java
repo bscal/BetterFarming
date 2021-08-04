@@ -2,6 +2,7 @@ package me.bscal.betterfarming.common.database.blockdata;
 
 import com.google.gson.*;
 import net.minecraft.block.Block;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -38,6 +39,7 @@ public class BlockData
 
 	public static class Serializer implements JsonSerializer<BlockData>, JsonDeserializer<BlockData>
 	{
+
 		@Override
 		public BlockData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 		{
@@ -65,6 +67,25 @@ public class BlockData
 			array.add(bits);
 
 			return array;
+		}
+
+		public static BlockData deserializeNbt(NbtCompound nbt)
+		{
+			return new BlockData(nbt.getLong("creationTime"), nbt.getInt("growthTime"), nbt.getInt("age"),
+					Registry.BLOCK.get(Identifier.tryParse(nbt.getString("block")))).SetFlags(nbt.getInt("flags"));
+		}
+
+		public static NbtCompound serializeNbt(BlockData src, NbtCompound nbt)
+		{
+			nbt.putLong("creationTime", src.creationTime);
+			nbt.putInt("growthTime", src.growthTime);
+			nbt.putInt("age", src.age);
+			nbt.putString("block", String.valueOf(Registry.BLOCK.getId(src.block)));
+			int bits = 0x00000000;
+			bits |= ((src.grow) ? 1 : 0);
+			bits |= ((src.destroy) ? 1 : 0) << 1;
+			nbt.putInt("flags", bits);
+			return nbt;
 		}
 	}
 

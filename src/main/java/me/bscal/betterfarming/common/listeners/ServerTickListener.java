@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.common.listeners;
 
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
 import me.bscal.betterfarming.common.utils.Utils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -28,7 +29,10 @@ public class ServerTickListener implements ServerTickEvents.EndTick
 				m_randomTickChance = Math.max(1, Math.floorDiv(UPDATE_TIME, (int) Math.floor(
 						Utils.GeometricDistributionMeanForRandomTicks(server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get()))));
 			}
-			BetterFarming.BLOCK_DATA.UpdateUnloadedEntries(server, m_randomTickChance);
+			server.getWorlds().forEach((world ->
+			{
+				BlockDataManager.GetOrCreate(world).UpdateUnloadedEntries(server, m_randomTickChance);
+			}));
 		}
 	}
 }

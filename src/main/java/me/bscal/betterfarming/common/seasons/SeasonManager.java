@@ -36,19 +36,15 @@ public class SeasonManager extends PersistentState
 
 	public static SeasonManager GetOrCreate(ServerWorld world)
 	{
-		SeasonManager seasons = world.getPersistentStateManager()
-				.getOrCreate(SeasonManager::LoadFromNbt, SeasonManager::new,
-						BetterFarming.MOD_ID + "_seasons");
-		return seasons;
+		return world.getPersistentStateManager()
+				.getOrCreate(SeasonManager::LoadFromNbt, SeasonManager::new, BetterFarming.MOD_ID + "_seasons");
 	}
 
 	private static SeasonManager LoadFromNbt(NbtCompound nbt)
 	{
 		SeasonManager seasons = new SeasonManager();
-		seasons.m_seasonClock.currentSeason = Math.min(Seasons.MAX_SEASONS - 1,
-				Math.max(0, nbt.getInt("season")));
-		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(
-				SeasonSettings.Root.ticksPerSeason.getValue() - 1,
+		seasons.m_seasonClock.currentSeason = Math.min(Seasons.MAX_SEASONS - 1, Math.max(0, nbt.getInt("season")));
+		seasons.m_seasonClock.ticksInCurrentSeason = Math.min(SeasonSettings.Root.ticksPerSeason.getValue() - 1,
 				Math.max(0, nbt.getInt("ticksInCurrentSeason")));
 		seasons.m_seasonClock.ticksSinceCreation = nbt.getLong("ticks");
 		return seasons;
@@ -86,8 +82,7 @@ public class SeasonManager extends PersistentState
 			{
 				ProgessSeason();
 				SeasonEvents.SEASON_CHANGED.invoker()
-						.OnSeasonChanged(m_seasonClock.currentSeason,
-								SeasonManager.GetDays(m_seasonClock.ticksSinceCreation));
+						.OnSeasonChanged(m_seasonClock.currentSeason, SeasonManager.GetDays(m_seasonClock.ticksSinceCreation));
 			}
 
 			if (newDay)
@@ -100,10 +95,8 @@ public class SeasonManager extends PersistentState
 				SyncSeasonTimeS2C();
 
 				if (BetterFarming.DEBUG)
-					BetterFarming.Log(String.format(
-							"[Time Ticked] ticks: %d : season: %d. --- timeday(%d)/lastday(%d) | diff(%d)",
-							m_seasonClock.ticksSinceCreation, m_seasonClock.currentSeason, timeOfDay,
-							m_lastTimeChecked,
+					BetterFarming.Log(String.format("[Time Ticked] ticks: %d : season: %d. --- timeday(%d)/lastday(%d) | diff(%d)",
+							m_seasonClock.ticksSinceCreation, m_seasonClock.currentSeason, timeOfDay, m_lastTimeChecked,
 							timeOfDay - (newDay ? m_lastTimeChecked - 24000 : m_lastTimeChecked)));
 			}
 			m_lastTimeChecked = timeOfDay;

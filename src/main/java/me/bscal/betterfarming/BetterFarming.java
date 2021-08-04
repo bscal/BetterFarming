@@ -36,7 +36,6 @@ public class BetterFarming implements ModInitializer
 	public static final SeasonSettings SEASON_SETTINGS = new SeasonSettings();
 	public static final SeasonsRegistry SEASONS_REGISTRY = new SeasonsRegistry();
 	public static final SeasonCropManager CROP_MANAGER = new SeasonCropManager();
-	public static final BlockDataManager BLOCK_DATA = new BlockDataManager();
 	public static final SeasonClock SEASON_CLOCK = new SeasonClock();
 	public static final Identifier SYNC_PACKET = new Identifier(MOD_ID, "sync_time");
 
@@ -48,17 +47,18 @@ public class BetterFarming implements ModInitializer
 		SeasonCropManager.GenerateDefaults(Utils.GetPathInConfig("seasonal_crops.json").toString());
 		CROP_MANAGER.Load(Utils.GetPathInConfig("seasonal_crops.json").toString());
 
-		BLOCK_DATA.Load(Utils.GetStringPathInConfig("block_data.json"));
+		//BLOCK_DATA.Load(Utils.GetStringPathInConfig("block_data.json"));
 
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
 		ServerLifecycleEvents.SERVER_STARTING.register((server) -> m_server = server);
 		ServerLifecycleEvents.SERVER_STOPPING.register((server) -> {
-			BLOCK_DATA.Save(Utils.GetStringPathInConfig("block_data.json"));
+			//BLOCK_DATA.Save(Utils.GetStringPathInConfig("block_data.json"));
 		});
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
 				SeasonManager.GetOrCreate(world);
+				BlockDataManager.GetOrCreate(world);
 				SEASONS_REGISTRY.Load(world);
 			}
 		}));
