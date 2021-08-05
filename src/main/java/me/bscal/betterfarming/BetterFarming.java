@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +41,7 @@ public class BetterFarming implements ModInitializer
 	public static final Identifier SYNC_PACKET = new Identifier(MOD_ID, "sync_time");
 
 	private static MinecraftServer m_server;
+	private static ServerWorld m_overWorldReference; // Cached for getTime() calls
 
 	@Override
 	public void onInitialize()
@@ -57,6 +59,7 @@ public class BetterFarming implements ModInitializer
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
+				m_overWorldReference = world;
 				SeasonManager.GetOrCreate(world);
 				BlockDataManager.GetOrCreate(world);
 				SEASONS_REGISTRY.Load(world);
@@ -75,6 +78,11 @@ public class BetterFarming implements ModInitializer
 	public static MinecraftServer GetServer()
 	{
 		return m_server;
+	}
+
+	public static long GetTime()
+	{
+		return m_overWorldReference.getTime();
 	}
 
 	public static void Log(String msg)

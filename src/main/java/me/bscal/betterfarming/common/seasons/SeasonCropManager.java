@@ -46,9 +46,9 @@ public class SeasonCropManager
 	{
 		Map<Block, SeasonalCrop> tempCropMap = new HashMap<>();
 
-		tempCropMap.put(Blocks.WHEAT, new SeasonalCrop.Builder().SetGrowRates(1f, 1f, .5f, 0f).Build());
-		tempCropMap.put(Blocks.CARROTS, new SeasonalCrop.Builder().SetGrowRates(0f, 1f, 0f, 0f).Build());
-		tempCropMap.put(Blocks.SUGAR_CANE, new SeasonalCrop.Builder().SetGrowRates(1f, 0f).Build());
+		tempCropMap.put(Blocks.WHEAT, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(1f, 1f, .5f, 0f).Build());
+		tempCropMap.put(Blocks.CARROTS, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(0f, 1f, 0f, 0f).Build());
+		tempCropMap.put(Blocks.SUGAR_CANE, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(1f, 0f).Build());
 
 		Gson gson = new GsonBuilder().setPrettyPrinting()
 				.enableComplexMapKeySerialization()

@@ -5,10 +5,12 @@ import me.bscal.betterfarming.common.database.blockdata.BlockData;
 import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
 import me.bscal.betterfarming.common.seasons.SeasonalCrop;
 import me.bscal.betterfarming.common.seasons.Seasons;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +18,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Random;
 
@@ -24,34 +25,58 @@ import java.util.Random;
 {
 
 	@Shadow
-	public abstract boolean isMature(BlockState state);
-
-	@Inject(method = "applyGrowth", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState" + "(Lnet/minecraft/util"
-			+ "/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
-	public void OnApplyGrowth(World world, BlockPos pos, BlockState state, CallbackInfo ci, int i)
+	protected static float getAvailableMoisture(Block block, BlockView world, BlockPos pos)
 	{
-		if (ShouldContinue(state, (ServerWorld) world, pos, i))
-		{
-			ci.cancel();
-		}
+		return 0;
 	}
 
-	//	@Inject(method = "randomTick", at = @At(value = "HEAD"), cancellable = true)
-	//	public void OnRandomTickHead(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci)
-	//	{
-	//	}
+	@Shadow
+	protected abstract int getAge(BlockState state);
 
-	@Inject(method = "randomTick", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/server/world/ServerWorld;setBlockState" + "(Lnet" + "/minecraft/util/math/BlockPos;" + "Lnet/minecraft/block" + "/BlockState;I)Z"), cancellable = true)
+	@Shadow
+	public abstract int getMaxAge();
+
+	@Shadow
+	public abstract BlockState withAge(int age);
+
+	@Shadow
+	protected abstract int getGrowthAmount(World world);
+
+	@Inject(method = "applyGrowth", at = @At(value = "HEAD"), cancellable = true)
+	public void OnApplyGrowth(World world, BlockPos pos, BlockState state, CallbackInfo ci)
+	{
+		int i = this.getAge(state) + getGrowthAmount(world);
+		int j = this.getMaxAge();
+		if (i > j)
+		{
+			i = j;
+		}
+
+		if (CanGrow(state, (ServerWorld) world, pos, i))
+		{
+			world.setBlockState(pos, this.withAge(i), Block.NOTIFY_LISTENERS);
+		}
+		ci.cancel();
+	}
+
+	@Inject(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/CropBlock;getAge" + "(Lnet/minecraft/block" +
+			"/BlockState;)I"), cancellable = true)
 	public void OnRandomTickInvoke(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci)
 	{
-		if (ShouldContinue(state, world, pos, 1))
+		int i = getAge(state);
+		if (i < getMaxAge())
 		{
-			ci.cancel();
+			float f = getAvailableMoisture((Block) ((Object) this), world, pos);
+			// f is weird... 1.0 is minimum the main (this) moist farmland block can be, I did not calculate other outcomes.
+			if (f >= 1.0f && CanGrow(state, world, pos, 1))
+			{
+				world.setBlockState(pos, withAge(i + 1), Block.NOTIFY_LISTENERS);
+			}
 		}
+		ci.cancel();
 	}
 
-	private boolean ShouldContinue(BlockState state, ServerWorld world, BlockPos pos, int growthAmount)
+	private boolean CanGrow(BlockState state, ServerWorld world, BlockPos pos, int growthAmount)
 	{
 		if (!world.isClient)
 		{
@@ -61,19 +86,26 @@ import java.util.Random;
 			BlockData blockData = BlockDataManager.GetOrCreate(world).GetOrCreateEntry(pos, 10, state.getBlock());
 			int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
 
-			// TODO 2 conditions checks, 1 for if can have growth, 1 for if can grow to full?
-			if (crop.CheckConditions(state, world, pos, biome, blockData))
+			if (crop.ShouldRemove(state, world, pos, biome, blockData, season))
+			{
+				BlockDataManager.GetOrCreate(world).GetDataMap().remove(pos);
+				BetterFarming.LOGGER.info("Removed!");
+				return false;
+			}
+
+			blockData.ableToGrow = crop.CheckGrowingCondition(state, world, pos, biome, blockData, season);
+			if (blockData.ableToGrow)
 			{
 				blockData.growthTime -= crop.growthRate[season];
-				if (blockData.growthTime < 1 && crop.growthRate[season] > 0f)
+
+				if (crop.CanFullyGrow(state, world, pos, biome, blockData, season))
 				{
-					blockData.growthTime = 10;
-					blockData.age += growthAmount;
-					BetterFarming.LOGGER.info("Grew canceling!");
-					return false;
+					crop.HandleGrowth(state, world, pos, biome, blockData, season, growthAmount);
+					BetterFarming.LOGGER.info("Grew!");
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 }

@@ -2,12 +2,10 @@ package me.bscal.betterfarming.common.database.blockdata;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.bscal.betterfarming.BetterFarming;
-import me.bscal.betterfarming.common.seasons.SeasonManager;
 import me.bscal.betterfarming.common.seasons.SeasonalCrop;
 import me.bscal.betterfarming.common.seasons.Seasons;
 import me.bscal.betterfarming.common.utils.Utils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
@@ -18,12 +16,10 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class BlockDataManager extends PersistentState
 {
-
 	private ServerWorld world;
 
 	// Serialized
@@ -93,45 +89,39 @@ public class BlockDataManager extends PersistentState
 		return nbt;
 	}
 
-	public Optional<BlockData> Get(WorldPos worldPos)
-	{
-		BlockData data = m_blockDataMap.get(worldPos);
-		return (data == null) ? Optional.empty() : Optional.of(data);
-	}
-
-	public void UpdateUnloadedEntries(MinecraftServer server, int estimatedRandomTicksPassed)
+	public void UpdateUnloadedEntries(MinecraftServer server, float estimatedRandomTicksPassed)
 	{
 		var entrySet = m_blockDataMap.object2ObjectEntrySet();
 		for (var pair : entrySet)
 		{
-			boolean chunkLoaded = world.getChunkManager()
-					.isChunkLoaded(ChunkSectionPos.getSectionCoord(pair.getKey().getX()),
-							ChunkSectionPos.getSectionCoord(pair.getKey().getZ()));
-			//TODO
-			if (chunkLoaded)
+			boolean chunkLoaded = world.isChunkLoaded(ChunkSectionPos.getSectionCoord(pair.getKey().getX()),
+					ChunkSectionPos.getSectionCoord(pair.getKey().getZ()));
+			// Estimated time that if BlockData has not been updated since, we can presume that the chunk is unloaded and does not update.
+			if (!chunkLoaded)
 			{
-				BlockState state = world.getBlockState(pair.getKey());
-				if (state.isAir() || !state.isOf(pair.getValue().block) || UpdateGrowable(pair.getKey(), pair.getValue(), state, world,
-						estimatedRandomTicksPassed))
-					entrySet.remove(pair); // Removed
+				// We can presume that when the block was unloaded and the last tick was a success that it can continue to tick while
+				// unloaded. It is incremented with estimated # of randomTicks and should not cause unloaded chunks to load.
+				UpdateGrowable(pair.getKey(), pair.getValue(), world, estimatedRandomTicksPassed);
 			}
 		}
 	}
 
-	private boolean UpdateGrowable(BlockPos pos, BlockData data, BlockState state, World world, int estimatedRandomTicksPassed)
+	private void UpdateGrowable(BlockPos pos, BlockData data, World world, float estimatedRandomTicksPassed)
 	{
-		SeasonalCrop crop = BetterFarming.CROP_MANAGER.seasonalCrops.get(data.block);
-		Biome biome = world.getBiome(pos);
-		int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
-
-		if (crop.CheckConditions(state, (ServerWorld) world, pos, biome, data))
+		if (data.ableToGrow)
 		{
-			data.growthTime -= crop.growthRate[season] * estimatedRandomTicksPassed;
-		}
-		BetterFarming.LOGGER.info("Updated unloaded BlockData");
+			SeasonalCrop crop = BetterFarming.CROP_MANAGER.seasonalCrops.get(data.block);
+			Biome biome = world.getBiome(pos);
+			int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
+			data.lastUpdate = BetterFarming.SEASON_CLOCK.ticksSinceCreation;
 
-		// TODO set block to grow or destroy or nothing
-		return false;
+			boolean isRandomTickLessThan1 = estimatedRandomTicksPassed < 1f && BetterFarming.RAND.nextFloat() < estimatedRandomTicksPassed;
+			data.growthTime -= crop.growthRate[season] * ((isRandomTickLessThan1) ?
+					(int) estimatedRandomTicksPassed :
+					Math.max((int) estimatedRandomTicksPassed, 1));
+		}
+		BetterFarming.LOGGER.info("Updated unloaded BlockData " + data.lastUpdate);
+
 	}
 
 	public BlockData GetOrCreateEntry(BlockPos pos, Supplier<BlockData> factory)
@@ -141,14 +131,16 @@ public class BlockDataManager extends PersistentState
 
 	public BlockData GetOrCreateEntry(BlockPos pos, int growthTime, Block block)
 	{
-		return m_blockDataMap.getOrDefault(pos,
-				Create(pos, () -> new BlockData(SeasonManager.GetOrCreate().GetSeasonClock().ticksSinceCreation, growthTime, 0, block)));
+		BlockData data = m_blockDataMap.get(pos);
+		return data != null ?
+				data :
+				Create(pos, () -> new BlockData(BetterFarming.GetTime(), growthTime, 0, block));
 	}
 
 	public BlockData Create(BlockPos pos, Supplier<BlockData> factory)
 	{
 		BlockData data = factory.get();
-		m_blockDataMap.put(pos, data);
+		m_blockDataMap.put(pos.toImmutable(), data);
 		return data;
 	}
 

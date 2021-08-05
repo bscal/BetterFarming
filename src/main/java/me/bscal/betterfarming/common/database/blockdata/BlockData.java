@@ -11,29 +11,37 @@ import java.lang.reflect.Type;
 public class BlockData
 {
 
-	public long creationTime;
+	public long lastUpdate;
 	public int growthTime;
 	public int age;
 	public Block block;
-	public boolean grow;
-	public boolean destroy;
+	public boolean ableToGrow;
 
 	public BlockData()
 	{
 	}
 
-	public BlockData(long creationTime, int growthTime, int age, Block block)
+	public BlockData(long lastUpdate, int growthTime, int age, Block block)
 	{
-		this.creationTime = creationTime;
+		this(lastUpdate, growthTime, age, block, false);
+	}
+
+	public BlockData(long lastUpdate, int growthTime, int age, Block block, boolean ableToGrow)
+	{
+		this.lastUpdate = lastUpdate;
 		this.growthTime = growthTime;
 		this.age = age;
 		this.block = block;
+		this.ableToGrow = ableToGrow;
 	}
 
+	/**
+	 * Keeping incase addition flags/data will be used?
+	 */
 	private BlockData SetFlags(int bits)
 	{
-		grow = (bits & 1) != 0;
-		destroy = (bits & 1 << 1) != 0;
+		//grow = (bits & 1) != 0;
+		//destroy = (bits & 1 << 1) != 0;
 		return this;
 	}
 
@@ -56,35 +64,37 @@ public class BlockData
 		public JsonElement serialize(BlockData src, Type typeOfSrc, JsonSerializationContext context)
 		{
 			JsonArray array = new JsonArray();
-			array.add(src.creationTime);
+			array.add(src.lastUpdate);
 			array.add(src.growthTime);
 			array.add(src.age);
 			array.add(String.valueOf(Registry.BLOCK.getId(src.block)));
 
-			int bits = 0x00000000;
-			bits |= ((src.grow) ? 1 : 0);
-			bits |= ((src.destroy) ? 1 : 0) << 1;
-			array.add(bits);
+			array.add(src.ableToGrow);
+			//int bits = 0x00000000;
+			//bits |= ((src.grow) ? 1 : 0);
+			//bits |= ((src.destroy) ? 1 : 0) << 1;
+			//array.add(bits);
 
 			return array;
 		}
 
 		public static BlockData deserializeNbt(NbtCompound nbt)
 		{
-			return new BlockData(nbt.getLong("creationTime"), nbt.getInt("growthTime"), nbt.getInt("age"),
-					Registry.BLOCK.get(Identifier.tryParse(nbt.getString("block")))).SetFlags(nbt.getInt("flags"));
+			return new BlockData(nbt.getLong("lastUpdate"), nbt.getInt("growthTime"), nbt.getInt("age"),
+					Registry.BLOCK.get(Identifier.tryParse(nbt.getString("block"))), nbt.getBoolean("ableToGrow"));
 		}
 
 		public static NbtCompound serializeNbt(BlockData src, NbtCompound nbt)
 		{
-			nbt.putLong("creationTime", src.creationTime);
+			nbt.putLong("lastUpdate", src.lastUpdate);
 			nbt.putInt("growthTime", src.growthTime);
 			nbt.putInt("age", src.age);
 			nbt.putString("block", String.valueOf(Registry.BLOCK.getId(src.block)));
-			int bits = 0x00000000;
-			bits |= ((src.grow) ? 1 : 0);
-			bits |= ((src.destroy) ? 1 : 0) << 1;
-			nbt.putInt("flags", bits);
+			nbt.putBoolean("ableToGrow", src.ableToGrow);
+			//int bits = 0x00000000;
+			//bits |= ((src.grow) ? 1 : 0);
+			//bits |= ((src.destroy) ? 1 : 0) << 1;
+			//nbt.putInt("flags", bits);
 			return nbt;
 		}
 	}
