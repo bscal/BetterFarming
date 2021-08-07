@@ -1,8 +1,8 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
-import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.common.seasons.SeasonClock;
+import me.bscal.betterfarming.common.utils.RegistryObjToObjMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -17,27 +17,23 @@ import java.util.Map;
 
 @Environment(EnvType.CLIENT) public class BiomeSeasonHandler
 {
+	public RegistryObjToObjMap<Biome, BiomeChanger> changerMap;
 	public final Map<RegistryKey<Biome>, BiomeChanger> biomeEffectChangerMap = new HashMap<>();
 	public final SeasonClock seasonClock = new SeasonClock();
-	public boolean recievedSyncPacket;
+	public boolean receivedSyncPacket;
 	public boolean haveBiomeChangersLoaded;
-
-	public BiomeSeasonHandler()
-	{
-	}
 
 	/**
 	 * This is loaded when the world is loaded to access the dynamic registry for biomes.
 	 */
 	public void RegisterBiomeChangers(ClientWorld world)
 	{
+		changerMap = new RegistryObjToObjMap<>(world.getRegistryManager().get(Registry.BIOME_KEY));
 		haveBiomeChangersLoaded = true;
 		world.getRegistryManager()
 				.get(Registry.BIOME_KEY)
 				.getEntries()
-				.forEach((key) -> Register(new BiomeChangers.SimpleBiomeChanger(key.getKey()),
-						key.getValue()));
-		BetterFarming.LOGGER.info("Registered BiomeChangers.");
+				.forEach((key) -> Register(new BiomeChangers.SimpleBiomeChanger(key.getKey()), key.getValue()));
 	}
 
 	public void Register(BiomeChanger changer, Biome biome)
@@ -48,30 +44,25 @@ import java.util.Map;
 
 	public void Reload(ClientWorld world)
 	{
-		biomeEffectChangerMap.clear();
+		Clean();
 		RegisterBiomeChangers(world);
 		MinecraftClient.getInstance().worldRenderer.reload();
 	}
 
-	public void UpdateSeasonColors()
+	private void Clean()
 	{
-		for (BiomeChanger changer : biomeEffectChangerMap.values())
-		{
-			//BetterFarming.LOGGER.info(changer.key.toString() + " Has updated.");
-			//changer.GetColor(seasonClock.currentSeason);
-		}
+		biomeEffectChangerMap.clear();
 	}
 
 	private void SyncTime(int season, int ticksInCurrentSeason, long ticks)
 	{
-		recievedSyncPacket = true;
+		receivedSyncPacket = true;
 		boolean seasonChanged = seasonClock.currentSeason != season;
 		seasonClock.currentSeason = season;
 		seasonClock.ticksInCurrentSeason = ticksInCurrentSeason;
 		seasonClock.ticksSinceCreation = ticks;
 		if (seasonChanged)
 		{
-			//UpdateSeasonColors();
 			MinecraftClient.getInstance().worldRenderer.reload();
 		}
 	}

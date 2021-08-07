@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.client.commands;
 
 import com.mojang.brigadier.context.CommandContext;
+import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
 import me.bscal.betterfarming.common.utils.Color;
 import me.bscal.betterfarming.mixin.client.biome.BiomeInvoker;
@@ -14,10 +15,10 @@ import net.minecraft.util.registry.Registry;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public final class ColorDumpCommand
+public final class ColorDumpCommand implements ClientCommand
 {
 
-	public static void Register(BiomeSeasonHandler handler)
+	public void Register()
 	{
 		ClientCommandManager.DISPATCHER.register(
 				ClientCommandManager.literal("seasoncolors").executes((source) -> {
@@ -32,7 +33,7 @@ public final class ColorDumpCommand
 											.get(Registry.BIOME_KEY)
 											.getId(key) + " ------- " + new Color(
 											key.getGrassColorAt(0, 0)).toHex())));
-					handler.biomeEffectChangerMap.forEach((biome, changer) -> {
+					BetterFarmingClient.GetBiomeSeasonHandler().biomeEffectChangerMap.forEach((biome, changer) -> {
 						String str = String.format("%s colors : D=%s | S=%s,%s,%s,%s", changer.key, new Color(
 										((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor()).toHex(),
 								new Color(changer.grassColors[0]).toHex(),
@@ -45,7 +46,7 @@ public final class ColorDumpCommand
 				}));
 
 		ClientCommandManager.DISPATCHER.register(ClientCommandManager.literal("seasoncolors_dump")
-				.executes((source) -> DumpSeasonalColors(source, handler,
+				.executes((source) -> DumpSeasonalColors(source, BetterFarmingClient.GetBiomeSeasonHandler(),
 						FabricLoader.getInstance().getConfigDir() + "\\season_colors_dump.txt")));
 	}
 

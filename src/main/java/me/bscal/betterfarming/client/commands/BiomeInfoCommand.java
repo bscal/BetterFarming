@@ -14,10 +14,10 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.Optional;
 
-public class BiomeInfoCommand
+public class BiomeInfoCommand implements ClientCommand
 {
 
-	public static void Register(BiomeSeasonHandler handler)
+	public void Register()
 	{
 		ClientCommandManager.DISPATCHER.register(
 				ClientCommandManager.literal("seasoninfo").executes((source) -> {
@@ -49,8 +49,8 @@ public class BiomeInfoCommand
 							Text.of("Biome Type: " + ((BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(biome) ?
 									BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(biome).getClass().getSimpleName() :
 									"NULL"))));
-					chatHud.addMessage(Text.of("Date: " + new MinecraftDate(
-							handler.seasonClock.ticksSinceCreation).AsDate(true)));
+					chatHud.addMessage(Text.of("Date: " + new MinecraftDate(BetterFarmingClient.GetBiomeSeasonHandler()
+							.seasonClock.ticksSinceCreation).AsDate(true)));
 
 					return 0;
 				}));
