@@ -10,6 +10,11 @@ public class Color
 
 	public int r, g, b, a;
 
+	public Color(Color c)
+	{
+		this(c.r, c.g, c.b, c.a);
+	}
+
 	public Color(int r, int g, int b)
 	{
 		this(r, g, b, 255);
@@ -416,6 +421,20 @@ public class Color
 		int green = Integer.parseInt(hex.substring(3, 5), 16);
 		int blue = Integer.parseInt(hex.substring(5, 7), 16);
 		return new Color(red, green, blue, alpha);
+	}
+
+	public static Color fromBlend(Color color1, Color color2)
+	{
+		Color result = new Color(color1);
+		result.blend(color2);
+		return result;
+	}
+
+	public static Color fromBlend(Color color1, Color color2, float weight)
+	{
+		Color result = new Color(color1);
+		result.blend(color2, weight);
+		return result;
 	}
 
 	private static String pad(String s)
