@@ -16,14 +16,12 @@ public class SeasonManager extends PersistentState
 {
 	private final SeasonClock m_seasonClock;
 	private long m_lastTimeChecked;
-	private final PacketByteBuf m_bufCache;
 	private int m_counter;
 
 	public SeasonManager()
 	{
 		// TODO loading from configs
 		m_seasonClock = BetterFarming.SEASON_CLOCK;
-		m_bufCache = new PacketByteBuf(Unpooled.buffer(1 + 4 + 8));
 	}
 
 	public static SeasonManager GetOrCreate()
@@ -106,12 +104,12 @@ public class SeasonManager extends PersistentState
 
 	protected void SyncSeasonTimeS2C()
 	{
-		m_bufCache.clear();
-		m_bufCache.writeByte(m_seasonClock.currentSeason);
-		m_bufCache.writeInt(m_seasonClock.ticksInCurrentSeason);
-		m_bufCache.writeLong(m_seasonClock.ticksSinceCreation);
+		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer(1 + 4 + 8, 1 + 4 + 8));
+		buf.writeByte(m_seasonClock.currentSeason);
+		buf.writeInt(m_seasonClock.ticksInCurrentSeason);
+		buf.writeLong(m_seasonClock.ticksSinceCreation);
 		for (ServerPlayerEntity player : PlayerLookup.all(BetterFarming.GetServer()))
-			ServerPlayNetworking.send(player, BetterFarming.SYNC_PACKET, m_bufCache);
+			ServerPlayNetworking.send(player, BetterFarming.SYNC_PACKET, buf);
 
 	}
 
