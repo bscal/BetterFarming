@@ -18,6 +18,16 @@ public class Timer
 		m_duration = System.nanoTime() - m_start;
 	}
 
+	public long GetDuration()
+	{
+		return m_duration;
+	}
+
+	public long GetDurationMillis()
+	{
+		return m_duration / 1000000;
+	}
+
 	public void Log(Logger log)
 	{
 		log.info(String.format("Duration: %dns, %fms", m_duration, m_duration * 0.000001));
