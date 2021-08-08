@@ -54,6 +54,15 @@ import net.minecraft.world.biome.Biome;
 		return foliageColor[season];
 	}
 
+	public int GetFoliageColorWithFall(int season, int x, int y)
+	{
+		if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED)
+		{
+			return GetRandomFallColor(x, y);
+		}
+		return GetFoliageColor(season);
+	}
+
 	public int GetRandomFallColor(int x, int y)
 	{
 		int index;

@@ -26,7 +26,7 @@ import java.math.BigInteger;
 @Environment(EnvType.CLIENT) public class BetterFarmingClient implements ClientModInitializer
 {
 
-	//public static final ParticleType<BlockStateParticleEffect> FALLING_LEAVES = FabricParticleTypes.complex(BlockStateParticleEffect.PARAMETERS_FACTORY);
+	public static final ParticleType<BlockStateParticleEffect> FALLING_LEAVES = FabricParticleTypes.complex(BlockStateParticleEffect.PARAMETERS_FACTORY);
 
 
 	private static final BiomeSeasonHandler SEASON_HANDLER = new BiomeSeasonHandler();
@@ -34,8 +34,8 @@ import java.math.BigInteger;
 	@Override
 	public void onInitializeClient()
 	{
-		//Registry.register(Registry.PARTICLE_TYPE, BetterFarming.MOD_ID + "_falling_leaves", FALLING_LEAVES);
-		//ParticleFactoryRegistry.getInstance().register(FALLING_LEAVES, FallingLeavesParticle.Factory::new);
+		Registry.register(Registry.PARTICLE_TYPE, BetterFarming.MOD_ID + ":falling_leaves", FALLING_LEAVES);
+		ParticleFactoryRegistry.getInstance().register(FALLING_LEAVES, FallingLeavesParticle.Factory::new);
 
 		ClientPlayNetworking.registerGlobalReceiver(BetterFarming.SYNC_PACKET, BiomeSeasonHandler.SyncTimeS2CPacketHandler());
 

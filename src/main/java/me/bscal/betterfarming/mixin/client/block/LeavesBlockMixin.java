@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.Material;
 import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -19,7 +18,7 @@ import java.util.Random;
 @Mixin(LeavesBlock.class) public class LeavesBlockMixin
 {
 
-	@Inject(method = "randomDisplayTick", at = @At("TAIL"))
+	@Inject(method = "randomDisplayTick", at = @At(value = "HEAD"))
 	public void OnRandomDisplayTick(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci)
 	{
 		if (random.nextInt(16) == 0)
@@ -30,16 +29,8 @@ import java.util.Random;
 				double d = (double) pos.getX() + random.nextDouble();
 				double e = (double) pos.getY() - 0.05D;
 				double f = (double) pos.getZ() + random.nextDouble();
-				world.addParticle(new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, state), d, e, f, 0.0D, 0.0D, 0.0D);
+				world.addParticle(new BlockStateParticleEffect(BetterFarmingClient.FALLING_LEAVES, state), d, e, f, 0.0D, 0.0D, 0.0D);
 			}
-		}
-
-		if (random.nextInt(8) == 0)
-		{
-			double d = (double) pos.getX() + random.nextDouble();
-			double e = (double) pos.getY() - 0.05D;
-			double f = (double) pos.getZ() + random.nextDouble();
-			world.addParticle(new BlockStateParticleEffect(BetterFarmingClient.FALLING_LEAVES, state), d, e, f, 0.0D, 0.0D, 0.0D);
 		}
 	}
 
