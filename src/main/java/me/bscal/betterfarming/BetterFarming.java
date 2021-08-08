@@ -46,6 +46,7 @@ public class BetterFarming implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
+		SEASON_SETTINGS.saveConfigToFile();
 		SeasonCropManager.GenerateDefaults(Utils.GetPathInConfig("seasonal_crops.json").toString());
 		CROP_MANAGER.Load(Utils.GetPathInConfig("seasonal_crops.json").toString());
 

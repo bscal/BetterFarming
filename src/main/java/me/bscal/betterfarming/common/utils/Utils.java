@@ -51,16 +51,6 @@ public final class Utils
 		return GetPathInConfig(childPath).toString();
 	}
 
-	public static int Clamp(int value, int min, int max)
-	{
-		return Math.min(max, Math.max(min, value));
-	}
-
-	public static double Clamp(double value, double min, double max)
-	{
-		return Math.min(max, Math.max(min, value));
-	}
-
 	public static Vec3i Vec3iFromShortString(String vec3iString)
 	{
 		vec3iString = vec3iString.replace(" ", "");

@@ -5,6 +5,8 @@ import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
 import me.bscal.betterfarming.common.utils.Color;
 import me.bscal.betterfarming.mixin.client.biome.BiomeInvoker;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,7 +17,8 @@ import net.minecraft.util.registry.Registry;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public final class ColorDumpCommand implements ClientCommand
+@Environment(EnvType.CLIENT)
+public class ColorDumpCommand implements ClientCommand
 {
 
 	public void Register()
@@ -36,10 +39,10 @@ public final class ColorDumpCommand implements ClientCommand
 					BetterFarmingClient.GetBiomeSeasonHandler().biomeEffectChangerMap.forEach((biome, changer) -> {
 						String str = String.format("%s colors : D=%s | S=%s,%s,%s,%s", changer.key, new Color(
 										((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor()).toHex(),
-								new Color(changer.grassColors[0]).toHex(),
-								new Color(changer.grassColors[1]).toHex(),
-								new Color(changer.grassColors[2]).toHex(),
-								new Color(changer.grassColors[3]).toHex());
+								new Color(changer.GetColor(0)).toHex(),
+								new Color(changer.GetColor(1)).toHex(),
+								new Color(changer.GetColor(2)).toHex(),
+								new Color(changer.GetColor(3)).toHex());
 						MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of(str));
 					});
 					return 0;
@@ -77,8 +80,8 @@ public final class ColorDumpCommand implements ClientCommand
 			handler.biomeEffectChangerMap.forEach((biome, changer) -> {
 				String str = String.format("%s colors : D=%s | S=%s,%s,%s,%s", changer.key,
 						new Color(((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor()).toHex(),
-						new Color(changer.grassColors[0]).toHex(), new Color(changer.grassColors[1]).toHex(),
-						new Color(changer.grassColors[2]).toHex(), new Color(changer.grassColors[3]).toHex());
+						new Color(changer.GetColor(0)).toHex(), new Color(changer.GetColor(1)).toHex(),
+						new Color(changer.GetColor(2)).toHex(), new Color(changer.GetColor(3)).toHex());
 				try
 				{
 					writer.append(str).append('\n');

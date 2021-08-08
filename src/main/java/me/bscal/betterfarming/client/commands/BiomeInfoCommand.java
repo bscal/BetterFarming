@@ -5,6 +5,8 @@ import me.bscal.betterfarming.client.BetterFarmingClient;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
 import me.bscal.betterfarming.common.seasons.MinecraftDate;
 import me.bscal.betterfarming.common.seasons.Seasons;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
@@ -14,6 +16,7 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.Optional;
 
+@Environment(EnvType.CLIENT)
 public class BiomeInfoCommand implements ClientCommand
 {
 

@@ -133,6 +133,7 @@ public class SeasonManager extends PersistentState
 			m_seasonClock.currentSeason = season;
 			SyncSeasonTimeS2C();
 		}
+		SeasonSettings.Root.Generation.seasonSeed.setValue(BetterFarming.RAND.nextInt(Integer.MAX_VALUE));
 		markDirty();
 	}
 
