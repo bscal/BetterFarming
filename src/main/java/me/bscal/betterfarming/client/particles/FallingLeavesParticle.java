@@ -10,13 +10,14 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 
+@Environment(EnvType.CLIENT)
 public class FallingLeavesParticle extends SpriteBillboardParticle
 {
 
-	// TODO Cleanup, wind?, rain speeds? seasonal effects? This doesnt need a complex factory prob
+	// TODO This doesnt need a complex factory prob
 
 	private final float angleVelocity;
 
@@ -25,20 +26,23 @@ public class FallingLeavesParticle extends SpriteBillboardParticle
 	{
 		super(clientWorld, d, e, f, g, h, i);
 		this.setSprite(sprites.getSprite(clientWorld.random));
-		this.scale *= clientWorld.random.nextFloat() * .25f + .25f;
-		int max = 48;
-		this.maxAge = max - clientWorld.random.nextInt(16);
+		this.maxAge = 60 - clientWorld.random.nextInt(10);
+		this.scale *= .75f;
 
-		var b = clientWorld.getBiome(new BlockPos(d, e, f));
-		clientWorld.getRegistryManager().get(Registry.BIOME_KEY).getKey(b).ifPresent((key) -> {
-			var changer = BetterFarmingClient.GetBiomeSeasonHandler().biomeEffectChangerMap.get(key);
-			Color c = new Color(changer.GetFoliageColorWithFall(Seasons.GetSeasonForBiome(b, Seasons.GetSeason()), (int) d, (int) f));
-			this.setColor(c.r / 255f, c.g / 255f, c.b / 255f);
-		});
-		this.velocityX = clientWorld.random.nextFloat() * .1f - .05f;
+		float vModifier = 0.1f;
+		vModifier += clientWorld.isRaining() ? .025f : 0;
+		vModifier += clientWorld.isThundering() ? .05f : 0;
+		float vModifierOffset = vModifier / 2;
+		this.velocityX = clientWorld.random.nextFloat() * vModifier - vModifierOffset;
 		this.velocityY = 0;
-		this.velocityZ = clientWorld.random.nextFloat() * .1f - .05f;
+		this.velocityZ = clientWorld.random.nextFloat() * vModifier - vModifierOffset;
 		this.angleVelocity = clientWorld.random.nextFloat() - 0.5f;
+
+		Biome b = clientWorld.getBiome(new BlockPos(d, e, f));
+		var changer = BetterFarmingClient.GetBiomeSeasonHandler().GetChangers().get(b);
+		Color c = new Color(changer.GetFoliageColorWithFall(Seasons.GetSeasonForBiome(b, Seasons.GetSeason()), (int) d, (int) f));
+		float[] rgba = c.toFloats();
+		this.setColor(rgba[0], rgba[1], rgba[2]);
 	}
 
 	@Override
