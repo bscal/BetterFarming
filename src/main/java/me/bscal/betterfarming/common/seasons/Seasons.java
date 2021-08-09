@@ -8,7 +8,9 @@ import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public final class Seasons
@@ -27,7 +29,7 @@ public final class Seasons
 	public static final int DRY = 1;
 
 	public static final SeasonType DESERT = new SeasonType(DRY, DRY, DRY, DRY, true);
-	public static final SeasonType JUNGLE = new SeasonType(WET, WET, WET, WET, true);
+	public static final SeasonType JUNGLE = new SeasonType(WET, WET, WET, DRY, true);
 	public static final SeasonType SAVANNA = new SeasonType(WET, WET, DRY, DRY, true);
 	public static final SeasonType BADLANDS = new SeasonType(DRY, DRY, DRY, WET, true);
 	public static final SeasonType BAMBOO_JUNGLE = new SeasonType(WET, WET, WET, DRY, true);
@@ -38,12 +40,14 @@ public final class Seasons
 
 	public static int GetSeason()
 	{
-		if (FabricLoader.getInstance()
-				.getEnvironmentType() == EnvType.SERVER || !MinecraftClient.getInstance().world.isClient)
-		{
-			return SeasonManager.GetOrCreate().GetSeasonClock().currentSeason;
-		}
-		return BetterFarmingClient.GetBiomeSeasonHandler().seasonClock.currentSeason;
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER || !MinecraftClient.getInstance().world.isClient)
+			return BetterFarmingClient.GetBiomeSeasonHandler().seasonClock.currentSeason;
+		return SeasonManager.GetOrCreate().GetSeasonClock().currentSeason;
+	}
+
+	public static int GetSeasonForPos(World world, BlockPos pos)
+	{
+		return GetSeasonForBiome(world.getBiome(pos), GetSeason());
 	}
 
 	public static int GetSeasonForBiome(Biome key, int season)
@@ -72,9 +76,7 @@ public final class Seasons
 		{
 			SeasonType type = BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryKey(key);
 			if (type.isTropical)
-				return new TranslatableText(BetterFarming.MOD_ID + ((type.seasonValues[season] == WET) ?
-						".wet" :
-						".dry")).getString();
+				return new TranslatableText(BetterFarming.MOD_ID + ((type.seasonValues[season] == WET) ? ".wet" : ".dry")).getString();
 		}
 		return GetNameOfSeason(season);
 	}

@@ -17,8 +17,7 @@ import java.util.Map;
 
 @Environment(EnvType.CLIENT) public class BiomeSeasonHandler
 {
-	public RegistryObjToObjMap<Biome, BiomeChanger> changerMap;
-	public final Map<RegistryKey<Biome>, BiomeChanger> biomeEffectChangerMap = new HashMap<>();
+	private RegistryObjToObjMap<Biome, BiomeChanger> m_changerMap;
 	public final SeasonClock seasonClock = new SeasonClock();
 	public boolean receivedSyncPacket;
 	public boolean haveBiomeChangersLoaded;
@@ -28,7 +27,7 @@ import java.util.Map;
 	 */
 	public void RegisterBiomeChangers(ClientWorld world)
 	{
-		changerMap = new RegistryObjToObjMap<>(world.getRegistryManager().get(Registry.BIOME_KEY));
+		m_changerMap = new RegistryObjToObjMap<>(world.getRegistryManager().get(Registry.BIOME_KEY));
 		haveBiomeChangersLoaded = true;
 		world.getRegistryManager()
 				.get(Registry.BIOME_KEY)
@@ -38,8 +37,13 @@ import java.util.Map;
 
 	public void Register(BiomeChanger changer, Biome biome)
 	{
-		biomeEffectChangerMap.put(changer.key, changer);
+		m_changerMap.put(biome, changer);
 		changer.InitChanger(biome);
+	}
+
+	public RegistryObjToObjMap<Biome, BiomeChanger> GetChangers()
+	{
+		return m_changerMap;
 	}
 
 	public void Reload(ClientWorld world)
@@ -51,7 +55,7 @@ import java.util.Map;
 
 	private void Clean()
 	{
-		biomeEffectChangerMap.clear();
+		m_changerMap.clear();
 	}
 
 	private void SyncTime(int season, int ticksInCurrentSeason, long ticks)

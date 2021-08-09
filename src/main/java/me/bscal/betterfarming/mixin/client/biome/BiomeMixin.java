@@ -22,15 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
 		if (seasonHandler.haveBiomeChangersLoaded)
 		{
-			MinecraftClient.getInstance().world.getRegistryManager()
-					.get(Registry.BIOME_KEY)
-					.getKey(biome)
-					.ifPresent((key) -> {
-						BiomeChanger changer = seasonHandler.biomeEffectChangerMap.get(key);
-						if (changer != null)
-							cir.setReturnValue(changer.GetColor(Seasons.GetSeason()));
-					});
-
+			cir.setReturnValue(seasonHandler.GetChangers().get(biome).GetColor(Seasons.GetSeason()));
 		}
 	}
 
@@ -41,14 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
 		if (seasonHandler.haveBiomeChangersLoaded)
 		{
-			MinecraftClient.getInstance().world.getRegistryManager()
-					.get(Registry.BIOME_KEY)
-					.getKey(biome)
-					.ifPresent((key) -> {
-						BiomeChanger changer = seasonHandler.biomeEffectChangerMap.get(key);
-						if (changer != null)
-							cir.setReturnValue(changer.GetFoliageColor(Seasons.GetSeason()));
-					});
+			cir.setReturnValue(seasonHandler.GetChangers().get(biome).GetFoliageColor(Seasons.GetSeason()));
 		}
 	}
 

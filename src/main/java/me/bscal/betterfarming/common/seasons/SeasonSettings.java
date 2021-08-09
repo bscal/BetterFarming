@@ -37,10 +37,11 @@ public class SeasonSettings extends Config
 
 		public static final ConfigItem<Integer> ticksPerSeason = new ConfigItem<>("ticksPerSeason", 30 * 24000, "ticksPerSeason");
 		public static final ConfigItem<FallLeavesSettings> fallLeavesGraphics = new ConfigItem<>("fallLeavesGraphics", FallLeavesSettings.FANCY, "fallLeavesGraphics");
+		public static final ConfigItem<Integer> leafFallingDistance = new ConfigItem<>("leafFallingDistance", 32, "leafFallingDistance");
 
 		public Root()
 		{
-			super(of(generationGroup, ticksPerSeason, fallLeavesGraphics), "root");
+			super(of(generationGroup, ticksPerSeason, fallLeavesGraphics, leafFallingDistance), "root");
 		}
 
 		public static class Generation extends ConfigItemGroup

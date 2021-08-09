@@ -54,9 +54,9 @@ import net.minecraft.world.biome.BiomeKeys;
 		{
 			fallLeaves = new int[] {
 					foliageColor[Seasons.AUTUMN],
-					Color.getIntFromColor(DEEP_YELLOW),
-					Color.getIntFromColor(DEEP_BROWN),
-					Color.getIntFromColor(DEEP_RED)
+					DEEP_YELLOW.toInt(),
+					DEEP_BROWN.toInt(),
+					DEEP_RED.toInt()
 			};
 		}
 	}

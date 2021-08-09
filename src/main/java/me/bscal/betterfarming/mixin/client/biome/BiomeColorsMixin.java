@@ -40,11 +40,7 @@ public class BiomeColorsMixin
 	{
 		if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED && BetterFarmingClient.GetBiomeSeasonHandler().seasonClock.currentSeason == Seasons.AUTUMN)
 		{
-			var optional = MinecraftClient.getInstance().player.world.getRegistryManager().get(Registry.BIOME_KEY).getKey(biome);
-			if (optional.isPresent())
-			{
-				return BetterFarmingClient.GetBiomeSeasonHandler().biomeEffectChangerMap.get(optional.get()).GetRandomFallColor((int)x, (int)y);
-			}
+			return BetterFarmingClient.GetBiomeSeasonHandler().GetChangers().get(biome).GetRandomFallColor((int)x, (int)y);
 		}
 		return biome.getFoliageColor();
 	}

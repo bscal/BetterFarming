@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.client.seasons.biome;
 
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.common.seasons.Seasons;
 import me.bscal.betterfarming.common.utils.FastNoiseLite;
 import me.bscal.betterfarming.common.seasons.SeasonSettings;
 import net.fabricmc.api.EnvType;
@@ -56,7 +57,7 @@ import net.minecraft.world.biome.Biome;
 
 	public int GetFoliageColorWithFall(int season, int x, int y)
 	{
-		if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED)
+		if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED && season == Seasons.AUTUMN)
 		{
 			return GetRandomFallColor(x, y);
 		}

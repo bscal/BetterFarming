@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
 		if (seasonHandler.haveBiomeChangersLoaded)
 		{
-			BiomeChanger changer = seasonHandler.biomeEffectChangerMap.get(BiomeKeys.BIRCH_FOREST);
+			BiomeChanger changer = seasonHandler.GetChangers().getFromRegistryKey(BiomeKeys.BIRCH_FOREST);
 			if (changer != null)
 			{
 				if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED && Seasons.GetSeason() == Seasons.AUTUMN)

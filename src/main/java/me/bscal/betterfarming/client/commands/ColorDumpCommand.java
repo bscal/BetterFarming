@@ -36,7 +36,7 @@ public class ColorDumpCommand implements ClientCommand
 											.get(Registry.BIOME_KEY)
 											.getId(key) + " ------- " + new Color(
 											key.getGrassColorAt(0, 0)).toHex())));
-					BetterFarmingClient.GetBiomeSeasonHandler().biomeEffectChangerMap.forEach((biome, changer) -> {
+					BetterFarmingClient.GetBiomeSeasonHandler().GetChangers().forEach((biome, changer) -> {
 						String str = String.format("%s colors : D=%s | S=%s,%s,%s,%s", changer.key, new Color(
 										((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor()).toHex(),
 								new Color(changer.GetColor(0)).toHex(),
@@ -77,7 +77,7 @@ public class ColorDumpCommand implements ClientCommand
 					e.printStackTrace();
 				}
 			});
-			handler.biomeEffectChangerMap.forEach((biome, changer) -> {
+			handler.GetChangers().forEach((biome, changer) -> {
 				String str = String.format("%s colors : D=%s | S=%s,%s,%s,%s", changer.key,
 						new Color(((BiomeInvoker) (Object) biome).invokeGetDefaultGrassColor()).toHex(),
 						new Color(changer.GetColor(0)).toHex(), new Color(changer.GetColor(1)).toHex(),
