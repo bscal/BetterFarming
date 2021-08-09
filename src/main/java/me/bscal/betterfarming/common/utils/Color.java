@@ -290,6 +290,14 @@ public class Color
 		return getIntFromColor(r, g, b, a);
 	}
 
+	/**
+	 * Returns a float array of size 4 contains the Colors rgba values in that respective order. All values are between 0.0 - 1.0
+	 */
+	public float[] toFloats()
+	{
+		return new float[] { r / 255f, g / 255f, b / 255f, a / 255f };
+	}
+
 	@Override
 	public String toString()
 	{
@@ -302,11 +310,6 @@ public class Color
 		return obj instanceof Color && ((Color) obj).r == r && ((Color) obj).g == g && ((Color) obj).b == b && ((Color) obj).a == a;
 	}
 
-	public static int getIntFromColor(int r, int g, int b, boolean hasAlpha)
-	{
-		return getIntFromColor(r, g, b, (hasAlpha) ? 255 : 0);
-	}
-
 	public static int getIntFromColor(int r, int g, int b, int a)
 	{
 		a = (a << 24) & 0xff000000;
@@ -314,11 +317,6 @@ public class Color
 		g = (g << 8) & 0x0000ff00;
 		b = b & 0x000000ff;
 		return a | r | g | b;
-	}
-
-	public static int getIntFromColor(Color color)
-	{
-		return getIntFromColor(color.r, color.g, color.b, color.a);
 	}
 
 	public static Color fromHsl(double[] hsl)
