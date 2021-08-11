@@ -3,8 +3,9 @@ package me.bscal.betterfarming;
 import me.bscal.betterfarming.common.commands.SeasonCommand;
 import me.bscal.betterfarming.common.config.TestConfig;
 import me.bscal.betterfarming.common.config.TestConfigBlock;
-import me.bscal.betterfarming.common.database.blockdata.BlockDataChunkManager;
 import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
+import me.bscal.betterfarming.common.database.blockdata.blocks.TestDataBlock;
+import me.bscal.betterfarming.common.database.blockdata.smart.SmartDataManager;
 import me.bscal.betterfarming.common.listeners.*;
 import me.bscal.betterfarming.common.seasons.*;
 import me.bscal.betterfarming.common.utils.Utils;
@@ -46,7 +47,7 @@ public class BetterFarming implements ModInitializer
 
 	public static TestConfig config;
 
-	public static BlockDataChunkManager dataChunkManager;
+	public static SmartDataManager smartDataManager;
 
 	@Override
 	public void onInitialize()
@@ -60,11 +61,14 @@ public class BetterFarming implements ModInitializer
 		//BLOCK_DATA.Load(Utils.GetStringPathInConfig("block_data.json"));
 
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
-		ServerLifecycleEvents.SERVER_STARTING.register((server) -> m_server = server);
+		ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+			m_server = server;
+			smartDataManager = new SmartDataManager(server, TestDataBlock::new);
+		});
 		ServerWorldEvents.LOAD.register(((server, world) -> {
+			smartDataManager.SetupWorld(world);
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
-				dataChunkManager = new BlockDataChunkManager(world);
 				m_overWorldReference = world;
 				SeasonManager.GetOrCreate(world);
 				BlockDataManager.GetOrCreate(world);
@@ -72,7 +76,7 @@ public class BetterFarming implements ModInitializer
 			}
 		}));
 		ServerWorldEvents.UNLOAD.register(((server, world) -> {
-			dataChunkManager.Save(world);
+			smartDataManager.Save();
 		}));
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());
