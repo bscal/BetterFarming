@@ -50,6 +50,13 @@ public final class Seasons
 		return GetSeasonForBiome(world.getBiome(pos), GetSeason());
 	}
 
+	public static int GetSeasonForBiome(Biome key)
+	{
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))
+			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(key).GetSeason(GetSeason());
+		return GetSeason();
+	}
+
 	public static int GetSeasonForBiome(Biome key, int season)
 	{
 		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))

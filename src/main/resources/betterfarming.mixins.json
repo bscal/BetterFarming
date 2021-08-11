@@ -19,7 +19,6 @@
     "client.biome.BiomeInvoker",
     "client.biome.BiomeMixin",
     "client.biome.FoliageColorsMixin",
-    "client.world.MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

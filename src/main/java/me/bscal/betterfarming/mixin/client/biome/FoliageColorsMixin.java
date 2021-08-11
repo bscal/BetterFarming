@@ -22,16 +22,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 	private static void OnGetBirchColor(CallbackInfoReturnable<Integer> cir)
 	{
 		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
-		if (seasonHandler.haveBiomeChangersLoaded)
+		BiomeChanger changer = seasonHandler.GetChangers().getFromRegistryKey(BiomeKeys.BIRCH_FOREST);
+		if (changer != null)
 		{
-			BiomeChanger changer = seasonHandler.GetChangers().getFromRegistryKey(BiomeKeys.BIRCH_FOREST);
-			if (changer != null)
-			{
-				if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED && Seasons.GetSeason() == Seasons.AUTUMN)
-					cir.setReturnValue(FALL_BIRCH_COLOR);
-				else
-					cir.setReturnValue(changer.GetColor(Seasons.GetSeason()));
-			}
+			if (SeasonSettings.Root.fallLeavesGraphics.getValue() != SeasonSettings.FallLeavesSettings.DISABLED && Seasons.GetSeason() == Seasons.AUTUMN)
+				cir.setReturnValue(FALL_BIRCH_COLOR);
+			else
+				cir.setReturnValue(changer.GetColor(Seasons.GetSeason()));
 		}
 	}
 

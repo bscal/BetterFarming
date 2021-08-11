@@ -1,11 +1,7 @@
 package me.bscal.betterfarming.mixin.client.biome;
 
 import me.bscal.betterfarming.client.BetterFarmingClient;
-import me.bscal.betterfarming.client.seasons.biome.BiomeChanger;
-import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
 import me.bscal.betterfarming.common.seasons.Seasons;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,22 +15,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 	public void OnGetGrassColorAt(double x, double z, CallbackInfoReturnable<Integer> cir)
 	{
 		Biome biome = (Biome) (Object) this;
-		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
-		if (seasonHandler.haveBiomeChangersLoaded)
-		{
-			cir.setReturnValue(seasonHandler.GetChangers().get(biome).GetColor(Seasons.GetSeason()));
-		}
+		cir.setReturnValue(BetterFarmingClient.GetBiomeSeasonHandler().GetChangers().get(biome).GetColor(Seasons.GetSeasonForBiome(biome)));
 	}
 
 	@Inject(method = "getFoliageColor", at = @At(value = "HEAD"), cancellable = true)
 	public void OnGetFoliageColor(CallbackInfoReturnable<Integer> cir)
 	{
 		Biome biome = (Biome) (Object) this;
-		BiomeSeasonHandler seasonHandler = BetterFarmingClient.GetBiomeSeasonHandler();
-		if (seasonHandler.haveBiomeChangersLoaded)
-		{
-			cir.setReturnValue(seasonHandler.GetChangers().get(biome).GetFoliageColor(Seasons.GetSeason()));
-		}
+		cir.setReturnValue(
+				BetterFarmingClient.GetBiomeSeasonHandler().GetChangers().get(biome).GetFoliageColor(Seasons.GetSeasonForBiome(biome)));
 	}
 
 	//@Inject(method = "getTemperature()F", at = @At(value = "RETURN"))

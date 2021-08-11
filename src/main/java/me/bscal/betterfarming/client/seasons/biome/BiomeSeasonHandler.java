@@ -17,18 +17,21 @@ import java.util.Map;
 
 @Environment(EnvType.CLIENT) public class BiomeSeasonHandler
 {
-	private RegistryObjToObjMap<Biome, BiomeChanger> m_changerMap;
+	private final RegistryObjToObjMap<Biome, BiomeChanger> m_changerMap;
 	public final SeasonClock seasonClock = new SeasonClock();
 	public boolean receivedSyncPacket;
-	public boolean haveBiomeChangersLoaded;
 
 	/**
 	 * This is loaded when the world is loaded to access the dynamic registry for biomes.
 	 */
-	public void RegisterBiomeChangers(ClientWorld world)
+	public BiomeSeasonHandler(ClientWorld world)
 	{
 		m_changerMap = new RegistryObjToObjMap<>(world.getRegistryManager().get(Registry.BIOME_KEY));
-		haveBiomeChangersLoaded = true;
+		InitChangers(world);
+	}
+
+	private void InitChangers(ClientWorld world)
+	{
 		world.getRegistryManager()
 				.get(Registry.BIOME_KEY)
 				.getEntries()
@@ -49,7 +52,7 @@ import java.util.Map;
 	public void Reload(ClientWorld world)
 	{
 		Clean();
-		RegisterBiomeChangers(world);
+		InitChangers(world);
 		MinecraftClient.getInstance().worldRenderer.reload();
 	}
 

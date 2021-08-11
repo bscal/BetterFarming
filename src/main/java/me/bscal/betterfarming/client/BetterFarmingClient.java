@@ -4,7 +4,6 @@ import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.commands.ClientCommandRegister;
 import me.bscal.betterfarming.client.particles.FallingLeavesParticle;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
-import me.bscal.betterfarming.common.utils.TimerList;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,15 +12,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
-import net.fabricmc.fabric.mixin.client.particle.ParticleManagerAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.util.registry.Registry;
-
-import java.math.BigInteger;
 
 @Environment(EnvType.CLIENT) public class BetterFarmingClient implements ClientModInitializer
 {
@@ -29,7 +22,7 @@ import java.math.BigInteger;
 	public static final ParticleType<BlockStateParticleEffect> FALLING_LEAVES = FabricParticleTypes.complex(BlockStateParticleEffect.PARAMETERS_FACTORY);
 
 
-	private static final BiomeSeasonHandler SEASON_HANDLER = new BiomeSeasonHandler();
+	private static BiomeSeasonHandler SEASON_HANDLER;
 
 	@Override
 	public void onInitializeClient()
@@ -40,7 +33,7 @@ import java.math.BigInteger;
 		ClientPlayNetworking.registerGlobalReceiver(BetterFarming.SYNC_PACKET, BiomeSeasonHandler.SyncTimeS2CPacketHandler());
 
 		ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
-			SEASON_HANDLER.RegisterBiomeChangers(client.world);
+			SEASON_HANDLER = new BiomeSeasonHandler(client.world);
 			BetterFarming.SEASONS_REGISTRY.Load(client.world);
 		}));
 		ClientPlayConnectionEvents.DISCONNECT.register(((handler, client) -> {
