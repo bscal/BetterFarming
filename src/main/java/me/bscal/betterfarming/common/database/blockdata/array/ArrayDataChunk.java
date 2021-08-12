@@ -44,9 +44,8 @@ public class ArrayDataChunk implements IBlockDataChunk
 	}
 
 	@Override
-	public ArrayDataChunk FromNbt(NbtCompound nbt)
+	public IBlockDataChunk FromNbt(NbtCompound nbt)
 	{
-		ArrayDataChunk chunk = new ArrayDataChunk();
 		NbtList yList = nbt.getList("y-data", NbtElement.COMPOUND_TYPE);
 		for (NbtElement eleZ : yList)
 		{
@@ -59,11 +58,11 @@ public class ArrayDataChunk implements IBlockDataChunk
 					int z = compound.getInt("z");
 					IBlockDataBlock data = new TestDataBlock();
 					data.FromNbt(nbt);
-					chunk.CreateAndPut(x, y, z, data);
+					this.CreateAndPut(x, y, z, data);
 				}
 			}
 		}
-		return chunk;
+		return this;
 	}
 
 	@Override

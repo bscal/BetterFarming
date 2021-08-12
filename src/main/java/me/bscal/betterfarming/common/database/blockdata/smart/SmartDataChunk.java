@@ -36,18 +36,17 @@ public class SmartDataChunk implements IBlockDataChunk
 	}
 
 	@Override
-	public SmartDataChunk FromNbt(NbtCompound nbt)
+	public IBlockDataChunk FromNbt(NbtCompound nbt)
 	{
-		SmartDataChunk chunk = new SmartDataChunk();
-		NbtList list = nbt.getList("data", NbtElement.COMPOUND_TYPE);
-		chunk.m_blockData = new Int2ObjectOpenHashMap<>(list.size() + 8, 1f);
+		NbtList list = nbt.getList("sections", NbtElement.COMPOUND_TYPE);
+		this.m_blockData = new Int2ObjectOpenHashMap<>(list.size() + 8, 1f);
 		list.forEach((element -> {
 			if (element instanceof NbtCompound compound)
 			{
-				chunk.m_blockData.put(compound.getInt("y"), new SmartDataChunkSection(compound));
+				this.m_blockData.put(compound.getInt("y"), new SmartDataChunkSection(compound));
 			}
 		}));
-		return chunk;
+		return this;
 	}
 
 	@Override

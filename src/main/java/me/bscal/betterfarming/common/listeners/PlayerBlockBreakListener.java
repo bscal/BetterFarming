@@ -26,7 +26,7 @@ public class PlayerBlockBreakListener implements PlayerBlockBreakEvents.After
 			TestDataBlock data = (TestDataBlock) BetterFarming.smartDataManager.GetOrCreateBlockData((ServerWorld) world, pos);
 			data.i = 10;
 
-			TestDataBlock data1 = (TestDataBlock) BetterFarming.smartDataManager.GetOrCreateBlockData((ServerWorld) world, pos);
+			TestDataBlock data1 = (TestDataBlock) BetterFarming.smartDataManager.GetOrCreateBlockData((ServerWorld) world, pos.up());
 			data1.i = 67;
 		}
 	}

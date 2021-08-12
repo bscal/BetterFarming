@@ -29,8 +29,8 @@ public class SmartDataChunkSection
 		NbtList list = nbt.getList("data", NbtElement.COMPOUND_TYPE);
 		list.forEach(compound -> {
 			TestDataBlock dataBlock = new TestDataBlock();
-			dataBlock.FromNbt(nbt);
-			SetBlockData(nbt.getLong("xz"), dataBlock);
+			dataBlock.FromNbt((NbtCompound) compound);
+			SetBlockData(((NbtCompound)compound).getLong("xz"), dataBlock);
 		});
 	}
 
@@ -60,7 +60,10 @@ public class SmartDataChunkSection
 
 	public IBlockDataBlock GetBlockData(int x, int z, Supplier<IBlockDataBlock> blockDataFactory)
 	{
-		return m_blockDataMap.getOrDefault(XZToLong(x, z), blockDataFactory.get());
+		long key = XZToLong(x, z);
+		var blockData  = m_blockDataMap.getOrDefault(key, blockDataFactory.get());
+		m_blockDataMap.put(key, blockData);
+		return blockData;
 	}
 
 	public IBlockDataBlock SetBlockData(long xz, IBlockDataBlock data)

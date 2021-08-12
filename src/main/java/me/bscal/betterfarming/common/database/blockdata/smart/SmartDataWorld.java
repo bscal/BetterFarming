@@ -42,9 +42,7 @@ public class SmartDataWorld extends DataWorld
 			try
 			{
 				NbtCompound nbt = NbtIo.readCompressed(file);
-				IBlockDataChunk dataChunk = new SmartDataChunk();
-				dataChunk.FromNbt(nbt);
-				m_chunkToSection.put(pos.toLong(), dataChunk);
+				m_chunkToSection.put(pos.toLong(), new SmartDataChunk().FromNbt(nbt));
 			}
 			catch (IOException e)
 			{

@@ -9,6 +9,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,8 @@ public abstract class DataWorld implements IBlockDataWorld
 	public DataWorld(ServerWorld world)
 	{
 		this.m_world = world;
-		this.m_saveDir = new File(world.getServer().getSavePath(WorldSavePath.ROOT) + "/data/" + BetterFarming.MOD_ID + "_block_data/");
+		this.m_saveDir = new File(DimensionType.getSaveDirectory(world.getRegistryKey(),
+				world.getServer().getSavePath(WorldSavePath.ROOT).toFile()) + "/data/" + BetterFarming.MOD_ID + "_block_data/");
 		this.m_saveDir.mkdirs();
 		this.m_chunkToSection = new Long2ObjectOpenHashMap<>(Hash.DEFAULT_INITIAL_SIZE, 1f);
 	}
@@ -55,7 +57,6 @@ public abstract class DataWorld implements IBlockDataWorld
 				e.printStackTrace();
 			}
 		}
-		m_chunkToSection.clear();
 	}
 
 	public void OnUnloadChunk(ServerWorld world, WorldChunk chunk)

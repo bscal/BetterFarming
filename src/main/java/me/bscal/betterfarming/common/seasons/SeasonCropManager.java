@@ -5,6 +5,7 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CropBlock;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -46,9 +47,11 @@ public class SeasonCropManager
 	{
 		Map<Block, SeasonalCrop> tempCropMap = new HashMap<>();
 
-		tempCropMap.put(Blocks.WHEAT, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(1f, 1f, .5f, 0f).Build());
-		tempCropMap.put(Blocks.CARROTS, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(0f, 1f, 0f, 0f).Build());
-		tempCropMap.put(Blocks.SUGAR_CANE, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(1f, 0f).Build());
+		tempCropMap.put(Blocks.WHEAT,
+				new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(1f, 1f, .5f, 0f).SetMaxAge(CropBlock.MAX_AGE).Build());
+		tempCropMap.put(Blocks.CARROTS,
+				new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(0f, 1f, 0f, 0f).SetMaxAge(CropBlock.MAX_AGE).Build());
+		tempCropMap.put(Blocks.SUGAR_CANE, new SeasonalCrop.Builder().SetGrowthTicks(10).SetGrowRates(1f, 0f).SetMaxAge(15).Build());
 
 		Gson gson = new GsonBuilder().setPrettyPrinting()
 				.enableComplexMapKeySerialization()

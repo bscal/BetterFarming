@@ -36,9 +36,7 @@ public class ArrayDataWorld extends DataWorld
 			try
 			{
 				NbtCompound nbt = NbtIo.readCompressed(file);
-				IBlockDataChunk dataChunk = new ArrayDataChunk();
-				dataChunk.FromNbt(nbt);
-				m_chunkToSection.put(pos.toLong(), dataChunk);
+				m_chunkToSection.put(pos.toLong(), new ArrayDataChunk().FromNbt(nbt));
 			}
 			catch (IOException e)
 			{
