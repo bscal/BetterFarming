@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.common.database.blockdata.array;
 
+import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.DataWorld;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
 import me.bscal.betterfarming.common.database.blockdata.smart.SmartDataChunk;
@@ -14,9 +15,9 @@ import java.io.IOException;
 
 public class ArrayDataWorld extends DataWorld
 {
-	public ArrayDataWorld(ServerWorld world)
+	public ArrayDataWorld(String id, ServerWorld world)
 	{
-		super(world);
+		super(id, world);
 	}
 
 	@Override
@@ -30,7 +31,7 @@ public class ArrayDataWorld extends DataWorld
 	public void OnLoadChunk(ServerWorld world, WorldChunk chunk)
 	{
 		ChunkPos pos = chunk.getPos();
-		File file = new File(m_saveDir, ChunkFileName(pos.x, pos.z));
+		File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
 		if (file.exists())
 		{
 			try

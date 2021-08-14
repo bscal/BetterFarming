@@ -23,10 +23,10 @@ public class PlayerBlockBreakListener implements PlayerBlockBreakEvents.After
 			Chunk chunk = world.getChunk(pos);
 			IChunkEcoComponent component = ChunkEcoProvider.CHUNK_ECO.get(chunk);
 
-			TestDataBlock data = (TestDataBlock) BetterFarming.smartDataManager.GetOrCreateBlockData((ServerWorld) world, pos);
+			TestDataBlock data = (TestDataBlock) BetterFarming.SMART_DATA_MANAGER.GetOrCreateBlockData((ServerWorld) world, pos);
 			data.i = 10;
 
-			TestDataBlock data1 = (TestDataBlock) BetterFarming.smartDataManager.GetOrCreateBlockData((ServerWorld) world, pos.up());
+			TestDataBlock data1 = (TestDataBlock) BetterFarming.SMART_DATA_MANAGER.GetOrCreateBlockData((ServerWorld) world, pos.up());
 			data1.i = 67;
 		}
 	}

@@ -47,7 +47,7 @@ public class BetterFarming implements ModInitializer
 
 	public static TestConfig config;
 
-	public static SmartDataManager smartDataManager;
+	public static final SmartDataManager SMART_DATA_MANAGER = new SmartDataManager(MOD_ID + "_blockdata", TestDataBlock::new);
 
 	@Override
 	public void onInitialize()
@@ -63,10 +63,9 @@ public class BetterFarming implements ModInitializer
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
 		ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
 			m_server = server;
-			smartDataManager = new SmartDataManager(server, TestDataBlock::new);
 		});
 		ServerWorldEvents.LOAD.register(((server, world) -> {
-			smartDataManager.SetupWorld(world);
+			SMART_DATA_MANAGER.SetupWorld(world);
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
 				m_overWorldReference = world;
@@ -76,7 +75,7 @@ public class BetterFarming implements ModInitializer
 			}
 		}));
 		ServerWorldEvents.UNLOAD.register(((server, world) -> {
-			smartDataManager.Save();
+			SMART_DATA_MANAGER.Save();
 		}));
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());

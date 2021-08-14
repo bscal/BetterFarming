@@ -10,20 +10,20 @@ import java.util.function.Supplier;
 
 public class SmartDataManager extends DataManager
 {
-	public SmartDataManager(MinecraftServer server)
+	public SmartDataManager(String id)
 	{
-		super(server);
+		super(id);
 	}
 
-	public SmartDataManager(MinecraftServer server, Supplier<IBlockDataBlock> blockDataFactoryDefault)
+	public SmartDataManager(String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
-		super(server, blockDataFactoryDefault);
+		super(id, blockDataFactoryDefault);
 	}
 
 	@Override
 	public IBlockDataWorld SetupWorld(ServerWorld world)
 	{
-		var dataWorld = new SmartDataWorld(world);
+		var dataWorld = new SmartDataWorld(id, world);
 		worlds.add(dataWorld);
 		return dataWorld;
 	}

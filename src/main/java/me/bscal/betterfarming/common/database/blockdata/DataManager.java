@@ -2,7 +2,6 @@ package me.bscal.betterfarming.common.database.blockdata;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.bscal.betterfarming.common.database.blockdata.blocks.EmptyDataBlock;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -13,16 +12,18 @@ import java.util.function.Supplier;
 public abstract class DataManager implements IBlockDataManager
 {
 
+	protected final String id;
 	public final ObjectArrayList<IBlockDataWorld> worlds;
 	public final Supplier<IBlockDataBlock> blockDataFactoryDefault;
 
-	public DataManager(MinecraftServer server)
+	public DataManager(String id)
 	{
-		this(server, () -> EmptyDataBlock.EMPTY_DATA);
+		this(id, () -> EmptyDataBlock.EMPTY_DATA);
 	}
 
-	public DataManager(MinecraftServer server, Supplier<IBlockDataBlock> blockDataFactoryDefault)
+	public DataManager(String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
+		this.id = id;
 		this.worlds = new ObjectArrayList<>(3 + 3);
 		this.blockDataFactoryDefault = blockDataFactoryDefault;
 	}
@@ -107,6 +108,16 @@ public abstract class DataManager implements IBlockDataManager
 	public void Save()
 	{
 		worlds.forEach(IBlockDataWorld::Save);
+	}
+
+	public static long XZToLong(int x, int z)
+	{
+		return x & 0xffL << 32 | z & 0xffL;
+	}
+
+	public static String ChunkFileName(int x, int z)
+	{
+		return x + "-" + z + ".dat";
 	}
 
 }

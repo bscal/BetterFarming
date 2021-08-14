@@ -3,6 +3,7 @@ package me.bscal.betterfarming.common.database.blockdata.smart;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectRBTreeMap;
+import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
 import me.bscal.betterfarming.common.database.blockdata.blocks.TestDataBlock;
 import net.minecraft.nbt.NbtCompound;
@@ -48,19 +49,14 @@ public class SmartDataChunkSection
 		return nbt;
 	}
 
-	public long XZToLong(int x, int z)
-	{
-		return x & 0xffL << 32 | z & 0xffL;
-	}
-
 	public IBlockDataBlock GetBlockData(int x, int z)
 	{
-		return m_blockDataMap.get(XZToLong(x, z));
+		return m_blockDataMap.get(DataManager.XZToLong(x, z));
 	}
 
 	public IBlockDataBlock GetBlockData(int x, int z, Supplier<IBlockDataBlock> blockDataFactory)
 	{
-		long key = XZToLong(x, z);
+		long key = DataManager.XZToLong(x, z);
 		var blockData  = m_blockDataMap.getOrDefault(key, blockDataFactory.get());
 		m_blockDataMap.put(key, blockData);
 		return blockData;
@@ -73,7 +69,7 @@ public class SmartDataChunkSection
 
 	public IBlockDataBlock SetBlockData(int x, int z, IBlockDataBlock data)
 	{
-		return m_blockDataMap.put(XZToLong(x, z), data);
+		return m_blockDataMap.put(DataManager.XZToLong(x, z), data);
 	}
 
 	public Long2ObjectOpenHashMap<IBlockDataBlock> GetMap()
@@ -95,6 +91,6 @@ public class SmartDataChunkSection
 
 	public IBlockDataBlock RemoveBlock(int x, int z)
 	{
-		return m_blockDataMap.remove(XZToLong(x, z));
+		return m_blockDataMap.remove(DataManager.XZToLong(x, z));
 	}
 }

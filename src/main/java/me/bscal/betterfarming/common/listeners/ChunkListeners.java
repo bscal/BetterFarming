@@ -10,12 +10,12 @@ public class ChunkListeners implements ServerChunkEvents.Load, ServerChunkEvents
 	@Override
 	public void onChunkLoad(ServerWorld world, WorldChunk chunk)
 	{
-		BetterFarming.smartDataManager.OnLoadChunk(world, chunk);
+		BetterFarming.SMART_DATA_MANAGER.OnLoadChunk(world, chunk);
 	}
 
 	@Override
 	public void onChunkUnload(ServerWorld world, WorldChunk chunk)
 	{
-		BetterFarming.smartDataManager.OnUnloadChunk(world, chunk);
+		BetterFarming.SMART_DATA_MANAGER.OnUnloadChunk(world, chunk);
 	}
 }

@@ -13,9 +13,9 @@ import java.io.IOException;
 
 public class SmartDataWorld extends DataWorld
 {
-	public SmartDataWorld(ServerWorld world)
+	public SmartDataWorld(String id, ServerWorld world)
 	{
-		super(world);
+		super(id, world);
 	}
 
 	@Override

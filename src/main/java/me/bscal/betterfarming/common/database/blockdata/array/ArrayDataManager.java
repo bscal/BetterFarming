@@ -10,20 +10,20 @@ import java.util.function.Supplier;
 
 public class ArrayDataManager extends DataManager
 {
-	public ArrayDataManager(MinecraftServer server)
+	public ArrayDataManager(String id)
 	{
-		super(server);
+		super(id);
 	}
 
-	public ArrayDataManager(MinecraftServer server, Supplier<IBlockDataBlock> blockDataFactoryDefault)
+	public ArrayDataManager(String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
-		super(server, blockDataFactoryDefault);
+		super(id, blockDataFactoryDefault);
 	}
 
 	@Override
 	public IBlockDataWorld SetupWorld(ServerWorld world)
 	{
-		var dataWorld = new ArrayDataWorld(world);
+		var dataWorld = new ArrayDataWorld(id, world);
 		worlds.add(dataWorld);
 		return dataWorld;
 	}
