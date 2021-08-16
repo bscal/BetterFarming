@@ -11,14 +11,16 @@
     "common.blocks.SaplingBlockScheduleMixin",
     "common.blocks.SpreadableBlockMixin",
     "common.entities.CowEntityMixin",
+    "common.loot.AbstractBlockMixin",
+    "common.loot.LivingEntityMixin",
     "common.world.ServerWorldMixin"
   ],
   "client": [
-    "client.block.LeavesBlockMixin",
     "client.biome.BiomeColorsMixin",
     "client.biome.BiomeInvoker",
     "client.biome.BiomeMixin",
     "client.biome.FoliageColorsMixin",
+    "client.block.LeavesBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
