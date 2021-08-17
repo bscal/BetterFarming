@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.common.database.blockdata.smart;
 
+import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.DataWorld;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
 import net.minecraft.nbt.NbtCompound;
@@ -36,7 +37,7 @@ public class SmartDataWorld extends DataWorld
 	public void OnLoadChunk(ServerWorld world, WorldChunk chunk)
 	{
 		ChunkPos pos = chunk.getPos();
-		File file = new File(m_saveDir, ChunkFileName(pos.x, pos.z));
+		File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
 		if (file.exists())
 		{
 			try
