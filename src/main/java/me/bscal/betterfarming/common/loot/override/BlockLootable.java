@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.List;
 import java.util.Optional;
 
-public class BlockLootable
+public interface BlockLootable
 {
 
 	/**
@@ -23,10 +23,7 @@ public class BlockLootable
 	 *<br>
 	 * - Loot gen functions are called from a several classes and blocks there are nullable parameters wrapped in optionals.
 	 */
-	public List<ItemStack> Generate(BlockState state, LootContext context, ServerWorld world, BlockPos origin,
-			Optional<BlockEntity> blockEntity, Optional<ItemStack> tool, Optional<Entity> entity)
-	{
-		return null;
-	}
+	List<ItemStack> Generate(BlockState state, LootContext context, ServerWorld world, BlockPos origin,
+			Optional<BlockEntity> blockEntity, Optional<ItemStack> tool, Optional<Entity> entity);
 
 }

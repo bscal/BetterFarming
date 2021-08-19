@@ -10,13 +10,10 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
-public class EntityLootable
+public interface EntityLootable
 {
 
-	public List<ItemStack> Generate(LivingEntity sourceEntity, LootContext context, DamageSource source, boolean causedByPlayer,
-			Identifier lootId, LootTable lootTable, ServerWorld world)
-	{
-		return null;
-	}
+	List<ItemStack> Generate(LivingEntity sourceEntity, LootContext context, DamageSource source, boolean causedByPlayer,
+			Identifier lootId, LootTable lootTable, ServerWorld world);
 
 }

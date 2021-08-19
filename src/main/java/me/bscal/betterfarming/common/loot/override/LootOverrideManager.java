@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class LootOverrideManager
 {
@@ -27,16 +28,34 @@ public class LootOverrideManager
 	private Object2ObjectOpenHashMap<Identifier, BlockLootable> m_blockLoot;
 	private Object2ObjectOpenHashMap<Identifier, EntityLootable> m_entityLoot;
 
+	public LootOverrideManager()
+	{
+		m_blockLoot = new Object2ObjectOpenHashMap<>();
+		m_entityLoot = new Object2ObjectOpenHashMap<>();
+	}
+
+	public void RegisterLootable(Identifier blockId, BlockLootable blockLootable)
+	{
+		m_blockLoot.put(blockId, blockLootable);
+	}
+
+	public void RegisterLootable(Identifier blockId, EntityLootable entityLootable)
+	{
+		m_entityLoot.put(blockId, entityLootable);
+	}
+
 	public List<ItemStack> RunLootableBlock(Identifier blockId, BlockState state, LootContext context,
 			BlockPos origin, Optional<BlockEntity> blockEntity, Optional<ItemStack> itemStack, Optional<Entity> enity)
 	{
-		return m_blockLoot.get(blockId).Generate(state, context, context.getWorld(), origin, blockEntity, itemStack, enity);
+		var lootable = m_blockLoot.get(blockEntity);
+		return lootable == null ? null : lootable.Generate(state, context, context.getWorld(), origin, blockEntity, itemStack, enity);
 	}
 
 	public List<ItemStack> RunLootableEntity(Identifier entityId, LivingEntity sourceEntity, LootContext context, DamageSource source, boolean causedByPlayer,
 			Identifier lootId, LootTable lootTable)
 	{
-		return m_entityLoot.get(entityId).Generate(sourceEntity, context, source, causedByPlayer, lootId, lootTable, context.getWorld());
+		var lootable = m_entityLoot.get(entityId);
+		return lootable == null ? null : lootable.Generate(sourceEntity, context, source, causedByPlayer, lootId, lootTable, context.getWorld());
 	}
 
 	public void DropEntityLoot(List<ItemStack> stack, LivingEntity sourceEntity, float yOffset)
@@ -55,6 +74,15 @@ public class LootOverrideManager
 				Block.dropStack(world, pos, dir, itemStack);
 			else
 				Block.dropStack(world, pos, itemStack);
+		}
+	}
+
+	public void OverrideLoot(List<ItemStack> loots, ServerWorld world, BlockPos pos, Supplier<BlockState> newState)
+	{
+		if (loots != null)
+		{
+			DropBlockLoot(loots, world, pos, null);
+			world.setBlockState(pos, newState.get(), Block.NOTIFY_ALL);
 		}
 	}
 
