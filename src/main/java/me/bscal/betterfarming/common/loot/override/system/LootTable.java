@@ -1,17 +1,15 @@
 package me.bscal.betterfarming.common.loot.override.system;
 
-import me.bscal.betterfarming.BetterFarming;
-
 import java.util.*;
 
 public class LootTable
 {
 
-
 	public final String name;
 	public final int rolls;
 	private final List<LootDrop> drops;
 	private final Set<LootDrop> uniqueDrops;
+	private final Random random;
 
 	public LootTable(String name, int rolls, List<LootDrop> drops)
 	{
@@ -19,11 +17,7 @@ public class LootTable
 		this.rolls = rolls;
 		this.drops = drops;
 		this.uniqueDrops = new HashSet<>(drops.size());
-	}
-
-	public void AddDrop(LootDrop drop)
-	{
-		drops.add(drop);
+		this.random = new Random();
 	}
 
 	public List<LootDrop> Roll(int bonusRolls)
@@ -48,7 +42,7 @@ public class LootTable
 			}
 		}
 
-		float hitValue = (float) (Math.random() * totalProbability);
+		float hitValue = random.nextFloat() * totalProbability;
 		int totalRolls = rolls + bonusRolls - lootResults.size();
 		for (int i = 0; i < totalRolls; i++)
 		{
@@ -70,10 +64,13 @@ public class LootTable
 	private void AddDropToLootResult(List<LootDrop> results, LootDrop drop)
 	{
 
-		if (drop.unique() && !uniqueDrops.contains(drop))
+		if (drop.unique())
 		{
-			uniqueDrops.add(drop);
-			results.add(drop);
+			if (!uniqueDrops.contains(drop))
+			{
+				uniqueDrops.add(drop);
+				results.add(drop);
+			}
 			return;
 		}
 		results.add(drop);
