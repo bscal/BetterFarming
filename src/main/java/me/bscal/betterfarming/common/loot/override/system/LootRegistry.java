@@ -3,24 +3,20 @@ package me.bscal.betterfarming.common.loot.override.system;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.util.Identifier;
 
-public class LootRegistry
+public final class LootRegistry
 {
 
-	private final Object2ObjectOpenHashMap<Identifier, LootTable> m_idToLootTable;
+	private static final Object2ObjectOpenHashMap<Identifier, LootTable> m_idToLootTable = new Object2ObjectOpenHashMap<>();;
 
-	public LootRegistry()
-	{
-		m_idToLootTable = new Object2ObjectOpenHashMap<>();
-	}
-
-	public void Register(Identifier id, LootTable table)
+	public static void Register(Identifier id, LootTable table)
 	{
 		m_idToLootTable.put(id, table);
 	}
 
-	public LootTable GetLootTable(Identifier id)
+	public static LootTable GetLootTable(Identifier id)
 	{
 		return m_idToLootTable.get(id);
 	}
+
 
 }
