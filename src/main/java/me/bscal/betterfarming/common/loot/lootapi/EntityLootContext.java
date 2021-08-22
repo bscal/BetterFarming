@@ -1,4 +1,4 @@
-package me.bscal.betterfarming.common.loot.override.system;
+package me.bscal.betterfarming.common.loot.lootapi;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;

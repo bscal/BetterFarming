@@ -1,6 +1,5 @@
-package me.bscal.betterfarming.common.loot.override.system;
+package me.bscal.betterfarming.common.loot.lootapi;
 
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,7 +13,7 @@ import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockLootContext extends me.bscal.betterfarming.common.loot.override.system.LootContext
+public class BlockLootContext extends me.bscal.betterfarming.common.loot.lootapi.LootContext
 {
 	public @NotNull BlockState state;
 	public @NotNull Identifier blockId;

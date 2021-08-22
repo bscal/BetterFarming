@@ -1,6 +1,6 @@
 package me.bscal.betterfarming.mixin.common.loot;
 
-import me.bscal.betterfarming.common.loot.override.system.*;
+import me.bscal.betterfarming.common.loot.lootapi.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -48,29 +48,21 @@ import java.util.List;
 				Identifier entityId = Registry.ENTITY_TYPE.getId(this.getType());
 				LootContext context = builder.build(LootContextTypes.ENTITY);
 				ServerWorld serverWorld = context.getWorld();
-				
+
 				EntityLootContext entityContext = new EntityLootContext(ent, entityId, serverWorld, context, minecraftLootTable, source,
 						causedByPlayer, lootTable);
-				if (lootTable.OnPreRoll(entityContext))
+				List<LootDrop> drops = lootTable.Roll(entityContext, 0);
+				if (drops == null || drops.isEmpty())
 				{
-					List<LootDrop> drops = lootTable.Roll(entityContext, 0);
-					lootTable.OnPostRoll(entityContext, drops);
-					if (drops == null || drops.isEmpty())
-					{
-						// Returns an empty list because we want to override loot
-						if (lootTable.alwaysOverrideDefault)
-							ci.cancel();
-					}
-					else
-					{
-						for (LootDrop drop : drops)
-						{
-							if (drop.item() instanceof LootItem.LootItemStack lootStack)
-								ent.dropStack(lootStack.GetItem());
-						}
-						// Returns an empty list because we want to override loot
+					// Returns an empty list because we want to override loot
+					if (lootTable.alwaysOverrideDefault)
 						ci.cancel();
-					}
+				}
+				else
+				{
+					LootTable.ProcessItemDrop(drops, entityContext, ent);
+					// Returns an empty list because we want to override loot
+					ci.cancel();
 				}
 			}
 		}

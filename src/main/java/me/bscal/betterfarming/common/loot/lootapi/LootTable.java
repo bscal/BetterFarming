@@ -1,8 +1,12 @@
-package me.bscal.betterfarming.common.loot.override.system;
+package me.bscal.betterfarming.common.loot.lootapi;
+
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 public class LootTable
 {
@@ -14,9 +18,6 @@ public class LootTable
 	private final List<LootDrop> m_drops;
 	private final Set<LootDrop> m_uniqueDrops;
 	private final Random m_random;
-	private final List<Predicate<LootContext>> m_preRollChecks;
-	// TODO possible move this to be done if Item was chosen during Roll() function
-	private final List<BiConsumer<LootContext, List<LootDrop>>> m_postRollModifiers;
 
 	public LootTable(String name, boolean alwaysOverrideDefault, int rolls, List<LootDrop> drops)
 	{
@@ -26,39 +27,12 @@ public class LootTable
 		this.m_drops = drops;
 		this.m_uniqueDrops = new HashSet<>(drops.size());
 		this.m_random = new Random();
-		this.m_preRollChecks = new ArrayList<>(4);
-		this.m_postRollModifiers = new ArrayList<>(4);
-	}
-
-	public void AddPreRollCheck(Predicate<LootContext> preRollCheck)
-	{
-		this.m_preRollChecks.add(preRollCheck);
-	}
-
-	public void AddPostRollCheck(BiConsumer<LootContext, List<LootDrop>> postRollModifier)
-	{
-		this.m_postRollModifiers.add(postRollModifier);
-	}
-
-	public boolean OnPreRoll(LootContext context)
-	{
-		for (var predicate : m_preRollChecks)
-		{
-			if (!predicate.test(context))
-				return false;
-		}
-		return true;
-	}
-
-	public void OnPostRoll(LootContext context, List<LootDrop> drops)
-	{
-		m_postRollModifiers.forEach(consumer -> consumer.accept(context, drops));
 	}
 
 	public List<LootDrop> Roll(LootContext context, int bonusRolls)
 	{
-		List<LootDrop> lootResults = new ArrayList<>(8);
-		List<LootDrop> rollableLoot = new ArrayList<>(8);
+		List<LootDrop> lootResults = new ArrayList<>();
+		List<LootDrop> rollableLoot = new ArrayList<>();
 
 		m_uniqueDrops.clear();
 
@@ -67,6 +41,9 @@ public class LootTable
 		{
 			if (drop.isEnabled())
 			{
+				if (!drop.item().TestPreRollPredicates(context))
+					continue;
+
 				if (drop.alwaysDrop())
 					AddDropToLootResult(lootResults, drop, context);
 				else
@@ -103,12 +80,28 @@ public class LootTable
 			if (drop.unique())
 				m_uniqueDrops.add(drop);
 
-			if (drop.item().IsLootTable())
-				results.addAll(drop.item().RollNestedTable(context));
+			if (drop.item() instanceof LootItem.LootLootTable table)
+				results.addAll(table.GetItem().Roll(context, 0));
 			else
 				results.add(drop);
 		}
+	}
 
+	public static void ProcessItemDrop(List<LootDrop> drops, LootContext context)
+	{
+		for (LootDrop drop : drops)
+		{
+			if (drop.item() instanceof LootItem.LootItemStack item)
+			{
+				ItemStack stack = item.GetItem();
+				drop.item().AcceptPostRollConsumers(context, stack);
+				if (context instanceof EntityLootContext entContext)
+					entContext.entity.dropStack(stack);
+				else if (context instanceof BlockLootContext blockContext)
+					Block.dropStack(blockContext.world, blockContext.origin, stack);
+			}
+
+		}
 	}
 
 }

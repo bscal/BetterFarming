@@ -1,6 +1,6 @@
 package me.bscal.betterfarming.mixin.common.loot;
 
-import me.bscal.betterfarming.common.loot.override.system.*;
+import me.bscal.betterfarming.common.loot.lootapi.*;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -57,27 +57,18 @@ import java.util.Optional;
 				Optional<Entity> entity = Optional.ofNullable(builder.getNullable(LootContextParameters.THIS_ENTITY));
 				entity.ifPresent(e -> blockContext.entity = e);
 
-
-				if (lootTable.OnPreRoll(blockContext))
+				List<LootDrop> drops = lootTable.Roll(blockContext, 0);
+				if (drops == null || drops.isEmpty())
 				{
-					List<LootDrop> drops = lootTable.Roll(blockContext, 0);
-					if (drops == null || drops.isEmpty())
-					{
-						// Returns an empty list because we want to override loot
-						if (lootTable.alwaysOverrideDefault)
-							cir.setReturnValue(Collections.emptyList());
-					}
-					else
-					{
-						lootTable.OnPostRoll(blockContext, drops);
-						for (LootDrop drop : drops)
-						{
-							if (drop.item() instanceof LootItem.LootItemStack lootStack)
-								Block.dropStack(serverWorld, origin, lootStack.GetItem());
-						}
-						// Returns an empty list because we want to override loot
+					// Returns an empty list because we want to override loot
+					if (lootTable.alwaysOverrideDefault)
 						cir.setReturnValue(Collections.emptyList());
-					}
+				}
+				else
+				{
+					LootTable.ProcessItemDrop(drops, blockContext, serverWorld, origin);
+					// Returns an empty list because we want to override loot
+					cir.setReturnValue(Collections.emptyList());
 				}
 			}
 		}
