@@ -14,7 +14,6 @@ public abstract class LootItem<T>
 	protected int m_itemCount;
 	private List<Predicate<LootContext>> m_preRollChecks;
 	private List<BiConsumer<LootContext, ItemStack>> m_postRollModifiers;
-	//protected List<BiFunction<ItemStack, LootContext, Integer>> m_stackAmountFunctions;
 
 	public LootItem(T item)
 	{
@@ -24,10 +23,7 @@ public abstract class LootItem<T>
 	public T GetItem()
 	{
 		return m_item;
-
 	}
-
-	// public abstract int GetAmount(LootContext context);
 
 	protected void SetPostRollModifiers(List<BiConsumer<LootContext, ItemStack>> postRollModifiers)
 	{
@@ -115,14 +111,16 @@ public abstract class LootItem<T>
 			return m_item.getCount();
 		}
 
-		//		@Override
-		//		public int GetAmount(LootContext context)
-		//		{
-		//			int i = m_item.getCount();
-		//			for (var countFunc : m_stackAmountFunctions)
-		//				i += countFunc.apply(context);
-		//			return i;
-		//		}
+		public static void AddAmount(ItemStack itemStack, int amount)
+		{
+			itemStack.setCount(itemStack.getCount() + amount);
+		}
+
+		public static void MultiplyAmount(ItemStack itemStack, float amount)
+		{
+			int count = itemStack.getCount();
+			itemStack.setCount((int) (count + Math.floor(count * amount)));
+		}
 	}
 
 	// ***********************************************************

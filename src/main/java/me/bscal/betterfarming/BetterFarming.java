@@ -7,6 +7,8 @@ import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
 import me.bscal.betterfarming.common.database.blockdata.blocks.TestDataBlock;
 import me.bscal.betterfarming.common.database.blockdata.smart.SmartDataManager;
 import me.bscal.betterfarming.common.listeners.*;
+import me.bscal.betterfarming.common.loot.override.LootOverrideManager;
+import me.bscal.betterfarming.common.loot.override.Lootables;
 import me.bscal.betterfarming.common.seasons.*;
 import me.bscal.betterfarming.common.utils.Utils;
 import net.fabricmc.api.ModInitializer;
@@ -53,6 +55,8 @@ public class BetterFarming implements ModInitializer
 	public void onInitialize()
 	{
 		config = new TestConfig(Utils.GetStringPathInConfig("test_config.json"), new TestConfigBlock());
+
+		Lootables.RegisterLootables();
 
 		SEASON_SETTINGS.saveConfigToFile();
 		SeasonCropManager.GenerateDefaults(Utils.GetPathInConfig("seasonal_crops.json").toString());

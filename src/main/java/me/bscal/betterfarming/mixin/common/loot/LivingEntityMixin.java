@@ -60,7 +60,7 @@ import java.util.List;
 				}
 				else
 				{
-					LootTable.ProcessItemDrop(drops, entityContext, ent);
+					LootTable.ProcessItemDrop(drops, entityContext);
 					// Returns an empty list because we want to override loot
 					ci.cancel();
 				}

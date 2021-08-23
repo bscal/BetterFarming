@@ -1,10 +1,7 @@
 package me.bscal.betterfarming.common.loot.lootapi;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
 
@@ -45,7 +42,9 @@ public class LootTable
 					continue;
 
 				if (drop.alwaysDrop())
+				{
 					AddDropToLootResult(lootResults, drop, context);
+				}
 				else
 				{
 					totalProbability += drop.chance();
@@ -55,6 +54,7 @@ public class LootTable
 		}
 
 		float hitValue = m_random.nextFloat() * totalProbability;
+		// We want to include always drop items into the roll amount
 		int totalRolls = rolls + bonusRolls - lootResults.size();
 		for (int i = 0; i < totalRolls; i++)
 		{

@@ -66,7 +66,7 @@ import java.util.Optional;
 				}
 				else
 				{
-					LootTable.ProcessItemDrop(drops, blockContext, serverWorld, origin);
+					LootTable.ProcessItemDrop(drops, blockContext);
 					// Returns an empty list because we want to override loot
 					cir.setReturnValue(Collections.emptyList());
 				}

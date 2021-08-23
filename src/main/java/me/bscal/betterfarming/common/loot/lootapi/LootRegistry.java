@@ -26,7 +26,9 @@ public final class LootRegistry
 
 	static
 	{
-		List<LootDrop> wheatDrops = List.of(new LootDrop(1.0f, false, false, true, LootItem.Of(new ItemStack(Items.APPLE, 1))));
+		List<LootDrop> wheatDrops = List.of(
+				new LootDrop(1.0f, false, false, true, LootItem.Of(new ItemStack(Items.APPLE, 1))),
+				new LootDrop(1.0f, false, false, true, LootItem.Of(new ItemStack(Items.GOLD_INGOT, 1))));
 		LootTable wheatTable = new LootTable("wheat", false, 1, wheatDrops);
 		Register(Blocks.WHEAT.getLootTableId(), wheatTable);
 	}
