@@ -196,12 +196,12 @@ public class FastRunnableScheduler
 
 		public NbtCompound Save(NbtCompound nbt)
 		{
-			if (schedulable instanceof PersistentSchedulable)
+			if (schedulable instanceof PersistentSchedulable persistentSchedulable)
 			{
 				nbt.putString("id", id);
 				nbt.putInt("interval", interval);
 				nbt.putInt("aliveTickCount", aliveTickCount);
-				nbt.putString("scheduleable", schedulable.getClass().getName());
+				persistentSchedulable.Serialize(nbt);
 				nbt.putString("owner", owner.getClass().getName());
 				owner.Serialize(nbt);
 				return nbt;
@@ -215,7 +215,9 @@ public class FastRunnableScheduler
 			try
 			{
 				FastEntry entry = new FastEntry();
-				entry.schedulable = (PersistentSchedulable) Class.forName(nbt.getString("scheduleable")).getConstructor().newInstance();
+				entry.schedulable = PersistentSchedulable.Deserialize(nbt);
+				if (entry.schedulable == null)
+					return null;
 				entry.owner = (SchedulableOwner) Class.forName(nbt.getString("owner")).getConstructor().newInstance();
 				entry.owner.Deserialize(nbt);
 				entry.id = nbt.getString("id");

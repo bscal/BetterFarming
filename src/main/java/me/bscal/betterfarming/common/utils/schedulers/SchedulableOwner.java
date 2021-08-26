@@ -27,7 +27,9 @@ public abstract class SchedulableOwner
 		protected BlockPos pos;
 		protected ServerWorld world;
 
-		public BlockOwner() {}
+		public BlockOwner()
+		{
+		}
 
 		public BlockOwner(BlockPos pos, ServerWorld world)
 		{
@@ -42,7 +44,7 @@ public abstract class SchedulableOwner
 			nbt.putInt("y", pos.getY());
 			nbt.putInt("z", pos.getZ());
 
-			nbt.putString("world", world.getRegistryKey().toString());
+			nbt.putString("world", world.getRegistryKey().getValue().toString());
 		}
 
 		@Override
