@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.common.listeners;
 
+import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
 import me.bscal.betterfarming.common.utils.Utils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -20,6 +21,9 @@ public class ServerTickListener implements ServerTickEvents.EndTick
 	@Override
 	public void onEndTick(MinecraftServer server)
 	{
+		BetterFarming.RUN_SCHEDULER.Tick(server.getTicks());
+		BetterFarming.DELAY_SCHEDULER.Tick(server.getTicks());
+
 		if (m_clock++ > UPDATE_TIME)
 		{
 			m_clock = 0;

@@ -2,6 +2,12 @@ package me.bscal.betterfarming.common.utils.schedulers;
 
 import me.bscal.betterfarming.BetterFarming;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +29,13 @@ public class FastRunnableScheduler
 
 	public void RegisterRunnable(FastEntry entry)
 	{
-		if (!entry.owner.IsValid())
+		if (entry == null) return;
+		if (entry.schedulable == null)
+		{
+			BetterFarming.LOGGER.error("Scheduleable is null");
+			return;
+		}
+		if (entry.owner != null && !entry.owner.IsValid())
 		{
 			BetterFarming.LOGGER.error("Trying to register an invalid owner!");
 			return;
@@ -59,16 +71,15 @@ public class FastRunnableScheduler
 
 	public void UnregisterRunnableById(String id, int interval)
 	{
-		var intervalList = GetRunnableList(interval);
-		if (intervalList.isPresent())
+		GetRunnableList(interval).ifPresent(intervalList ->
 		{
-			intervalList.get().UnregisterById(id);
-			if (runnableLists.size() < 1)
-				runnableLists.remove(intervalList.get());
-		}
+			intervalList.UnregisterById(id);
+			if (intervalList.Size() < 1)
+				runnableLists.remove(intervalList);
+		});
 	}
 
-	public <T> void UnregisterRunnableByOwner(T owner)
+	public void UnregisterRunnableByOwner(SchedulableOwner owner)
 	{
 		var it = runnableLists.listIterator();
 		while (it.hasNext())
@@ -95,6 +106,54 @@ public class FastRunnableScheduler
 	public Optional<FastRunnableList> GetRunnableList(int tickInterval)
 	{
 		return runnableLists.stream().filter(runnableLists -> runnableLists.tickInterval == tickInterval).findFirst();
+	}
+
+	public void Save(MinecraftServer server)
+	{
+		File overworldSavePath = DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server.getSavePath(WorldSavePath.ROOT).toFile());
+		File scheduleSavePath = new File(overworldSavePath, "schedulables/schedulables.dat");
+		scheduleSavePath.mkdirs();
+		NbtCompound root = new NbtCompound();
+		NbtList rootList = new NbtList();
+		runnableLists.forEach(list -> {
+			list.tickEntries.forEach(entry -> {
+				if (entry.schedulable instanceof PersistentSchedulable)
+				{
+					rootList.add(entry.Serialize(new NbtCompound()));
+				}
+			});
+		});
+		root.put("entries", rootList);
+		try
+		{
+			NbtIo.writeCompressed(root, scheduleSavePath);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public void Load(MinecraftServer server)
+	{
+		File overworldSavePath = DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server.getSavePath(WorldSavePath.ROOT).toFile());
+		File scheduleSavePath = new File(overworldSavePath, "schedulables/delayables.dat");
+		if (scheduleSavePath.exists())
+		{
+			try
+			{
+				NbtCompound root = NbtIo.readCompressed(scheduleSavePath);
+				NbtList rootList = root.getList("entries", NbtElement.COMPOUND_TYPE);
+				for (NbtElement ele : rootList)
+				{
+					RegisterRunnable(FastEntry.FromNbt((NbtCompound) ele));
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void Tick(int currentTick)
@@ -194,7 +253,7 @@ public class FastRunnableScheduler
 			this.interval = interval;
 		}
 
-		public NbtCompound Save(NbtCompound nbt)
+		public NbtCompound Serialize(NbtCompound nbt)
 		{
 			if (schedulable instanceof PersistentSchedulable persistentSchedulable)
 			{
@@ -210,7 +269,7 @@ public class FastRunnableScheduler
 			return nbt;
 		}
 
-		public static FastEntry Load(NbtCompound nbt)
+		public static FastEntry FromNbt(NbtCompound nbt)
 		{
 			try
 			{
@@ -237,45 +296,22 @@ public class FastRunnableScheduler
 		{
 			return Objects.hash(id, interval, owner);
 		}
-	}
 
-	/**
-	 * Read the object from Base64 string.
-	 */
-	public static Object fromString(String s)
-	{
-		byte[] data = Base64.getDecoder().decode(s);
-		try
+		@Override
+		public boolean equals(Object o)
 		{
-			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-			Object o = ois.readObject();
-			ois.close();
-			return o;
-		}
-		catch (IOException | ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		return null;
-	}
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 
-	/**
-	 * Write the object to a Base64 string.
-	 */
-	public static String toString(Serializable o)
-	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try
-		{
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-			oos.writeObject(o);
-			oos.close();
-			return Base64.getEncoder().encodeToString(baos.toByteArray());
+			FastEntry entry = (FastEntry) o;
+
+			if (interval != entry.interval)
+				return false;
+			if (!id.equals(entry.id))
+				return false;
+			return Objects.equals(owner, entry.owner);
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

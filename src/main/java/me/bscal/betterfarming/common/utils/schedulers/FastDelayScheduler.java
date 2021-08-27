@@ -1,6 +1,17 @@
 package me.bscal.betterfarming.common.utils.schedulers;
 
-import java.lang.ref.WeakReference;
+import me.bscal.betterfarming.BetterFarming;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.dimension.DimensionType;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -21,6 +32,52 @@ public class FastDelayScheduler
 		}));
 	}
 
+	public void Save(MinecraftServer server)
+	{
+		File overworldSavePath = DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server.getSavePath(WorldSavePath.ROOT).toFile());
+		File scheduleSavePath = new File(overworldSavePath, "schedulables/delayables.dat");
+		scheduleSavePath.mkdirs();
+		NbtCompound root = new NbtCompound();
+		NbtList rootList = new NbtList();
+		entries.forEach(entry -> {
+			if (entry.persistent)
+			{
+				rootList.add(entry.Serialize(new NbtCompound()));
+			}
+		});
+		root.put("entries", rootList);
+		try
+		{
+			NbtIo.writeCompressed(root, scheduleSavePath);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public void Load(MinecraftServer server)
+	{
+		File overworldSavePath = DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server.getSavePath(WorldSavePath.ROOT).toFile());
+		File scheduleSavePath = new File(overworldSavePath, "schedulables/delayables.dat");
+		if (scheduleSavePath.exists())
+		{
+			try
+			{
+				NbtCompound root = NbtIo.readCompressed(scheduleSavePath);
+				NbtList rootList = root.getList("entries", NbtElement.COMPOUND_TYPE);
+				for (NbtElement ele : rootList)
+				{
+					ScheduleEntry(DelayEntry.FromNbt((NbtCompound) ele));
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public void Tick(int currentTick)
 	{
 		lastProcessedTick = currentTick;
@@ -32,18 +89,22 @@ public class FastDelayScheduler
 			boolean shouldReschedule = DoRunnable(entry);
 			if (entry.repeat && shouldReschedule)
 			{
-				ScheduleEntry(new DelayEntry(entry.runnable, entry.interval, entry.owner, currentTick + entry.interval, true));
+				ScheduleEntry(new DelayEntry(entry.interval, currentTick + entry.interval, true, entry.persistent, entry.delayable));
 			}
 		}
 	}
 
-	public void ScheduleRunnable(Runnable runnable, int dueInTicks, Object owner, boolean repeat)
+	public void ScheduleRunnable(int dueInTicks, boolean repeat, boolean persistent, Delayable delayable)
 	{
-		if (lastProcessedTick < 0) return;
-		if (runnable == null) return;
-		if (dueInTicks < 0) return;
-		if (dueInTicks == 0 && repeat) return;
-		DelayEntry entry = new DelayEntry(runnable, dueInTicks, new WeakReference<>(owner), lastProcessedTick + dueInTicks, repeat);
+		if (lastProcessedTick < 0)
+			return;
+		if (delayable == null)
+			return;
+		if (dueInTicks < 0)
+			return;
+		if (dueInTicks == 0 && repeat)
+			return;
+		DelayEntry entry = new DelayEntry(dueInTicks, lastProcessedTick + dueInTicks, repeat, persistent, delayable);
 		if (dueInTicks == 0)
 			DoRunnable(entry);
 		else
@@ -57,16 +118,29 @@ public class FastDelayScheduler
 
 	private boolean DoRunnable(DelayEntry entry)
 	{
-		if (entry.owner.get() != null)
-		{
-			entry.runnable.run();
-			return true;
-		}
-		return false;
+		return entry.delayable.test(entry);
 	}
 
-	public static record DelayEntry(Runnable runnable, int interval, WeakReference<Object> owner, int dueAtTick, boolean repeat)
+	public static record DelayEntry(int interval, int dueAtTick, boolean repeat, boolean persistent, Delayable delayable)
+			implements Serializable
 	{
+
+		public NbtCompound Serialize(NbtCompound nbt)
+		{
+			nbt.putInt("interval", interval);
+			nbt.putInt("dueAtTick", dueAtTick - BetterFarming.GetServer().getTicks());
+			nbt.putBoolean("repeat", repeat);
+			nbt.putBoolean("persistent", persistent);
+			nbt.putString("delayable", Utils.ToString(delayable));
+			return nbt;
+		}
+
+		public static DelayEntry FromNbt(NbtCompound nbt)
+		{
+			return new DelayEntry(nbt.getInt("interval"), nbt.getInt("dueAtTick"), nbt.getBoolean("repeat"), nbt.getBoolean("persistent"),
+					(Delayable) Utils.FromString(nbt.getString("delayable")));
+		}
+
 	}
 
 }
