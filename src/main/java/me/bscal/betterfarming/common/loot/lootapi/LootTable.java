@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class LootTable
 {
@@ -16,6 +17,13 @@ public class LootTable
 	private final Set<LootDrop> m_uniqueDrops;
 	private final Random m_random;
 
+	private final List<Function<LootContext, List<LootDrop>>> m_dynamicModifiers;
+
+	public LootTable(String name, boolean alwaysOverrideDefault, int rolls)
+	{
+		this(name, alwaysOverrideDefault, rolls, new ArrayList<>(2));
+	}
+
 	public LootTable(String name, boolean alwaysOverrideDefault, int rolls, List<LootDrop> drops)
 	{
 		this.name = name;
@@ -24,6 +32,7 @@ public class LootTable
 		this.m_drops = drops;
 		this.m_uniqueDrops = new HashSet<>(drops.size());
 		this.m_random = new Random();
+		this.m_dynamicModifiers = new ArrayList<>(4);
 	}
 
 	public List<LootDrop> Roll(LootContext context, int bonusRolls)
@@ -34,7 +43,10 @@ public class LootTable
 		m_uniqueDrops.clear();
 
 		float totalProbability = 0;
-		for (LootDrop drop : m_drops)
+		List<LootDrop> constantAndDynamicDrops = new ArrayList<>(m_drops.size() + m_dynamicModifiers.size());
+		constantAndDynamicDrops.addAll(m_drops);
+		constantAndDynamicDrops.addAll(ProcessDynamicDrops(context));
+		for (LootDrop drop : constantAndDynamicDrops)
 		{
 			if (drop.isEnabled())
 			{
@@ -87,6 +99,18 @@ public class LootTable
 		}
 	}
 
+	public void AddDynamicDrops(Function<LootContext, List<LootDrop>> dynamicModifier)
+	{
+		m_dynamicModifiers.add(dynamicModifier);
+	}
+
+	public List<LootDrop> ProcessDynamicDrops(LootContext context)
+	{
+		List<LootDrop> results = new ArrayList<>();
+		m_dynamicModifiers.forEach(func -> results.addAll(func.apply(context)));
+		return results;
+	}
+
 	public static void ProcessItemDrop(List<LootDrop> drops, LootContext context)
 	{
 		for (LootDrop drop : drops)
@@ -104,4 +128,8 @@ public class LootTable
 		}
 	}
 
+	public void AddDrop(LootDrop lootDrop)
+	{
+		m_drops.add(lootDrop);
+	}
 }

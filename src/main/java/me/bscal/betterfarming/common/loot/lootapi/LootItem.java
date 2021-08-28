@@ -9,11 +9,10 @@ import java.util.function.Predicate;
 
 public abstract class LootItem<T>
 {
-	protected T m_item;
+	protected final T m_item;
 
-	protected int m_itemCount;
-	private List<Predicate<LootContext>> m_preRollChecks;
-	private List<BiConsumer<LootContext, ItemStack>> m_postRollModifiers;
+	protected List<Predicate<LootContext>> m_preRollChecks;
+	protected List<BiConsumer<LootContext, ItemStack>> m_postRollModifiers;
 
 	public LootItem(T item)
 	{
@@ -35,7 +34,7 @@ public abstract class LootItem<T>
 		return m_postRollModifiers == null ? m_postRollModifiers = new ArrayList<>(4) : m_postRollModifiers;
 	}
 
-	public void AddPreRollPredicate(BiConsumer<LootContext, ItemStack> consumer)
+	public void AddPostRollConsumer(BiConsumer<LootContext, ItemStack> consumer)
 	{
 		GetPostRollConsumers().add(consumer);
 	}
@@ -72,8 +71,9 @@ public abstract class LootItem<T>
 				return false;
 		}
 		return true;
-
 	}
+
+	public abstract LootItem<T> Clone();
 
 	// ***********************************************************
 	// Static creation methods
@@ -106,6 +106,16 @@ public abstract class LootItem<T>
 			return m_item.copy();
 		}
 
+		@Override
+		public LootItem<ItemStack> Clone()
+		{
+			LootItemStack other = new LootItemStack(m_item.copy());
+			// These should be ok to copy like this.
+			other.m_preRollChecks = this.m_preRollChecks;
+			other.m_postRollModifiers = this.m_postRollModifiers;
+			return other;
+		}
+
 		public int GetBaseAmount()
 		{
 			return m_item.getCount();
@@ -131,6 +141,12 @@ public abstract class LootItem<T>
 		public LootLootTable(LootTable item)
 		{
 			super(item);
+		}
+
+		@Override
+		public LootLootTable Clone()
+		{
+			return new LootLootTable(m_item);
 		}
 	}
 
