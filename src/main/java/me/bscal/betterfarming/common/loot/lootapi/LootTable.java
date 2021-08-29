@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LootTable
 {
@@ -13,10 +14,11 @@ public class LootTable
 	public final boolean alwaysOverrideDefault;
 	public final int rolls;
 
+	public boolean canceled;
+
 	private final List<LootDrop> m_drops;
 	private final Set<LootDrop> m_uniqueDrops;
 	private final Random m_random;
-
 	private final List<Function<LootContext, List<LootDrop>>> m_dynamicModifiers;
 
 	public LootTable(String name, boolean alwaysOverrideDefault, int rolls)
@@ -32,7 +34,7 @@ public class LootTable
 		this.m_drops = drops;
 		this.m_uniqueDrops = new HashSet<>(drops.size());
 		this.m_random = new Random();
-		this.m_dynamicModifiers = new ArrayList<>(4);
+		this.m_dynamicModifiers = new ArrayList<>(2);
 	}
 
 	public List<LootDrop> Roll(LootContext context, int bonusRolls)
@@ -40,12 +42,17 @@ public class LootTable
 		List<LootDrop> lootResults = new ArrayList<>();
 		List<LootDrop> rollableLoot = new ArrayList<>();
 
+		canceled = false;
 		m_uniqueDrops.clear();
 
 		float totalProbability = 0;
 		List<LootDrop> constantAndDynamicDrops = new ArrayList<>(m_drops.size() + m_dynamicModifiers.size());
 		constantAndDynamicDrops.addAll(m_drops);
 		constantAndDynamicDrops.addAll(ProcessDynamicDrops(context));
+
+		if (canceled)
+			return null;
+
 		for (LootDrop drop : constantAndDynamicDrops)
 		{
 			if (drop.isEnabled())
@@ -81,6 +88,10 @@ public class LootTable
 				}
 			}
 		}
+
+		// Null is checked and if alwaysOverrideDefaults is false will use minecraft implementation for drops, if true no drops.
+		if (canceled)
+			return null;
 
 		return lootResults;
 	}
@@ -126,6 +137,13 @@ public class LootTable
 			}
 
 		}
+	}
+
+	public static List<LootDrop> ItemStackToLootDrop(List<ItemStack> itemStacks)
+	{
+		List<LootDrop> res = new ArrayList<>(itemStacks.size());
+		itemStacks.forEach(itemStack -> res.add(LootDrop.Of(itemStack)));
+		return res;
 	}
 
 	public void AddDrop(LootDrop lootDrop)

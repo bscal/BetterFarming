@@ -193,7 +193,7 @@ public class FastRunnableScheduler
 			}
 
 			listProgress += tickEntries.size() / (float) tickInterval;
-			int maxIndex = (int) Math.min(tickEntries.size(), listProgress);
+			int maxIndex = Math.min(tickEntries.size(), (int)Math.ceil(listProgress));
 			var it = tickEntries.listIterator(currentIndex);
 			while (currentIndex < maxIndex)
 			{
