@@ -37,7 +37,7 @@ public abstract class DataManager implements IBlockDataManager
 		if (dataChunk == null)
 			return EmptyDataBlock.EMPTY_DATA;
 
-		IBlockDataBlock dataBlock = dataChunk.GetBlock(pos.getX(), pos.getY(), pos.getZ());
+		IBlockDataBlock dataBlock = dataChunk.GetBlock(pos);
 		return dataBlock == null ? EmptyDataBlock.EMPTY_DATA : dataBlock;
 	}
 
@@ -45,20 +45,26 @@ public abstract class DataManager implements IBlockDataManager
 	public IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos)
 	{
 		return GetWorld(world).GetOrCreateChunk(world.getChunk(pos).getPos())
-				.GetOrCreate(pos.getX(), pos.getY(), pos.getZ(), blockDataFactoryDefault);
+				.GetOrCreate(pos, blockDataFactoryDefault);
 	}
 
 	@Override
 	public IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> customBlockDataFactor)
 	{
 		return GetWorld(world).GetOrCreateChunk(world.getChunk(pos).getPos())
-				.GetOrCreate(pos.getX(), pos.getY(), pos.getZ(), customBlockDataFactor);
+				.GetOrCreate(pos, customBlockDataFactor);
+	}
+
+	@Override
+	public void RemoveBlockData(ServerWorld world, BlockPos pos)
+	{
+		GetWorld(world).Remove(pos);
 	}
 
 	@Override
 	public void SetBlockData(ServerWorld world, BlockPos pos, IBlockDataBlock data)
 	{
-		GetWorld(world).GetOrCreateChunk(world.getChunk(pos).getPos()).PutBlock(pos.getX(), pos.getY(), pos.getZ(), data);
+		GetWorld(world).GetOrCreateChunk(world.getChunk(pos).getPos()).PutBlock(pos, data);
 	}
 
 	@Override

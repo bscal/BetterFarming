@@ -2,10 +2,12 @@ package me.bscal.betterfarming.common.database.blockdata;
 
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import me.bscal.betterfarming.BetterFarming;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
@@ -25,7 +27,7 @@ public abstract class DataWorld implements IBlockDataWorld
 		this.m_world = world;
 		this.m_saveDir = new File(DimensionType.getSaveDirectory(world.getRegistryKey(), world.getServer()
 				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + File.pathSeparator + "data" + File.pathSeparator + id + File.pathSeparator);
+				.toFile()) + "/data/" + id + "/");
 		this.m_saveDir.mkdirs();
 		this.m_chunkToSection = new Long2ObjectOpenHashMap<>(Hash.DEFAULT_INITIAL_SIZE, 1f);
 	}
@@ -39,6 +41,18 @@ public abstract class DataWorld implements IBlockDataWorld
 	public ServerWorld GetWorld()
 	{
 		return m_world;
+	}
+
+	public void Remove(BlockPos pos)
+	{
+		ChunkPos chunkPos = m_world.getChunk(pos).getPos();
+		var chunk = Get(chunkPos);
+		if (chunk != null)
+		{
+			chunk.RemoveBlock(pos);
+			if (chunk.Size() < 1)
+				m_chunkToSection.remove(chunkPos.toLong());
+		}
 	}
 
 	public void Save()

@@ -110,8 +110,9 @@ public class FastRunnableScheduler
 
 	public void Save(MinecraftServer server)
 	{
-		File overworldSavePath = DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server.getSavePath(WorldSavePath.ROOT).toFile());
-		File scheduleSavePath = new File(overworldSavePath, "schedulables/schedulables.dat");
+		File scheduleSavePath  = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server
+				.getSavePath(WorldSavePath.ROOT)
+				.toFile()) + "/schedulables");
 		scheduleSavePath.mkdirs();
 		NbtCompound root = new NbtCompound();
 		NbtList rootList = new NbtList();
@@ -126,7 +127,7 @@ public class FastRunnableScheduler
 		root.put("entries", rootList);
 		try
 		{
-			NbtIo.writeCompressed(root, scheduleSavePath);
+			NbtIo.writeCompressed(root, new File(scheduleSavePath, "schedulables.dat"));
 		}
 		catch (IOException e)
 		{
@@ -136,13 +137,14 @@ public class FastRunnableScheduler
 
 	public void Load(MinecraftServer server)
 	{
-		File overworldSavePath = DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server.getSavePath(WorldSavePath.ROOT).toFile());
-		File scheduleSavePath = new File(overworldSavePath, "schedulables/delayables.dat");
+		File scheduleSavePath  = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server
+				.getSavePath(WorldSavePath.ROOT)
+				.toFile()) + "/schedulables");
 		if (scheduleSavePath.exists())
 		{
 			try
 			{
-				NbtCompound root = NbtIo.readCompressed(scheduleSavePath);
+				NbtCompound root = NbtIo.readCompressed(new File(scheduleSavePath, "schedulables.dat"));
 				NbtList rootList = root.getList("entries", NbtElement.COMPOUND_TYPE);
 				for (NbtElement ele : rootList)
 				{

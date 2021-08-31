@@ -22,6 +22,8 @@ public interface IBlockDataManager
 
 	void SetBlockData(ServerWorld world, BlockPos pos, IBlockDataBlock data);
 
+	void RemoveBlockData(ServerWorld world, BlockPos pos);
+
 	boolean DoesChunkExist(ServerWorld world, ChunkPos pos);
 
 	void OnLoadChunk(ServerWorld world, WorldChunk chunk);

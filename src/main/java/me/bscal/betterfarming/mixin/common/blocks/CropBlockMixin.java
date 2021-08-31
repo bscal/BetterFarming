@@ -2,7 +2,6 @@ package me.bscal.betterfarming.mixin.common.blocks;
 
 import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.common.database.blockdata.BlockData;
-import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
 import me.bscal.betterfarming.common.seasons.SeasonalCrop;
 import me.bscal.betterfarming.common.seasons.Seasons;
 import net.minecraft.block.Block;
@@ -59,8 +58,8 @@ import java.util.Random;
 		ci.cancel();
 	}
 
-	@Inject(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/CropBlock;getAge" + "(Lnet/minecraft/block" +
-			"/BlockState;)I"), cancellable = true)
+	@Inject(method = "randomTick", at = @At(value = "INVOKE", target =
+			"Lnet/minecraft/block/CropBlock;getAge" + "(Lnet/minecraft/block" + "/BlockState;)I"), cancellable = true)
 	public void OnRandomTickInvoke(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci)
 	{
 		int i = getAge(state);
@@ -73,6 +72,9 @@ import java.util.Random;
 				world.setBlockState(pos, withAge(i + 1), Block.NOTIFY_LISTENERS);
 			}
 		}
+		else
+		{
+		}
 		ci.cancel();
 	}
 
@@ -83,12 +85,13 @@ import java.util.Random;
 			BetterFarming.LOGGER.info("Trying to grow!");
 			Biome biome = world.getBiome(pos);
 			SeasonalCrop crop = BetterFarming.CROP_MANAGER.seasonalCrops.get(state.getBlock());
-			BlockData blockData = BlockDataManager.GetOrCreate(world).GetOrCreateEntry(pos, 10, state.getBlock());
+			BlockData blockData = (BlockData) BetterFarming.WORLD_DATAMANGER.GetOrCreateBlockData(world, pos,
+					() -> new BlockData(0, crop.baseGrowthTicks, 0, (Block) (Object) this));
 			int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
 
 			if (crop.ShouldRemove(state, world, pos, biome, blockData, season))
 			{
-				BlockDataManager.GetOrCreate(world).GetDataMap().remove(pos);
+				BetterFarming.WORLD_DATAMANGER.RemoveBlockData(world, pos);
 				BetterFarming.LOGGER.info("Removed!");
 				return false;
 			}

@@ -8,6 +8,7 @@ import me.bscal.betterfarming.common.database.blockdata.blocks.TestDataBlock;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.function.Supplier;
 
@@ -66,30 +67,36 @@ public class ArrayDataChunk implements IBlockDataChunk
 	}
 
 	@Override
-	public IBlockDataBlock GetBlock(int x, int y, int z)
+	public IBlockDataBlock GetBlock(BlockPos pos)
 	{
-		return m_blockData.get(y)[x][z];
+		return m_blockData.get(pos.getY())[pos.getX()][pos.getZ()];
 	}
 
 	@Override
-	public void PutBlock(int x, int y, int z, IBlockDataBlock data)
+	public void PutBlock(BlockPos pos, IBlockDataBlock data)
 	{
-		m_blockData.get(y)[x][z] = data;
+		m_blockData.get(pos.getY())[pos.getX()][pos.getZ()] = data;
 	}
 
 	@Override
-	public IBlockDataBlock RemoveBlock(int x, int y, int z)
+	public IBlockDataBlock RemoveBlock(BlockPos pos)
 	{
-		return m_blockData.get(y)[x][z] = null;
+		return m_blockData.get(pos.getY())[pos.getX()][pos.getZ()] = null;
 	}
 
 	@Override
-	public IBlockDataBlock GetOrCreate(int x, int y, int z, Supplier<IBlockDataBlock> blockDataFactory)
+	public int Size()
 	{
-		IBlockDataBlock[][] blockDataArray = m_blockData.get(y);
+		return m_blockData.size();
+	}
+
+	@Override
+	public IBlockDataBlock GetOrCreate(BlockPos pos, Supplier<IBlockDataBlock> blockDataFactory)
+	{
+		IBlockDataBlock[][] blockDataArray = m_blockData.get(pos.getY());
 		return (blockDataArray == null) ?
-				CreateChunk(x, y, z, blockDataFactory)[x][z] :
-				IfNullCreate(blockDataArray[x][z], blockDataFactory);
+				CreateChunk(pos, blockDataFactory)[pos.getX()][pos.getZ()] :
+				IfNullCreate(blockDataArray[pos.getX()][pos.getZ()], blockDataFactory);
 	}
 
 	public IBlockDataBlock[][] CreateChunk(int y)
@@ -100,10 +107,10 @@ public class ArrayDataChunk implements IBlockDataChunk
 		return data2DArray;
 	}
 
-	public IBlockDataBlock[][] CreateChunk(int x, int y, int z, Supplier<IBlockDataBlock> blockDataFactory)
+	public IBlockDataBlock[][] CreateChunk(BlockPos pos, Supplier<IBlockDataBlock> blockDataFactory)
 	{
-		IBlockDataBlock[][] data2DArray = CreateChunk(y);
-		data2DArray[x][z] = blockDataFactory.get();
+		IBlockDataBlock[][] data2DArray = CreateChunk(pos.getY());
+		data2DArray[pos.getX()][pos.getZ()] = blockDataFactory.get();
 		return data2DArray;
 	}
 

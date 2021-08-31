@@ -1,6 +1,7 @@
 package me.bscal.betterfarming.common.database.blockdata;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.function.Supplier;
 
@@ -11,12 +12,14 @@ public interface IBlockDataChunk
 
 	IBlockDataChunk FromNbt(NbtCompound nbt);
 
-	IBlockDataBlock GetBlock(int x, int y, int z);
+	IBlockDataBlock GetBlock(BlockPos pos);
 
-	IBlockDataBlock GetOrCreate(int x, int y, int z, Supplier<IBlockDataBlock> blockDataFactory);
+	IBlockDataBlock GetOrCreate(BlockPos pos, Supplier<IBlockDataBlock> blockDataFactory);
 
-	void PutBlock(int x, int y, int z, IBlockDataBlock blockData);
+	void PutBlock(BlockPos pos, IBlockDataBlock blockData);
 
-	IBlockDataBlock RemoveBlock(int x, int y, int z);
+	IBlockDataBlock RemoveBlock(BlockPos pos);
+
+	int Size();
 
 }

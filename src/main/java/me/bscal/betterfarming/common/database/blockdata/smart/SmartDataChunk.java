@@ -7,6 +7,7 @@ import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.function.Supplier;
 
@@ -50,21 +51,27 @@ public class SmartDataChunk implements IBlockDataChunk
 	}
 
 	@Override
-	public IBlockDataBlock GetBlock(int x, int y, int z)
+	public IBlockDataBlock GetBlock(BlockPos pos)
 	{
-		return m_blockData.get(y).GetBlockData(x, z);
+		return m_blockData.get(pos.getY()).GetBlockData(pos.getX(), pos.getZ());
 	}
 
 	@Override
-	public void PutBlock(int x, int y, int z, IBlockDataBlock data)
+	public void PutBlock(BlockPos pos, IBlockDataBlock data)
 	{
-		m_blockData.get(y).SetBlockData(x, z, data);
+		m_blockData.get(pos.getY()).SetBlockData(pos.getX(), pos.getZ(), data);
 	}
 
 	@Override
-	public IBlockDataBlock RemoveBlock(int x, int y, int z)
+	public IBlockDataBlock RemoveBlock(BlockPos pos)
 	{
-		return m_blockData.get(y).RemoveBlock(x, z);
+		return m_blockData.get(pos.getY()).RemoveBlock(pos.getX(), pos.getZ());
+	}
+
+	@Override
+	public int Size()
+	{
+		return m_blockData.size();
 	}
 
 	public SmartDataChunkSection CreateChunk(int y)
@@ -75,19 +82,21 @@ public class SmartDataChunk implements IBlockDataChunk
 	}
 
 	@Override
-	public IBlockDataBlock GetOrCreate(int x, int y, int z, Supplier<IBlockDataBlock> blockDataFactory)
+	public IBlockDataBlock GetOrCreate(BlockPos pos, Supplier<IBlockDataBlock> blockDataFactory)
 	{
-		var section = m_blockData.get(y);
-		return (section == null) ? CreateChunk(y).GetBlockData(x, z, blockDataFactory) : section.GetBlockData(x, z, blockDataFactory);
+		var section = m_blockData.get(pos.getY());
+		return (section == null) ?
+				CreateChunk(pos.getY()).GetBlockData(pos.getX(), pos.getZ(), blockDataFactory) :
+				section.GetBlockData(pos.getX(), pos.getZ(), blockDataFactory);
 	}
 
-	public void CreateAndPut(int x, int y, int z, IBlockDataBlock data)
+	public void CreateAndPut(BlockPos pos, IBlockDataBlock data)
 	{
-		var section = m_blockData.get(y);
+		var section = m_blockData.get(pos.getY());
 		if (section == null)
-			CreateChunk(y).SetBlockData(x, z, data);
+			CreateChunk(pos.getY()).SetBlockData(pos.getX(), pos.getZ(), data);
 		else
-			section.SetBlockData(x, z, data);
+			section.SetBlockData(pos.getX(), pos.getZ(), data);
 	}
 
 }

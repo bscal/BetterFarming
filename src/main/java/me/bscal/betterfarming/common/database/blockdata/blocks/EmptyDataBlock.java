@@ -1,6 +1,8 @@
 package me.bscal.betterfarming.common.database.blockdata.blocks;
 
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 
 public class EmptyDataBlock implements IBlockDataBlock
@@ -18,4 +20,5 @@ public class EmptyDataBlock implements IBlockDataBlock
 	public void FromNbt(NbtCompound nbt)
 	{
 	}
+
 }

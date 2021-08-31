@@ -52,21 +52,24 @@ public final class Seasons
 
 	public static int GetSeasonForBiome(Biome key)
 	{
-		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap != null && BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(
+				key))
 			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(key).GetSeason(GetSeason());
 		return GetSeason();
 	}
 
 	public static int GetSeasonForBiome(Biome key, int season)
 	{
-		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(key))
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap != null && BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryType(
+				key))
 			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryType(key).GetSeason(season);
 		return season;
 	}
 
 	public static int GetSeasonForBiome(RegistryKey<Biome> key, int season)
 	{
-		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryKey(key))
+		if (BetterFarming.SEASONS_REGISTRY.seasonDataMap != null && BetterFarming.SEASONS_REGISTRY.seasonDataMap.containsFromRegistryKey(
+				key))
 			return BetterFarming.SEASONS_REGISTRY.seasonDataMap.getFromRegistryKey(key).GetSeason(season);
 		return season;
 	}
