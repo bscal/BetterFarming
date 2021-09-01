@@ -72,9 +72,6 @@ import java.util.Random;
 				world.setBlockState(pos, withAge(i + 1), Block.NOTIFY_LISTENERS);
 			}
 		}
-		else
-		{
-		}
 		ci.cancel();
 	}
 
@@ -105,6 +102,7 @@ import java.util.Random;
 				{
 					crop.HandleGrowth(state, world, pos, biome, blockData, season, growthAmount);
 					BetterFarming.LOGGER.info("Grew!");
+					BetterFarming.WORLD_DATAMANGER.RemoveBlockData(world, pos);
 					return true;
 				}
 			}

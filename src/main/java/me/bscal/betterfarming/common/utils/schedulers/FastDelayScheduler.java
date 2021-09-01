@@ -24,9 +24,9 @@ public class FastDelayScheduler
 	public FastDelayScheduler()
 	{
 		entries = new PriorityQueue<>(((o1, o2) -> {
-			if (o1.dueAtTick < o2.dueAtTick)
+			if (o1.dueAtTick > o2.dueAtTick)
 				return 1;
-			else if (o1.dueAtTick > o2.dueAtTick)
+			else if (o1.dueAtTick < o2.dueAtTick)
 				return -1;
 			return 0;
 		}));
@@ -83,12 +83,13 @@ public class FastDelayScheduler
 	public void Tick(int currentTick)
 	{
 		lastProcessedTick = currentTick;
-		while (entries.peek() != null)
+		while (entries.size() > 0)
 		{
-			var entry = entries.remove();
+			var entry = entries.peek();
 			if (entry.dueAtTick > currentTick)
 				return;
-			boolean shouldReschedule = DoRunnable(entry);
+			entries.remove();
+			boolean shouldReschedule = entry.delayable.test(entry);
 			if (entry.repeat && shouldReschedule)
 			{
 				ScheduleEntry(new DelayEntry(entry.interval, currentTick + entry.interval, true, entry.persistent, entry.delayable));
@@ -98,8 +99,6 @@ public class FastDelayScheduler
 
 	public void ScheduleRunnable(int dueInTicks, boolean repeat, boolean persistent, Delayable delayable)
 	{
-		if (lastProcessedTick < 0)
-			return;
 		if (delayable == null)
 			return;
 		if (dueInTicks < 0)
@@ -108,7 +107,7 @@ public class FastDelayScheduler
 			return;
 		DelayEntry entry = new DelayEntry(dueInTicks, lastProcessedTick + dueInTicks, repeat, persistent, delayable);
 		if (dueInTicks == 0)
-			DoRunnable(entry);
+			entry.delayable.test(entry);
 		else
 			ScheduleEntry(entry);
 	}
@@ -116,11 +115,6 @@ public class FastDelayScheduler
 	private void ScheduleEntry(DelayEntry delayEntry)
 	{
 		entries.add(delayEntry);
-	}
-
-	private boolean DoRunnable(DelayEntry entry)
-	{
-		return entry.delayable.test(entry);
 	}
 
 	public static record DelayEntry(int interval, int dueAtTick, boolean repeat, boolean persistent, Delayable delayable)

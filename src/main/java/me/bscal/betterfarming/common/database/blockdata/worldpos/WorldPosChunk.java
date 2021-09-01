@@ -81,16 +81,24 @@ public class WorldPosChunk implements IBlockDataChunk
 	@Override
 	public IBlockDataBlock GetOrCreate(BlockPos pos, Supplier<IBlockDataBlock> blockDataFactory)
 	{
+		long posKey = pos.asLong();
 		ChunkPos chunkPos = new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()));
-		var chunks = m_blockData.get(chunkPos.toLong());
-		if (chunks == null)
+		var chunk = m_blockData.get(chunkPos.toLong());
+		if (chunk == null)
 		{
-			chunks = new Long2ObjectOpenHashMap<>(Hash.DEFAULT_INITIAL_SIZE, 1f);
+			chunk = new Long2ObjectOpenHashMap<>(Hash.DEFAULT_INITIAL_SIZE, 1f);
 			var data = blockDataFactory.get();
-			chunks.put(pos.asLong(), data);
+			chunk.put(posKey, data);
+			m_blockData.put(chunkPos.toLong(), chunk);
 			return data;
 		}
-		return chunks.get(pos.asLong());
+		var data = chunk.get(posKey);
+		if (data == null)
+		{
+			data = blockDataFactory.get();
+			chunk.put(posKey, data);
+		}
+		return data;
 	}
 
 	@Override

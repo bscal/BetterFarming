@@ -49,8 +49,8 @@ public final class LootRegistry
 						}
 						else if (blockCtx.tool.getItem() instanceof SickleItem)
 						{
-							res.add(LootDrop.Of(Items.WHEAT, 1 + RandomQuantity.Probability(new RandomQuantity.ProbabilityPair(1, .75f),
-									new RandomQuantity.ProbabilityPair(2, .25f))));
+							res.add(LootDrop.Of(Items.WHEAT, 1 + RandomQuantity.Probability(new RandomQuantity.ProbabilityPair(1, 75f),
+									new RandomQuantity.ProbabilityPair(2, 25f))));
 							res.add(LootDrop.Of(Items.GRASS, RandomQuantity.Rand(1, 3)));
 						}
 						else

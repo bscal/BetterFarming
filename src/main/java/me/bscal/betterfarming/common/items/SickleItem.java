@@ -41,29 +41,4 @@ public class SickleItem extends ToolItem
 						EntityAttributeModifier.Operation.ADDITION));
 		this.m_attributeModifiers = builder.build();
 	}
-
-
-	@Override
-	public ActionResult useOnBlock(ItemUsageContext context)
-	{
-		if (context.getWorld() instanceof ServerWorld world && !world.isClient)
-		{
-			BlockState state = world.getBlockState(context.getBlockPos());
-
-			if (state.getBlock() instanceof CropBlock)
-			{
-				LootOverrideManager.Get().OverrideLoot(GenerateLoots(world.random), world, context.getBlockPos(), Blocks.AIR::getDefaultState);
-			}
-
-		}
-
-		return super.useOnBlock(context);
-	}
-
-	private List<ItemStack> GenerateLoots(Random rand)
-	{
-		// TODO
-		return null;
-
-	}
 }

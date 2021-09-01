@@ -233,6 +233,16 @@ public class FastRunnableScheduler
 		{
 			tickEntries.removeIf(listEntry -> listEntry.owner.equals(owner));
 		}
+
+		public Optional<FastEntry> Get(String id)
+		{
+			return tickEntries.stream().filter(e -> e.id.equals(id)).findFirst();
+		}
+
+		public FastEntry[] GetAll(String id)
+		{
+			return (FastEntry[]) tickEntries.stream().filter(e -> e.id.equals(id)).toArray();
+		}
 	}
 
 	public static class FastEntry

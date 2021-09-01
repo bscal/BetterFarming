@@ -3,15 +3,23 @@ package me.bscal.betterfarming;
 import me.bscal.betterfarming.common.commands.SeasonCommand;
 import me.bscal.betterfarming.common.config.TestConfig;
 import me.bscal.betterfarming.common.config.TestConfigBlock;
+import me.bscal.betterfarming.common.database.blockdata.BlockData;
 import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
 import me.bscal.betterfarming.common.database.blockdata.blocks.TestDataBlock;
 import me.bscal.betterfarming.common.database.blockdata.smart.SmartDataManager;
+import me.bscal.betterfarming.common.database.blockdata.worldpos.WorldPosDataManager;
+import me.bscal.betterfarming.common.generation.Generators;
 import me.bscal.betterfarming.common.listeners.*;
 import me.bscal.betterfarming.common.loot.override.Lootables;
+import me.bscal.betterfarming.common.registries.ItemRegistry;
 import me.bscal.betterfarming.common.seasons.*;
 import me.bscal.betterfarming.common.utils.Utils;
-import me.bscal.betterfarming.common.utils.schedulers.*;
+import me.bscal.betterfarming.common.utils.schedulers.FastDelayScheduler;
+import me.bscal.betterfarming.common.utils.schedulers.FastRunnableScheduler;
+import me.bscal.betterfarming.common.utils.schedulers.SchedulableOwner;
 import me.bscal.betterfarming.common.utils.schedulers.example.TestPersistentSchedulable;
+import net.devtech.arrp.api.RRPCallback;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -21,6 +29,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -39,6 +48,7 @@ public class BetterFarming implements ModInitializer
 	public static final String MOD_NAME = "BetterFarming";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 	public static final boolean DEBUG = true;
+	public static final boolean CLIENT = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
 	public static final Random RAND = new Random();
 	public static final int UPDATE_DELAY = 20 * 30;
 	public static final SeasonSettings SEASON_SETTINGS = new SeasonSettings();
@@ -52,7 +62,8 @@ public class BetterFarming implements ModInitializer
 
 	public static TestConfig config;
 
-	public static final SmartDataManager SMART_DATA_MANAGER = new SmartDataManager(MOD_ID + "_blockdata", TestDataBlock::new);
+	public static WorldPosDataManager WORLD_DATAMANGER;
+	//public static final SmartDataManager SMART_DATA_MANAGER = new SmartDataManager(MOD_ID + "_blockdata", TestDataBlock::new);
 	public static final FastRunnableScheduler RUN_SCHEDULER = new FastRunnableScheduler();
 	public static final FastDelayScheduler DELAY_SCHEDULER = new FastDelayScheduler();
 
@@ -60,6 +71,10 @@ public class BetterFarming implements ModInitializer
 	public void onInitialize()
 	{
 		config = new TestConfig(Utils.GetStringPathInConfig("test_config.json"), new TestConfigBlock());
+
+		RRPCallback.BEFORE_VANILLA.register(pack -> pack.add(Generators.RESOURCE_PACK));
+		ItemRegistry.Register();
+		Generators.Init();
 
 		Lootables.RegisterLootables();
 
@@ -76,11 +91,12 @@ public class BetterFarming implements ModInitializer
 		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
 			RUN_SCHEDULER.Save(server);
 			DELAY_SCHEDULER.Save(server);
+			WORLD_DATAMANGER.Save();
 		}));
 		ServerWorldEvents.LOAD.register(((server, world) -> {
-			SMART_DATA_MANAGER.SetupWorld(world);
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
+				WORLD_DATAMANGER = new WorldPosDataManager("world_blocks", world, BlockData::new);
 				m_overWorldReference = world;
 				SeasonManager.GetOrCreate(world);
 				BlockDataManager.GetOrCreate(world);
@@ -99,16 +115,21 @@ public class BetterFarming implements ModInitializer
 
 				RUN_SCHEDULER.RegisterRunnable(entry1);
 
-				var nbt = entry.Serialize(new NbtCompound());
-				var nbt1 = entry1.Serialize(new NbtCompound());
-				var entry2 = FastRunnableScheduler.FastEntry.FromNbt(nbt);
-				var entry3 = FastRunnableScheduler.FastEntry.FromNbt(nbt1);
-				RUN_SCHEDULER.RegisterRunnable(entry3);
-				int x = 1;
+				DELAY_SCHEDULER.ScheduleRunnable(100, false, false, (delayEntry) ->
+				{
+					BetterFarming.LOGGER.info("DELAY FIRST!");
+					return false;
+				});
+
+				DELAY_SCHEDULER.ScheduleRunnable(150, false, false, (delayEntry) ->
+				{
+					BetterFarming.LOGGER.info("DELAY SECOND!");
+					return false;
+				});
 			}
 		}));
 		ServerWorldEvents.UNLOAD.register(((server, world) -> {
-			SMART_DATA_MANAGER.Save();
+
 		}));
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());
@@ -122,6 +143,10 @@ public class BetterFarming implements ModInitializer
 		ServerChunkEvents.CHUNK_LOAD.register(cl);
 		ServerChunkEvents.CHUNK_UNLOAD.register(cl);
 
+	}
+
+	public static Identifier prefixPath(Identifier identifier, String prefix) {
+		return new Identifier(identifier.getNamespace(), prefix + '/' + identifier.getPath());
 	}
 
 	public static MinecraftServer GetServer()
