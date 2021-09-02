@@ -63,7 +63,6 @@ public class BetterFarming implements ModInitializer
 	public static TestConfig config;
 
 	public static WorldPosDataManager WORLD_DATAMANGER;
-	//public static final SmartDataManager SMART_DATA_MANAGER = new SmartDataManager(MOD_ID + "_blockdata", TestDataBlock::new);
 	public static final FastRunnableScheduler RUN_SCHEDULER = new FastRunnableScheduler();
 	public static final FastDelayScheduler DELAY_SCHEDULER = new FastDelayScheduler();
 
@@ -99,21 +98,9 @@ public class BetterFarming implements ModInitializer
 				WORLD_DATAMANGER = new WorldPosDataManager("world_blocks", world, BlockData::new);
 				m_overWorldReference = world;
 				SeasonManager.GetOrCreate(world);
-				BlockDataManager.GetOrCreate(world);
 				SEASONS_REGISTRY.Load(world);
 				RUN_SCHEDULER.Load(server);
 				DELAY_SCHEDULER.Load(server);
-
-				var entry = new FastRunnableScheduler.FastEntry("test", 10);
-				entry.owner = new SchedulableOwner.BlockOwner(new BlockPos(1, 2, 3), world);
-				entry.schedulable = (lambda) -> BetterFarming.LOGGER.info("WORKING 1");
-				RUN_SCHEDULER.RegisterRunnable(entry);
-
-				var entry1 = new FastRunnableScheduler.FastEntry("", 10);
-				entry1.owner = new SchedulableOwner.BlockOwner(new BlockPos(3, 3, 3), world);
-				entry1.schedulable = TestPersistentSchedulable.Function();
-
-				RUN_SCHEDULER.RegisterRunnable(entry1);
 
 				DELAY_SCHEDULER.ScheduleRunnable(100, false, false, (delayEntry) ->
 				{

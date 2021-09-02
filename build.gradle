@@ -37,12 +37,11 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
-    modImplementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
-
-    modImplementation("com.lettuce.fudge:working-scheduler:${project.working_scheduler_version}")
-    include("net.fabricmc:fabric-language-kotlin:${project.kotlin_version}")
-    include("com.lettuce.fudge:fabric-drawer:${project.fabric_drawer_version}")
+    //modImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    //modImplementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    //modImplementation("com.lettuce.fudge:working-scheduler:${project.working_scheduler_version}")
+    //include("net.fabricmc:fabric-language-kotlin:${project.kotlin_version}")
+    //include("com.lettuce.fudge:fabric-drawer:${project.fabric_drawer_version}")
 
     modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components_version}")
     modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-chunk:${project.cardinal_components_version}")

@@ -1,28 +1,27 @@
 package me.bscal.betterfarming.common.database.blockdata.blocks;
 
-import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class CompoundDataBlock implements IBlockDataBlock
 {
 
-	public final long xz;
+	public final Block block;
 	public NbtCompound data;
 
-	public CompoundDataBlock(long xz)
+	public CompoundDataBlock(Block block)
 	{
-		this.xz = xz;
+		this.block = block;
 		this.data = new NbtCompound();
 	}
 
-	public CompoundDataBlock(int x, int z)
+	public CompoundDataBlock(Block block, NbtCompound data)
 	{
-		this(DataManager.XZToLong(x, z));
+		this.block = block;
+		this.data = data.copy();
 	}
 
 	public NbtCompound CloneData()
@@ -30,24 +29,24 @@ public class CompoundDataBlock implements IBlockDataBlock
 		return data.copy();
 	}
 
-	public NbtElement GetSafely(String key, int type, NbtElement defaultValue)
-	{
-		if (data.contains(key, type))
-			return data.get(key);
-		return defaultValue;
-	}
-
 	@Override
 	public NbtCompound ToNbt(NbtCompound nbt)
 	{
-		nbt.put(Long.toString(xz), data);
+		//nbt.putString("type", "block"); // TODO for different owners possible?
+		nbt.putString("owner", Registry.BLOCK.getId(block).toString());
+		nbt.put("data", data);
 		return nbt;
 	}
 
 	@Override
 	public void FromNbt(NbtCompound nbt)
 	{
-		data = nbt.getCompound(Long.toString(xz));
+		data = nbt.getCompound("data");
+	}
+
+	public static CompoundDataBlock Create(NbtCompound nbt)
+	{
+		return new CompoundDataBlock(Registry.BLOCK.get(new Identifier(nbt.getString("owner"))), nbt.getCompound("data"));
 	}
 
 }

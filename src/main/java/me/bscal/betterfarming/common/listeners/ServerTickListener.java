@@ -32,9 +32,6 @@ public class ServerTickListener implements ServerTickEvents.EndTick
 				m_randomTickChance = UPDATE_TIME / Utils.GeometricDistributionMeanForRandomTicks(
 						server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get());
 			}
-			server.getWorlds().forEach((world -> {
-				BlockDataManager.GetOrCreate(world).UpdateUnloadedEntries(server, m_randomTickChance);
-			}));
 		}
 	}
 }
