@@ -2,14 +2,22 @@ package me.bscal.betterfarming.common.database.blockdata.smart;
 
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
+import me.bscal.betterfarming.common.utils.LongPair;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class SmartDataChunk implements IBlockDataChunk
 {
@@ -66,6 +74,29 @@ public class SmartDataChunk implements IBlockDataChunk
 	public IBlockDataBlock RemoveBlock(BlockPos pos)
 	{
 		return m_blockData.get(pos.getY()).RemoveBlock(pos.getX(), pos.getZ());
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAll(ServerWorld world)
+	{
+		Stream<IBlockDataBlock> stream = Stream.of();
+		for (var chunkSection : m_blockData.values())
+			stream = Stream.concat(stream, chunkSection.GetMap().values().stream());
+		return (IBlockDataBlock[]) stream.toArray();
+	}
+
+	@Override
+	public Object GetMap()
+	{
+		return m_blockData;
+	}
+
+	@Override
+	public void ForEach(Consumer<IBlockDataBlock> foreach)
+	{
+		m_blockData.forEach((integer, smartDataChunkSection) -> {
+			smartDataChunkSection.GetMap().values().forEach(foreach);
+		});
 	}
 
 	@Override

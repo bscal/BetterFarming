@@ -9,28 +9,37 @@ import net.minecraft.util.registry.Registry;
 public class CropDataBlock implements IBlockDataBlock
 {
 
-	public long lastUpdate;
-	public int growthTime;
-	public int age;
 	public Block block;
+	public float totalGrowthReceived;
+	public float currentAgeGrowthReceived;
+	public int age;
+	public float growthModifier;
 	public boolean ableToGrow;
 
-	public CropDataBlock(long lastUpdate, int growthTime, int age, Block block, boolean ableToGrow)
+	public CropDataBlock() {}
+
+	public CropDataBlock(Block block)
 	{
-		this.lastUpdate = lastUpdate;
-		this.growthTime = growthTime;
-		this.age = age;
+		this(block, 0, 0, 0);
+	}
+
+	public CropDataBlock(Block block, float totalGrowthReceived, float currentAgeGrowthReceived, int age)
+	{
 		this.block = block;
-		this.ableToGrow = ableToGrow;
+		this.totalGrowthReceived = totalGrowthReceived;
+		this.currentAgeGrowthReceived = currentAgeGrowthReceived;
+		this.age = age;
+		this.growthModifier = 1.0f;
 	}
 
 	@Override
 	public NbtCompound ToNbt(NbtCompound nbt)
 	{
-		nbt.putLong("lastUpdate", lastUpdate);
-		nbt.putInt("growthTime", growthTime);
-		nbt.putInt("age", age);
 		nbt.putString("block", String.valueOf(Registry.BLOCK.getId(block)));
+		nbt.putFloat("totalGrowthReceived", totalGrowthReceived);
+		nbt.putFloat("currentAgeGrowthReceived", currentAgeGrowthReceived);
+		nbt.putInt("age", age);
+		nbt.putFloat("growthModifier", growthModifier);
 		nbt.putBoolean("ableToGrow", ableToGrow);
 		return nbt;
 	}
@@ -38,10 +47,21 @@ public class CropDataBlock implements IBlockDataBlock
 	@Override
 	public void FromNbt(NbtCompound nbt)
 	{
-		lastUpdate = nbt.getLong("lastUpdate");
-		growthTime = nbt.getInt("growthTime");
+		String blockId = nbt.getString("block");
+		if (blockId.isBlank() || blockId.equals("null"))
+			return;
+		block = Registry.BLOCK.get(new Identifier(blockId));
+		totalGrowthReceived = nbt.getFloat("totalGrowthReceived");
+		currentAgeGrowthReceived = nbt.getFloat("currentAgeGrowthReceived");
 		age = nbt.getInt("age");
-		block = Registry.BLOCK.get(Identifier.tryParse(nbt.getString("block")));
+		growthModifier = nbt.getFloat("growthModifier");
 		ableToGrow = nbt.getBoolean("ableToGrow");
+	}
+
+	public static CropDataBlock Create(NbtCompound nbt)
+	{
+		CropDataBlock crop = new CropDataBlock();
+		crop.FromNbt(nbt);
+		return crop;
 	}
 }

@@ -6,6 +6,7 @@ import me.bscal.betterfarming.common.database.blockdata.IBlockDataWorld;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.function.Supplier;
@@ -25,6 +26,11 @@ public class WorldPosDataManager implements IBlockDataManager
 		this.m_dataFactory = blockDataFactoryDefault;
 	}
 
+	public WorldPosWorld GetWorld()
+	{
+		return m_dataWorld;
+	}
+
 	@Override
 	public IBlockDataWorld GetWorld(ServerWorld world)
 	{
@@ -40,37 +46,56 @@ public class WorldPosDataManager implements IBlockDataManager
 	@Override
 	public IBlockDataBlock GetBlockData(ServerWorld world, BlockPos pos)
 	{
-		return m_dataWorld.Get().GetBlock(pos);
+		return m_dataWorld.Get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
+				.GetBlock(pos);
 	}
 
 	@Override
 	public IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos)
 	{
-		return m_dataWorld.Get().GetOrCreate(pos, m_dataFactory);
+		return m_dataWorld.GetOrCreateChunk(
+						new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
+				.GetOrCreate(pos, m_dataFactory);
 	}
 
 	@Override
 	public IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> customBlockDataFactor)
 	{
-		return m_dataWorld.Get().GetOrCreate(pos, customBlockDataFactor);
+		return m_dataWorld.GetOrCreateChunk(
+						new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
+				.GetOrCreate(pos, customBlockDataFactor);
 	}
 
 	@Override
 	public void SetBlockData(ServerWorld world, BlockPos pos, IBlockDataBlock data)
 	{
-		m_dataWorld.Get().PutBlock(pos, data);
+		m_dataWorld.Get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
+				.PutBlock(pos, data);
 	}
 
 	@Override
 	public void RemoveBlockData(ServerWorld world, BlockPos pos)
 	{
-		m_dataWorld.Get().RemoveBlock(pos);
+		m_dataWorld.Get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
+				.RemoveBlock(pos);
 	}
 
 	@Override
 	public boolean DoesChunkExist(ServerWorld world, ChunkPos pos)
 	{
 		return true;
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAll(ServerWorld world)
+	{
+		return m_dataWorld.GetAll(world);
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAllChunk(ServerWorld world, ChunkPos pos)
+	{
+		return m_dataWorld.GetAllChunk(world, pos);
 	}
 
 	@Override

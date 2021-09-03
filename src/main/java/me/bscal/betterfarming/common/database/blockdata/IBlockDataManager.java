@@ -26,6 +26,10 @@ public interface IBlockDataManager
 
 	boolean DoesChunkExist(ServerWorld world, ChunkPos pos);
 
+	IBlockDataBlock[] GetAll(ServerWorld world);
+
+	IBlockDataBlock[] GetAllChunk(ServerWorld world, ChunkPos pos);
+
 	void OnLoadChunk(ServerWorld world, WorldChunk chunk);
 
 	void OnUnloadChunk(ServerWorld world, WorldChunk chunk);

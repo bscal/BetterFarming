@@ -1,67 +1,52 @@
 package me.bscal.betterfarming.common.database.blockdata.worldpos;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.bscal.betterfarming.common.database.blockdata.DataManager;
-import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
-import me.bscal.betterfarming.common.database.blockdata.IBlockDataWorld;
-import me.bscal.betterfarming.common.database.blockdata.smart.SmartDataChunk;
+import me.bscal.betterfarming.common.database.blockdata.DataWorld;
+import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
+import me.bscal.betterfarming.common.utils.LongPair;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class WorldPosWorld implements IBlockDataWorld
+public class WorldPosWorld extends DataWorld
 {
-
-	protected final ServerWorld world;
 	protected final WorldPosDataManager parent;
-	protected final WorldPosChunk m_dataChunk;
-	protected final File m_saveDir;
 
-	public WorldPosWorld( ServerWorld world, WorldPosDataManager parent)
+	public WorldPosWorld(ServerWorld world, WorldPosDataManager parent)
 	{
-		this.world = world;
+		super(parent.id, world);
 		this.parent = parent;
-		this.m_dataChunk = new WorldPosChunk(this);
-		this.m_saveDir = new File(DimensionType.getSaveDirectory(world.getRegistryKey(), world.getServer()
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/data/" + parent.id + "/");
-		this.m_saveDir.mkdirs();
+	}
+
+	public List<LongPair<Long2ObjectMap.FastEntrySet<IBlockDataBlock>>> GetPairs()
+	{
+		List<LongPair<Long2ObjectMap.FastEntrySet<IBlockDataBlock>>> list = new ArrayList<>();
+		for (var entry : m_chunkToSection.long2ObjectEntrySet())
+			if (entry.getValue() instanceof WorldPosChunk worldChunk)
+			list.add(new LongPair<>(entry.getLongKey(), worldChunk.GetPairs()));
+		return list;
 	}
 
 	@Override
-	public ServerWorld GetWorld()
+	public WorldPosChunk GetOrCreateChunk(ChunkPos pos)
 	{
-		return world;
-	}
-
-	@Override
-	public IBlockDataChunk GetOrCreateChunk(ChunkPos pos)
-	{
-		return m_dataChunk;
-	}
-
-	public WorldPosChunk Get()
-	{
-		return m_dataChunk;
-	}
-
-	@Override
-	public IBlockDataChunk Get(ChunkPos pos)
-	{
-		return m_dataChunk;
-	}
-
-	@Override
-	public void Remove(BlockPos pos)
-	{
-		m_dataChunk.RemoveBlock(pos);
+		long key = pos.toLong();
+		var chunk = m_chunkToSection.get(key);
+		if (chunk == null)
+		{
+			var newChunk = new WorldPosChunk(this);
+			m_chunkToSection.put(key, newChunk);
+			return newChunk;
+		}
+		return (WorldPosChunk) chunk;
 	}
 
 	@Override
@@ -74,46 +59,7 @@ public class WorldPosWorld implements IBlockDataWorld
 			try
 			{
 				NbtCompound nbt = NbtIo.readCompressed(file);
-				m_dataChunk.FromNbt(nbt);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@Override
-	public void OnUnloadChunk(ServerWorld world, WorldChunk chunk)
-	{
-		ChunkPos pos = chunk.getPos();
-		File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
-		NbtCompound root = new NbtCompound();
-		try
-		{
-			var data = m_dataChunk.ChunkToNbt(pos, root);
-			if (data != null)
-				NbtIo.writeCompressed(data, file);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void Save()
-	{
-		for (var pair : m_dataChunk.m_blockData.long2ObjectEntrySet())
-		{
-			ChunkPos pos = new ChunkPos(pair.getLongKey());
-			File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
-			NbtCompound root = new NbtCompound();
-			try
-			{
-				var data = m_dataChunk.ChunkToNbt(pos, root);
-				if (data != null)
-					NbtIo.writeCompressed(data, file);
+				m_chunkToSection.put(pos.toLong(), new WorldPosChunk(this).FromNbt(nbt));
 			}
 			catch (IOException e)
 			{

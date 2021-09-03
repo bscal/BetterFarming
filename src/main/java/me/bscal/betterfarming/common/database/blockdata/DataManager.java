@@ -78,10 +78,22 @@ public abstract class DataManager implements IBlockDataManager
 	{
 		for (IBlockDataWorld dataWorld : worlds)
 		{
-			if (dataWorld.GetWorld().getRegistryKey().getValue().equals(world.getRegistryKey().getValue()))
+			if (dataWorld.GetServerWorld().getRegistryKey().getValue().equals(world.getRegistryKey().getValue()))
 				return dataWorld;
 		}
 		return null;
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAll(ServerWorld world)
+	{
+		return GetWorld(world).GetAll(world);
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAllChunk(ServerWorld world, ChunkPos pos)
+	{
+		return GetWorld(world).GetAllChunk(world, pos);
 	}
 
 	@Override
@@ -89,7 +101,7 @@ public abstract class DataManager implements IBlockDataManager
 	{
 		for (var worldData : worlds)
 		{
-			if (worldData.GetWorld().equals(world))
+			if (worldData.GetServerWorld().equals(world))
 			{
 				worldData.OnLoadChunk(world, chunk);
 				break;
@@ -102,7 +114,7 @@ public abstract class DataManager implements IBlockDataManager
 	{
 		for (var worldData : worlds)
 		{
-			if (worldData.GetWorld().equals(world))
+			if (worldData.GetServerWorld().equals(world))
 			{
 				worldData.OnUnloadChunk(world, chunk);
 				break;
@@ -118,7 +130,14 @@ public abstract class DataManager implements IBlockDataManager
 
 	public static long XZToLong(int x, int z)
 	{
-		return x & 0xffL << 32 | z & 0xffL;
+		return ((long)x << 32) | z & 0xffL;
+	}
+
+	public static int[] LongToXZ(long xz) {
+		int[] i = new int[2];
+		i[0] = (int) (xz >> 32);
+		i[1] = (int) xz;
+		return i;
 	}
 
 	public static String ChunkFileName(int x, int z)

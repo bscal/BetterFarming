@@ -1,8 +1,10 @@
 package me.bscal.betterfarming.common.database.blockdata;
 
 import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import me.bscal.betterfarming.BetterFarming;
+import me.bscal.betterfarming.common.utils.LongPair;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.world.ServerWorld;
@@ -14,6 +16,11 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public abstract class DataWorld implements IBlockDataWorld
 {
@@ -38,7 +45,7 @@ public abstract class DataWorld implements IBlockDataWorld
 		return m_chunkToSection.get(pos.toLong());
 	}
 
-	public ServerWorld GetWorld()
+	public ServerWorld GetServerWorld()
 	{
 		return m_world;
 	}
@@ -53,6 +60,30 @@ public abstract class DataWorld implements IBlockDataWorld
 			if (chunk.Size() < 1)
 				m_chunkToSection.remove(chunkPos.toLong());
 		}
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAll(ServerWorld world)
+	{
+		Stream<IBlockDataBlock> stream = Stream.of();
+		for (var chunk : m_chunkToSection.values())
+			stream = Stream.concat(stream, Arrays.stream(chunk.GetAll(world)));
+		return (IBlockDataBlock[]) stream.toArray();
+	}
+
+	@Override
+	public IBlockDataBlock[] GetAllChunk(ServerWorld world, ChunkPos pos)
+	{
+		var chunk = Get(pos);
+		if (chunk == null)
+			return new IBlockDataBlock[0];
+		return chunk.GetAll(world);
+	}
+
+	@Override
+	public void ForEach(Consumer<IBlockDataBlock> foreach)
+	{
+		m_chunkToSection.values().forEach(value -> value.ForEach(foreach));
 	}
 
 	public void Save()

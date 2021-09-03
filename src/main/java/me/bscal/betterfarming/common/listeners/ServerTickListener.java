@@ -1,7 +1,7 @@
 package me.bscal.betterfarming.common.listeners;
 
 import me.bscal.betterfarming.BetterFarming;
-import me.bscal.betterfarming.common.database.blockdata.BlockDataManager;
+import me.bscal.betterfarming.common.database.blockdata.CropDataBlockHandler;
 import me.bscal.betterfarming.common.utils.Utils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -10,9 +10,8 @@ import net.minecraft.world.GameRules;
 public class ServerTickListener implements ServerTickEvents.EndTick
 {
 
-	private static final int UPDATE_TIME = 20 * 10;
+	private static final int UPDATE_TIME = 60 * 20;
 
-	private int m_clock;
 	/**
 	 * The average time a random tick takes / the UPDATE_TIME. Used to "progress" time for unloaded blocks with RANDOM_TICK_SPEED GameRule
 	 */
@@ -24,14 +23,9 @@ public class ServerTickListener implements ServerTickEvents.EndTick
 		BetterFarming.RUN_SCHEDULER.Tick(server.getTicks());
 		BetterFarming.DELAY_SCHEDULER.Tick(server.getTicks());
 
-		if (m_clock++ > UPDATE_TIME)
+		if (server.getTicks() % UPDATE_TIME == 0)
 		{
-			m_clock = 0;
-			if (m_randomTickChance < 1)
-			{
-				m_randomTickChance = UPDATE_TIME / Utils.GeometricDistributionMeanForRandomTicks(
-						server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get());
-			}
+			BetterFarming.TICK_SPEED = server.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
 		}
 	}
 }
