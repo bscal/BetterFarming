@@ -20,6 +20,8 @@ public interface IBlockDataManager
 
 	IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> customBlockDataFactor);
 
+	IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory);
+
 	void SetBlockData(ServerWorld world, BlockPos pos, IBlockDataBlock data);
 
 	void RemoveBlockData(ServerWorld world, BlockPos pos);

@@ -56,6 +56,12 @@ public abstract class DataManager implements IBlockDataManager
 	}
 
 	@Override
+	public IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory)
+	{
+		return GetWorld(world).Create(world, pos, factory);
+	}
+
+	@Override
 	public void RemoveBlockData(ServerWorld world, BlockPos pos)
 	{
 		GetWorld(world).Remove(pos);

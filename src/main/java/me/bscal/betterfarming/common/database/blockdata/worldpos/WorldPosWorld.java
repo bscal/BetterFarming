@@ -4,17 +4,21 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.DataWorld;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
+import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
 import me.bscal.betterfarming.common.utils.LongPair;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class WorldPosWorld extends DataWorld
 {
@@ -47,6 +51,21 @@ public class WorldPosWorld extends DataWorld
 			return newChunk;
 		}
 		return (WorldPosChunk) chunk;
+	}
+
+	@Override
+	public IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory)
+	{
+		long key = pos.asLong();
+		IBlockDataChunk chunk = m_chunkToSection.get(ChunkSectionPos.from(pos).asLong());
+		if (chunk == null)
+		{
+			chunk = new WorldPosChunk(this);
+			m_chunkToSection.put(key, chunk);
+		}
+		IBlockDataBlock data = factory.get();
+		chunk.PutBlock(pos, data);
+		return data;
 	}
 
 	@Override

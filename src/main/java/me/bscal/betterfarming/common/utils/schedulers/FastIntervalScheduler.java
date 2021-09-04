@@ -17,14 +17,14 @@ import java.util.*;
  * Inspiration from HugsLib's tick scheduler a Rimworld modding library. Thought it could be a useful addition when I want to
  * scheduler runnables for mods or plugins more efficiently
  */
-public final class FastRunnableScheduler
+public final class FastIntervalScheduler
 {
 
-	public static final FastRunnableScheduler INSTANCE = new FastRunnableScheduler();
+	public static final FastIntervalScheduler INSTANCE = new FastIntervalScheduler();
 
 	private final List<FastRunnableList> runnableLists;
 
-	public FastRunnableScheduler()
+	public FastIntervalScheduler()
 	{
 		runnableLists = new ArrayList<>();
 	}
@@ -210,14 +210,11 @@ public final class FastRunnableScheduler
 			{
 				currentIndex++;
 				var entry = it.next();
-				if (entry.owner.IsValid())
-				{
-					entry.aliveTickCount += tickInterval;
-					entry.schedulable.accept(entry);
-					if (entry.canceled)
-						it.remove();
-				}
-				else
+				if (entry.owner != null && !entry.owner.IsValid())
+					it.remove();
+				entry.aliveTickCount += tickInterval;
+				entry.schedulable.accept(entry);
+				if (entry.canceled)
 					it.remove();
 			}
 		}

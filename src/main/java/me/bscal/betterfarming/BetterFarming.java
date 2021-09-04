@@ -4,8 +4,6 @@ import me.bscal.betterfarming.common.commands.SeasonCommand;
 import me.bscal.betterfarming.common.config.TestConfig;
 import me.bscal.betterfarming.common.config.TestConfigBlock;
 import me.bscal.betterfarming.common.database.blockdata.CropDataBlockHandler;
-import me.bscal.betterfarming.common.database.blockdata.blocks.CropDataBlock;
-import me.bscal.betterfarming.common.database.blockdata.worldpos.WorldPosDataManager;
 import me.bscal.betterfarming.common.generation.Generators;
 import me.bscal.betterfarming.common.listeners.*;
 import me.bscal.betterfarming.common.loot.override.Lootables;
@@ -13,7 +11,7 @@ import me.bscal.betterfarming.common.registries.ItemRegistry;
 import me.bscal.betterfarming.common.seasons.*;
 import me.bscal.betterfarming.common.utils.Utils;
 import me.bscal.betterfarming.common.utils.schedulers.FastDelayScheduler;
-import me.bscal.betterfarming.common.utils.schedulers.FastRunnableScheduler;
+import me.bscal.betterfarming.common.utils.schedulers.FastIntervalScheduler;
 import net.devtech.arrp.api.RRPCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
@@ -57,9 +55,6 @@ public class BetterFarming implements ModInitializer
 
 	public static TestConfig config;
 
-	public static final FastRunnableScheduler RUN_SCHEDULER = new FastRunnableScheduler();
-	public static final FastDelayScheduler DELAY_SCHEDULER = new FastDelayScheduler();
-
 	public static int TICK_SPEED;
 
 	@Override
@@ -80,15 +75,19 @@ public class BetterFarming implements ModInitializer
 		//BLOCK_DATA.Load(Utils.GetStringPathInConfig("block_data.json"));
 
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
-		ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			m_server = server;
-			TICK_SPEED = server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get();
 		});
-		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
-			RUN_SCHEDULER.Save(server);
-			DELAY_SCHEDULER.Save(server);
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+			TICK_SPEED = server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get();
+			FastDelayScheduler.INSTANCE.Load(server);
+			FastIntervalScheduler.INSTANCE.Load(server);
+		});
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			FastDelayScheduler.INSTANCE.Save(server);
+			FastIntervalScheduler.INSTANCE.Save(server);
 			CropDataBlockHandler.Save();
-		}));
+		});
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
@@ -96,20 +95,6 @@ public class BetterFarming implements ModInitializer
 				m_overWorldReference = world;
 				SeasonManager.GetOrCreate(world);
 				SEASONS_REGISTRY.Load(world);
-				RUN_SCHEDULER.Load(server);
-				DELAY_SCHEDULER.Load(server);
-
-				DELAY_SCHEDULER.ScheduleRunnable(100, false, false, (delayEntry) ->
-				{
-					BetterFarming.LOGGER.info("DELAY FIRST!");
-					return false;
-				});
-
-				DELAY_SCHEDULER.ScheduleRunnable(150, false, false, (delayEntry) ->
-				{
-					BetterFarming.LOGGER.info("DELAY SECOND!");
-					return false;
-				});
 			}
 		}));
 		ServerWorldEvents.UNLOAD.register(((server, world) -> {

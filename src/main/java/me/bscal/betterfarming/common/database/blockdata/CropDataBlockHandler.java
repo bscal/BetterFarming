@@ -6,6 +6,7 @@ import me.bscal.betterfarming.common.database.blockdata.worldpos.WorldPosDataMan
 import me.bscal.betterfarming.common.seasons.SeasonalCrop;
 import me.bscal.betterfarming.common.seasons.Seasons;
 import me.bscal.betterfarming.common.utils.Utils;
+import me.bscal.betterfarming.common.utils.schedulers.FastIntervalScheduler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -25,7 +26,7 @@ public final class CropDataBlockHandler
 	{
 		WORLD_DATA_MANAGER = new WorldPosDataManager(BetterFarming.MOD_ID + "_cropdata", world, CropDataBlock::new);
 
-		BetterFarming.RUN_SCHEDULER.RegisterRunnable(300, (entry) -> CropDataBlockHandler.UpdateUnloadedEntries(
+		FastIntervalScheduler.INSTANCE.RegisterRunnable(300, (entry) -> CropDataBlockHandler.UpdateUnloadedEntries(
 				300 / Utils.GeometricDistributionMeanForRandomTicks(BetterFarming.TICK_SPEED)));
 
 	}

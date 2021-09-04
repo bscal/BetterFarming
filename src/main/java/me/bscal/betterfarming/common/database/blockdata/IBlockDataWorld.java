@@ -10,6 +10,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface IBlockDataWorld
 {
@@ -19,6 +20,8 @@ public interface IBlockDataWorld
 	IBlockDataChunk GetOrCreateChunk(ChunkPos pos);
 
 	IBlockDataChunk Get(ChunkPos pos);
+
+	IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory);
 
 	void Remove(BlockPos pos);
 

@@ -18,6 +18,8 @@ import java.util.Queue;
 public class FastDelayScheduler
 {
 
+	public static final FastDelayScheduler INSTANCE = new FastDelayScheduler();
+
 	private final Queue<DelayEntry> entries;
 	private int lastProcessedTick = -1;
 

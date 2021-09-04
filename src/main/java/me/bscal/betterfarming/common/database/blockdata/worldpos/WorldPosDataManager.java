@@ -50,6 +50,11 @@ public class WorldPosDataManager implements IBlockDataManager
 				.GetBlock(pos);
 	}
 
+	public IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory)
+	{
+		return m_dataWorld.Create(world, pos, factory);
+	}
+
 	@Override
 	public IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos)
 	{
@@ -69,7 +74,7 @@ public class WorldPosDataManager implements IBlockDataManager
 	@Override
 	public void SetBlockData(ServerWorld world, BlockPos pos, IBlockDataBlock data)
 	{
-		m_dataWorld.Get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
+		m_dataWorld.GetOrCreateChunk(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
 				.PutBlock(pos, data);
 	}
 
