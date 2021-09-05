@@ -1,27 +1,31 @@
 package me.bscal.betterfarming.mixin.common.blocks;
 
 import me.bscal.betterfarming.BetterFarming;
-import net.minecraft.block.*;
+import me.bscal.betterfarming.common.utils.schedulers.FastDelayScheduler;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.PlantBlock;
+import net.minecraft.block.SaplingBlock;
 import net.minecraft.block.sapling.SaplingGenerator;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import scheduler.Scheduleable;
-import scheduler.Scheduler;
 
 import java.util.Random;
 
-@Mixin(SaplingBlock.class)
-public abstract class SaplingBlockScheduleMixin extends PlantBlock implements Scheduleable
+@Mixin(SaplingBlock.class) public abstract class SaplingBlockScheduleMixin extends PlantBlock
 {
 
 	@Shadow
@@ -38,7 +42,7 @@ public abstract class SaplingBlockScheduleMixin extends PlantBlock implements Sc
 	}
 
 	@Inject(method = "<init>", at = @At(value = "TAIL"))
-	public void OnConstuctor(SaplingGenerator generator, Settings settings, CallbackInfo ci)
+	public void OnConstructor(SaplingGenerator generator, Settings settings, CallbackInfo ci)
 	{
 		this.setDefaultState(this.getDefaultState().with(STARTED, false));
 	}
@@ -49,7 +53,6 @@ public abstract class SaplingBlockScheduleMixin extends PlantBlock implements Sc
 		builder.add(STARTED);
 	}
 
-	@Override
 	public void onScheduleEnd(World world, BlockPos pos, int scheduleId, NbtCompound additionalData)
 	{
 		if (!world.isClient())
@@ -72,24 +75,44 @@ public abstract class SaplingBlockScheduleMixin extends PlantBlock implements Sc
 			else
 			{
 				additionalData.putInt("age", age + 1);
-				Scheduler.Builder(this, world)
-						.pos(pos)
-						.additionalData(additionalData)
-						.schedule(10 * 20);
 			}
 		}
 	}
 
 	@Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
-	public void OnRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random,
-			CallbackInfo ci)
+	public void OnRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci)
 	{
 		BetterFarming.LOGGER.info("RandomTick = " + state.get(STARTED));
 		if (!state.get(STARTED))
 		{
 			world.setBlockState(pos, state.with(STARTED, true).cycle(Properties.STAGE));
 
-			Scheduler.Builder(this, world).pos(pos).schedule(20 * 10);
+			NbtCompound data = new NbtCompound();
+			data.putInt("x", pos.getX());
+			data.putInt("y", pos.getY());
+			data.putInt("z", pos.getZ());
+			data.putString("block", String.valueOf(Registry.BLOCK.getId(state.getBlock())));
+			data.putString("world", world.getRegistryKey().getValue().toString());
+			FastDelayScheduler.INSTANCE.ScheduleRunnable(100, false, true, data, (entry) ->
+			{
+				ServerWorld blockWorld = BetterFarming.GetServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, new Identifier(data.getString("world"))));
+				if (blockWorld == null)
+					return false;
+				BlockPos blockPos = new BlockPos(data.getInt("x"), data.getInt("y"), data.getInt("z"));
+				BlockState blockState = blockWorld.getBlockState(blockPos);
+				Identifier blockId = Identifier.tryParse(entry.additionalData().getString("block"));
+				if (blockId == null)
+					return false;
+				Block block = Registry.BLOCK.get(blockId);
+
+				if (blockState.isOf(block))
+				{
+					if (blockWorld.random.nextFloat() < .17f);
+				}
+
+				return false;
+			});
+
 			BetterFarming.LOGGER.info("Tick called.");
 		}
 

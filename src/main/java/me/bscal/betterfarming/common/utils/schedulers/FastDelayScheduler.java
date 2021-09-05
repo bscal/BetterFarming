@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.dimension.DimensionType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +37,8 @@ public class FastDelayScheduler
 
 	public void Save(MinecraftServer server)
 	{
-		File scheduleSavePath  = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/schedulables");
+		File scheduleSavePath = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(),
+				server.getSavePath(WorldSavePath.ROOT).toFile()) + "/schedulables");
 		scheduleSavePath.mkdirs();
 		NbtCompound root = new NbtCompound();
 		NbtList rootList = new NbtList();
@@ -61,9 +61,8 @@ public class FastDelayScheduler
 
 	public void Load(MinecraftServer server)
 	{
-		File scheduleSavePath  = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/schedulables");
+		File scheduleSavePath = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(),
+				server.getSavePath(WorldSavePath.ROOT).toFile()) + "/schedulables");
 		if (scheduleSavePath.exists())
 		{
 			try
@@ -94,12 +93,13 @@ public class FastDelayScheduler
 			boolean shouldReschedule = entry.delayable.test(entry);
 			if (entry.repeat && shouldReschedule)
 			{
-				ScheduleEntry(new DelayEntry(entry.interval, currentTick + entry.interval, true, entry.persistent, entry.delayable));
+				ScheduleEntry(
+						new DelayEntry(entry.interval, currentTick + entry.interval, true, entry.persistent, entry.additionalData, entry.delayable));
 			}
 		}
 	}
 
-	public void ScheduleRunnable(int dueInTicks, boolean repeat, boolean persistent, Delayable delayable)
+	public void ScheduleRunnable(int dueInTicks, boolean repeat, boolean persistent, @Nullable NbtCompound additionalData, Delayable delayable)
 	{
 		if (delayable == null)
 			return;
@@ -107,7 +107,9 @@ public class FastDelayScheduler
 			return;
 		if (dueInTicks == 0 && repeat)
 			return;
-		DelayEntry entry = new DelayEntry(dueInTicks, lastProcessedTick + dueInTicks, repeat, persistent, delayable);
+		if (additionalData == null)
+			additionalData = new NbtCompound();
+		DelayEntry entry = new DelayEntry(dueInTicks, lastProcessedTick + dueInTicks, repeat, persistent, additionalData, delayable);
 		if (dueInTicks == 0)
 			entry.delayable.test(entry);
 		else
@@ -119,7 +121,7 @@ public class FastDelayScheduler
 		entries.add(delayEntry);
 	}
 
-	public static record DelayEntry(int interval, int dueAtTick, boolean repeat, boolean persistent, Delayable delayable)
+	public static record DelayEntry(int interval, int dueAtTick, boolean repeat, boolean persistent, NbtCompound additionalData, Delayable delayable)
 			implements Serializable
 	{
 
@@ -129,6 +131,7 @@ public class FastDelayScheduler
 			nbt.putInt("dueAtTick", dueAtTick - BetterFarming.GetServer().getTicks());
 			nbt.putBoolean("repeat", repeat);
 			nbt.putBoolean("persistent", persistent);
+			nbt.put("data", additionalData);
 			nbt.putString("delayable", Utils.ToString(delayable));
 			return nbt;
 		}
@@ -136,7 +139,7 @@ public class FastDelayScheduler
 		public static DelayEntry FromNbt(NbtCompound nbt)
 		{
 			return new DelayEntry(nbt.getInt("interval"), nbt.getInt("dueAtTick"), nbt.getBoolean("repeat"), nbt.getBoolean("persistent"),
-					(Delayable) Utils.FromString(nbt.getString("delayable")));
+					nbt.getCompound("data"), (Delayable) Utils.FromString(nbt.getString("delayable")));
 		}
 
 	}

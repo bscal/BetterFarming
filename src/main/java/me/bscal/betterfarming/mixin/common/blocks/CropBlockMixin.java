@@ -1,10 +1,16 @@
 package me.bscal.betterfarming.mixin.common.blocks;
 
 import me.bscal.betterfarming.BetterFarming;
-import me.bscal.betterfarming.common.database.blockdata.BlockData;
+import me.bscal.betterfarming.common.database.blockdata.CropDataBlockHandler;
+import me.bscal.betterfarming.common.database.blockdata.blocks.CropDataBlock;
 import me.bscal.betterfarming.common.seasons.SeasonalCrop;
 import me.bscal.betterfarming.common.seasons.Seasons;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CropBlock;
+import net.minecraft.block.Fertilizable;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
@@ -18,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Random;
 
-@Mixin(CropBlock.class) public abstract class CropBlockMixin extends PlantBlock implements Fertilizable
+@Mixin(CropBlock.class) public abstract class CropBlockMixin extends PlantBlockMixin implements Fertilizable
 {
 
 	protected CropBlockMixin(Settings settings)
@@ -44,6 +50,21 @@ import java.util.Random;
 	@Shadow
 	protected abstract int getGrowthAmount(World world);
 
+	@Override
+	public void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
+	{
+		SeasonalCrop crop = BetterFarming.CROP_MANAGER.Get(state.getBlock());
+		if (crop != null)
+		{
+			int age = state.get(CropBlock.AGE);
+			CropDataBlockHandler.GetManager().Create((ServerWorld) world, pos, () -> {
+				if (age > 0)
+					new CropDataBlock((Block) (Object) this);
+				return new CropDataBlock((Block) (Object) this, crop.GetGrowthFromAge(age), 0, age);
+			});
+		}
+	}
+
 	@Inject(method = "applyGrowth", at = @At(value = "HEAD"), cancellable = true)
 	public void OnApplyGrowth(World world, BlockPos pos, BlockState state, CallbackInfo ci)
 	{
@@ -53,12 +74,20 @@ import java.util.Random;
 		{
 			i = j;
 		}
-
-		if (CanGrow(state, (ServerWorld) world, pos, i))
+		if (i < getMaxAge())
 		{
-			world.setBlockState(pos, this.withAge(i), Block.NOTIFY_LISTENERS);
+			SeasonalCrop crop = BetterFarming.CROP_MANAGER.Get(state.getBlock());
+			if (crop != null)
+			{
+				float f = getAvailableMoisture((Block) (Object) this, world, pos);
+				// f is weird... 1.0 is minimum the main (this) moist farmland block can be, I did not calculate other outcomes.
+				if (f >= 1.0f && CanGrow(state, (ServerWorld) world, pos, crop, i))
+				{
+					world.setBlockState(pos, withAge(i + 1), Block.NOTIFY_LISTENERS);
+				}
+				ci.cancel();
+			}
 		}
-		ci.cancel();
 	}
 
 	@Inject(method = "randomTick", at = @At(value = "INVOKE", target =
@@ -68,49 +97,42 @@ import java.util.Random;
 		int i = getAge(state);
 		if (i < getMaxAge())
 		{
-			float f = getAvailableMoisture((Block) ((Object) this), world, pos);
-			// f is weird... 1.0 is minimum the main (this) moist farmland block can be, I did not calculate other outcomes.
-			if (f >= 1.0f && CanGrow(state, world, pos, 1))
+			SeasonalCrop crop = BetterFarming.CROP_MANAGER.Get(state.getBlock());
+			if (crop != null)
 			{
-				world.setBlockState(pos, withAge(i + 1), Block.NOTIFY_LISTENERS);
+				float f = getAvailableMoisture((Block) (Object) this, world, pos);
+				// f is weird... 1.0 is minimum the main (this) moist farmland block can be, I did not calculate other outcomes.
+				if (f >= 1.0f && CanGrow(state, world, pos, crop, 1))
+				{
+					world.setBlockState(pos, withAge(i + 1), Block.NOTIFY_LISTENERS);
+				}
+				ci.cancel();
 			}
 		}
-		ci.cancel();
 	}
 
-	private boolean CanGrow(BlockState state, ServerWorld world, BlockPos pos, int growthAmount)
+	private boolean CanGrow(BlockState state, ServerWorld world, BlockPos pos, SeasonalCrop crop, int growthAmount)
 	{
 		if (!world.isClient)
 		{
 			Biome biome = world.getBiome(pos);
-			SeasonalCrop crop = BetterFarming.CROP_MANAGER.seasonalCrops.get(state.getBlock());
-
-			if (crop == null)
-				return false;
-
-			BlockData blockData = (BlockData) BetterFarming.WORLD_DATAMANGER.GetOrCreateBlockData(world, pos,
-					() -> new BlockData(0, crop.baseGrowthTicks, 0, this));
+			CropDataBlock blockData = (CropDataBlock) CropDataBlockHandler.GetManager().GetBlockData(world, pos);
 			int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
 
-			if (!state.isOf(blockData.block) || crop.ShouldRemove(state, world, pos, biome, blockData, season))
+			if (crop.ShouldRemove(state, world, pos, biome, blockData, season))
 			{
-				BetterFarming.WORLD_DATAMANGER.RemoveBlockData(world, pos);
+				CropDataBlockHandler.GetManager().RemoveBlockData(world, pos);
 				BetterFarming.LOGGER.info("Removed!");
 				return false;
 			}
 
-			blockData.ableToGrow = crop.CheckGrowingCondition(state, world, pos, biome, blockData, season);
-			if (blockData.ableToGrow)
+			blockData.ableToGrow = crop.TestGrowingCondition(state, world, pos, biome, blockData, season);
+			if (blockData.ableToGrow && crop.TickGrowth(state, world, pos, biome, blockData, season))
 			{
-				blockData.growthTime -= crop.growthRate[season];
-
-				if (crop.CanFullyGrow(state, world, pos, biome, blockData, season))
-				{
-					crop.HandleGrowth(state, world, pos, biome, blockData, season, growthAmount);
-					BetterFarming.LOGGER.info("Grew!");
-					BetterFarming.WORLD_DATAMANGER.RemoveBlockData(world, pos);
-					return true;
-				}
+				crop.OnGrow(state, world, pos, blockData, growthAmount);
+				CropDataBlockHandler.GetManager().RemoveBlockData(world, pos);
+				BetterFarming.LOGGER.info("Grew!");
+				return true;
 			}
 		}
 		return false;

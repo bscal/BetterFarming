@@ -7,10 +7,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import scheduler.Scheduleable;
 
 @Mixin(SaplingBlock.class) public abstract class SaplingBlockMixin extends BlockMixin
-		implements Scheduleable
 {
 
 	private static final BooleanProperty STARTED;
