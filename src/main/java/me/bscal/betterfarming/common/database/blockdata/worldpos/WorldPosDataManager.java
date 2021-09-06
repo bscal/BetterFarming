@@ -1,5 +1,6 @@
 package me.bscal.betterfarming.common.database.blockdata.worldpos;
 
+import me.bscal.betterfarming.common.database.blockdata.DataManager;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataManager;
 import me.bscal.betterfarming.common.database.blockdata.IBlockDataWorld;
@@ -14,31 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class WorldPosDataManager implements IBlockDataManager
+public class WorldPosDataManager extends DataManager
 {
-
-	public final String id;
-
-	protected final List<WorldPosWorld> m_dataWorld;
-	protected final Supplier<IBlockDataBlock> m_dataFactory;
 
 	public WorldPosDataManager(MinecraftServer server, String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
-		this.id = id;
-		this.m_dataWorld = new ArrayList<>(4);
-		this.m_dataWorld.add(new WorldPosWorld(server.getOverworld(), this));
-		this.m_dataFactory = blockDataFactoryDefault;
+		super(server, id, blockDataFactoryDefault);
+		this.worlds.add(new WorldPosWorld(server.getOverworld(), this));
 	}
 
 	public WorldPosWorld GetWorld()
 	{
-		return m_dataWorld.get(0);
+		return (WorldPosWorld) worlds.get(0);
 	}
 
 	@Override
 	public IBlockDataWorld GetWorld(ServerWorld world)
 	{
-		for (IBlockDataWorld dataWorld : m_dataWorld)
+		for (IBlockDataWorld dataWorld : worlds)
 		{
 			if (dataWorld.GetServerWorld().getRegistryKey().getValue().equals(world.getRegistryKey().getValue()))
 				return dataWorld;
@@ -50,7 +44,7 @@ public class WorldPosDataManager implements IBlockDataManager
 	public IBlockDataWorld SetupWorld(ServerWorld world)
 	{
 		var dataWorld = new WorldPosWorld(world, this);
-		this.m_dataWorld.add(dataWorld);
+		this.worlds.add(dataWorld);
 		return dataWorld;
 	}
 
@@ -69,7 +63,7 @@ public class WorldPosDataManager implements IBlockDataManager
 	public IBlockDataBlock GetOrCreateBlockData(ServerWorld world, BlockPos pos)
 	{
 		return GetWorld(world).GetOrCreateChunk(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())))
-				.GetOrCreate(pos, m_dataFactory);
+				.GetOrCreate(pos, blockDataFactoryDefault);
 	}
 
 	@Override
@@ -125,7 +119,7 @@ public class WorldPosDataManager implements IBlockDataManager
 	@Override
 	public void Save()
 	{
-		for (IBlockDataWorld dataWorld : m_dataWorld)
+		for (IBlockDataWorld dataWorld : worlds)
 		{
 			dataWorld.Save();
 		}

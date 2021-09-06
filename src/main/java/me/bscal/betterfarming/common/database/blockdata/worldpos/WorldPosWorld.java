@@ -26,7 +26,7 @@ public class WorldPosWorld extends DataWorld
 
 	public WorldPosWorld(ServerWorld world, WorldPosDataManager parent)
 	{
-		super(parent.id, world);
+		super(parent.GetId(), world);
 		this.parent = parent;
 	}
 

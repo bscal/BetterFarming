@@ -49,7 +49,7 @@ public class WorldPosChunk implements IBlockDataChunk
 			if (element instanceof NbtCompound compound)
 			{
 				long posKey = compound.getLong("posKey");
-				IBlockDataBlock data = m_parent.parent.m_dataFactory.get();
+				IBlockDataBlock data = m_parent.parent.GetDataBlockFactory().get();
 				data.FromNbt(compound);
 				m_blockData.put(posKey, data);
 			}

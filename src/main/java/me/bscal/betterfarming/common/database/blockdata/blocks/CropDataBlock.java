@@ -58,6 +58,12 @@ public class CropDataBlock implements IBlockDataBlock
 		ableToGrow = nbt.getBoolean("ableToGrow");
 	}
 
+	@Override
+	public Block GetBlock()
+	{
+		return block;
+	}
+
 	public static CropDataBlock Create(NbtCompound nbt)
 	{
 		CropDataBlock crop = new CropDataBlock();

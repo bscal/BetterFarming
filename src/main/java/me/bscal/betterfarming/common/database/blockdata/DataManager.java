@@ -2,30 +2,44 @@ package me.bscal.betterfarming.common.database.blockdata;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.bscal.betterfarming.common.database.blockdata.blocks.EmptyDataBlock;
+import me.bscal.betterfarming.common.database.blockdata.worldpos.WorldPosWorld;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class DataManager implements IBlockDataManager
 {
 
 	protected final String id;
-	public final ObjectArrayList<IBlockDataWorld> worlds;
+	protected final boolean m_persistent;
+	public final List<IBlockDataWorld> worlds;
 	public final Supplier<IBlockDataBlock> blockDataFactoryDefault;
 
-	public DataManager(String id)
-	{
-		this(id, () -> EmptyDataBlock.EMPTY_DATA);
-	}
 
-	public DataManager(String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
+	public DataManager(MinecraftServer server, String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
 		this.id = id;
-		this.worlds = new ObjectArrayList<>(3 + 3);
+		this.worlds = new ArrayList<>(4);
 		this.blockDataFactoryDefault = blockDataFactoryDefault;
+		this.m_persistent = true;
+	}
+
+	@Override
+	public boolean IsPersistent()
+	{
+		return m_persistent;
+	}
+
+	@Override
+	public String GetId()
+	{
+		return id;
 	}
 
 	@Override
@@ -100,6 +114,12 @@ public abstract class DataManager implements IBlockDataManager
 	public IBlockDataBlock[] GetAllChunk(ServerWorld world, ChunkPos pos)
 	{
 		return GetWorld(world).GetAllChunk(world, pos);
+	}
+
+	@Override
+	public Supplier<IBlockDataBlock> GetDataBlockFactory()
+	{
+		return blockDataFactoryDefault;
 	}
 
 	@Override

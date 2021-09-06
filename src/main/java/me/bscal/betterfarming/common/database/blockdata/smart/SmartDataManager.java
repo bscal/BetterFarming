@@ -10,14 +10,10 @@ import java.util.function.Supplier;
 
 public class SmartDataManager extends DataManager
 {
-	public SmartDataManager(String id)
-	{
-		super(id);
-	}
 
-	public SmartDataManager(String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
+	public SmartDataManager(MinecraftServer server, String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
-		super(id, blockDataFactoryDefault);
+		super(server, id, blockDataFactoryDefault);
 	}
 
 	@Override

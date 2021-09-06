@@ -10,6 +10,10 @@ import java.util.function.Supplier;
 public interface IBlockDataManager
 {
 
+	boolean IsPersistent();
+
+	String GetId();
+
 	IBlockDataWorld GetWorld(ServerWorld world);
 
 	IBlockDataWorld SetupWorld(ServerWorld world);
@@ -31,6 +35,8 @@ public interface IBlockDataManager
 	IBlockDataBlock[] GetAll(ServerWorld world);
 
 	IBlockDataBlock[] GetAllChunk(ServerWorld world, ChunkPos pos);
+
+	Supplier<IBlockDataBlock> GetDataBlockFactory();
 
 	void OnLoadChunk(ServerWorld world, WorldChunk chunk);
 

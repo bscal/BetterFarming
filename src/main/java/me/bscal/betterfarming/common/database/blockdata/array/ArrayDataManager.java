@@ -10,14 +10,10 @@ import java.util.function.Supplier;
 
 public class ArrayDataManager extends DataManager
 {
-	public ArrayDataManager(String id)
-	{
-		super(id);
-	}
 
-	public ArrayDataManager(String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
+	public ArrayDataManager(MinecraftServer server, String id, Supplier<IBlockDataBlock> blockDataFactoryDefault)
 	{
-		super(id, blockDataFactoryDefault);
+		super(server, id, blockDataFactoryDefault);
 	}
 
 	@Override

@@ -21,4 +21,10 @@ public class EmptyDataBlock implements IBlockDataBlock
 	{
 	}
 
+	@Override
+	public Block GetBlock()
+	{
+		return Blocks.AIR;
+	}
+
 }

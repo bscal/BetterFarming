@@ -43,6 +43,12 @@ public class CompoundDataBlock implements IBlockDataBlock
 		data = nbt.getCompound("data");
 	}
 
+	@Override
+	public Block GetBlock()
+	{
+		return block;
+	}
+
 	public static CompoundDataBlock Create(NbtCompound nbt)
 	{
 		return new CompoundDataBlock(Registry.BLOCK.get(new Identifier(nbt.getString("block"))), nbt.getCompound("data"));

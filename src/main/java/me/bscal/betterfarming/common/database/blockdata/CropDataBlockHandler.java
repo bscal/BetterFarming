@@ -7,6 +7,8 @@ import me.bscal.betterfarming.common.seasons.SeasonalCrop;
 import me.bscal.betterfarming.common.seasons.Seasons;
 import me.bscal.betterfarming.common.utils.Utils;
 import me.bscal.betterfarming.common.utils.schedulers.FastIntervalScheduler;
+import net.minecraft.block.SaplingBlock;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -22,9 +24,9 @@ public final class CropDataBlockHandler
 	{
 	}
 
-	public static void Init(ServerWorld world)
+	public static void Init(MinecraftServer server)
 	{
-		WORLD_DATA_MANAGER = new WorldPosDataManager(BetterFarming.MOD_ID + "_cropdata", world, CropDataBlock::new);
+		WORLD_DATA_MANAGER = new WorldPosDataManager(server, BetterFarming.MOD_ID + "_cropdata", CropDataBlock::new);
 
 		FastIntervalScheduler.INSTANCE.RegisterRunnable(300, (entry) -> CropDataBlockHandler.UpdateUnloadedEntries(
 				300 / Utils.GeometricDistributionMeanForRandomTicks(BetterFarming.TICK_SPEED)));
@@ -66,7 +68,10 @@ public final class CropDataBlockHandler
 		{
 			SeasonalCrop crop = BetterFarming.CROP_MANAGER.Get(data.block);
 			if (crop == null)
-				return;
+			{
+				if (data.GetBlock() instanceof SaplingBlock)
+					TickSapling(data);
+			}
 			Biome biome = world.getBiome(pos);
 			int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
 
@@ -75,11 +80,22 @@ public final class CropDataBlockHandler
 			crop.ApplyGrowth(data, season, 0, multiplier);
 		}
 		BetterFarming.LOGGER.info("Updated unloaded BlockData");
-
 	}
 
 	public static void Save()
 	{
 		WORLD_DATA_MANAGER.Save();
+	}
+
+	public static void TickSapling(CropDataBlock cropDataBlock)
+	{
+		float growth = 1f + cropDataBlock.growthModifier;
+		cropDataBlock.totalGrowthReceived += growth;
+		cropDataBlock.currentAgeGrowthReceived += growth;
+		if (cropDataBlock.totalGrowthReceived > 24000 * 10 / SeasonalCrop.RANDOM_TICK_DEFAULT_AVERAGE)
+		{
+			cropDataBlock.age++;
+			cropDataBlock.currentAgeGrowthReceived = 0;
+		}
 	}
 }

@@ -82,6 +82,7 @@ public class BetterFarming implements ModInitializer
 			TICK_SPEED = server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get();
 			FastDelayScheduler.INSTANCE.Load(server);
 			FastIntervalScheduler.INSTANCE.Load(server);
+			CropDataBlockHandler.Init(server);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			FastDelayScheduler.INSTANCE.Save(server);
@@ -91,7 +92,6 @@ public class BetterFarming implements ModInitializer
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
-				CropDataBlockHandler.Init(world);
 				m_overWorldReference = world;
 				SeasonManager.GetOrCreate(world);
 				SEASONS_REGISTRY.Load(world);
@@ -130,6 +130,13 @@ public class BetterFarming implements ModInitializer
 
 	public static void Log(String msg)
 	{
-		LOGGER.info(msg);
+		if (DEBUG)
+			LOGGER.info(msg);
+	}
+
+	public static void Error(String msg)
+	{
+		if (DEBUG)
+			LOGGER.error(msg);
 	}
 }

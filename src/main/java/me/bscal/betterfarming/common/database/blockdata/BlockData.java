@@ -70,6 +70,12 @@ public class BlockData implements IBlockDataBlock
 		ableToGrow = nbt.getBoolean("ableToGrow");
 	}
 
+	@Override
+	public Block GetBlock()
+	{
+		return null;
+	}
+
 	public static class Serializer implements JsonSerializer<BlockData>, JsonDeserializer<BlockData>
 	{
 
