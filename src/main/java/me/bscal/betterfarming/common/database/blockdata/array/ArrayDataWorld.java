@@ -1,9 +1,6 @@
 package me.bscal.betterfarming.common.database.blockdata.array;
 
-import me.bscal.betterfarming.common.database.blockdata.DataManager;
-import me.bscal.betterfarming.common.database.blockdata.DataWorld;
-import me.bscal.betterfarming.common.database.blockdata.IBlockDataBlock;
-import me.bscal.betterfarming.common.database.blockdata.IBlockDataChunk;
+import me.bscal.betterfarming.common.database.blockdata.*;
 import me.bscal.betterfarming.common.database.blockdata.smart.SmartDataChunk;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -35,7 +32,7 @@ public class ArrayDataWorld extends DataWorld
 	public IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory)
 	{
 		long key = pos.asLong();
-		IBlockDataChunk chunk = m_chunkToSection.get(ChunkSectionPos.from(pos).asLong());
+		IBlockDataChunk chunk = m_chunkToSection.get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())).toLong());
 		if (chunk == null)
 		{
 			var newChunk = new ArrayDataChunk();
@@ -47,9 +44,8 @@ public class ArrayDataWorld extends DataWorld
 	}
 
 	@Override
-	public void OnLoadChunk(ServerWorld world, WorldChunk chunk)
+	public void OnLoadChunk(ServerWorld world, ChunkPos pos)
 	{
-		ChunkPos pos = chunk.getPos();
 		File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
 		if (file.exists())
 		{

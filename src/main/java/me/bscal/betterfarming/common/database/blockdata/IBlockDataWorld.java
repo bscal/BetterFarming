@@ -25,9 +25,9 @@ public interface IBlockDataWorld
 
 	void Remove(BlockPos pos);
 
-	void OnLoadChunk(ServerWorld world, WorldChunk chunk);
+	void OnLoadChunk(ServerWorld world, ChunkPos chunk);
 
-	void OnUnloadChunk(ServerWorld world, WorldChunk chunk);
+	void OnUnloadChunk(ServerWorld world, ChunkPos chunk);
 
 	IBlockDataBlock[] GetAll(ServerWorld world);
 
@@ -36,5 +36,7 @@ public interface IBlockDataWorld
 	void ForEach(Consumer<IBlockDataBlock> foreach);
 
 	void Save();
+
+	void Load();
 
 }

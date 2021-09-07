@@ -82,14 +82,16 @@ public class BetterFarming implements ModInitializer
 			TICK_SPEED = server.getGameRules().get(GameRules.RANDOM_TICK_SPEED).get();
 			FastDelayScheduler.INSTANCE.Load(server);
 			FastIntervalScheduler.INSTANCE.Load(server);
-			CropDataBlockHandler.Init(server);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			FastDelayScheduler.INSTANCE.Save(server);
 			FastIntervalScheduler.INSTANCE.Save(server);
-			CropDataBlockHandler.Save();
 		});
 		ServerWorldEvents.LOAD.register(((server, world) -> {
+			if (!CropDataBlockHandler.IsInitialized())
+				CropDataBlockHandler.Init(server);
+
+			CropDataBlockHandler.GetManager().Load(world);
 			if (world.getRegistryKey().equals(World.OVERWORLD))
 			{
 				m_overWorldReference = world;
@@ -98,7 +100,7 @@ public class BetterFarming implements ModInitializer
 			}
 		}));
 		ServerWorldEvents.UNLOAD.register(((server, world) -> {
-
+			CropDataBlockHandler.GetManager().Save(world);
 		}));
 		PlayerBlockBreakEvents.AFTER.register(new PlayerBlockBreakListener());
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());

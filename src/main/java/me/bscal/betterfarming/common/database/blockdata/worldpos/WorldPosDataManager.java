@@ -51,7 +51,8 @@ public class WorldPosDataManager extends DataManager
 	@Override
 	public IBlockDataBlock GetBlockData(ServerWorld world, BlockPos pos)
 	{
-		return GetWorld(world).Get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()))).GetBlock(pos);
+		var chunk = GetWorld(world).Get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())));
+		return chunk == null ? null : chunk.GetBlock(pos);
 	}
 
 	public IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory)
@@ -107,21 +108,12 @@ public class WorldPosDataManager extends DataManager
 	@Override
 	public void OnLoadChunk(ServerWorld world, WorldChunk chunk)
 	{
-		GetWorld(world).OnLoadChunk(world, chunk);
+		GetWorld(world).OnLoadChunk(world, chunk.getPos());
 	}
 
 	@Override
 	public void OnUnloadChunk(ServerWorld world, WorldChunk chunk)
 	{
-		GetWorld(world).OnUnloadChunk(world, chunk);
-	}
-
-	@Override
-	public void Save()
-	{
-		for (IBlockDataWorld dataWorld : worlds)
-		{
-			dataWorld.Save();
-		}
+		GetWorld(world).OnUnloadChunk(world, chunk.getPos());
 	}
 }

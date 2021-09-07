@@ -14,6 +14,8 @@ public interface IBlockDataManager
 
 	String GetId();
 
+	void SetPersistent(boolean persistent);
+
 	IBlockDataWorld GetWorld(ServerWorld world);
 
 	IBlockDataWorld SetupWorld(ServerWorld world);
@@ -42,6 +44,8 @@ public interface IBlockDataManager
 
 	void OnUnloadChunk(ServerWorld world, WorldChunk chunk);
 
-	void Save();
+	void Save(ServerWorld world);
+
+	void Load(ServerWorld world);
 
 }

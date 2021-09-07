@@ -105,9 +105,43 @@ public abstract class DataWorld implements IBlockDataWorld
 		}
 	}
 
-	public void OnUnloadChunk(ServerWorld world, WorldChunk chunk)
+	public void Load()
 	{
-		ChunkPos pos = chunk.getPos();
+		String[] content = m_saveDir.list();
+		for (String fileName : content)
+		{
+			String[] extensionSplit = fileName.split("/.");
+			if (extensionSplit.length != 2 || extensionSplit[1].equals("dat"))
+				continue;
+
+			String[] nameSplit = fileName.split("_");
+			if (nameSplit.length != 2)
+				continue;
+
+			int chunkX = Integer.parseInt(extensionSplit[0]);
+			int chunkZ = Integer.parseInt(extensionSplit[1]);
+			ChunkPos pos = new ChunkPos(chunkX, chunkZ);
+			OnUnloadChunk(m_world, pos);
+		}
+
+		for (var pair : m_chunkToSection.long2ObjectEntrySet())
+		{
+			ChunkPos pos = new ChunkPos(pair.getLongKey());
+			File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
+			NbtCompound root = new NbtCompound();
+			try
+			{
+				NbtIo.writeCompressed(pair.getValue().ToNbt(root), file);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void OnUnloadChunk(ServerWorld world, ChunkPos pos)
+	{
 		File file = new File(m_saveDir, DataManager.ChunkFileName(pos.x, pos.z));
 		IBlockDataChunk dataChunk = m_chunkToSection.remove(pos.toLong());
 

@@ -33,7 +33,7 @@ public abstract class BlockMixin extends AbstractBlock
 	}
 
 	@Inject(method = "onPlaced", at = @At(value = "HEAD"))
-	public void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
+	protected void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
 	{
 	}
 

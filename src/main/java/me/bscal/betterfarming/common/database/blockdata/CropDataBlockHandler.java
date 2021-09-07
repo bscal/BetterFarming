@@ -27,7 +27,7 @@ public final class CropDataBlockHandler
 	public static void Init(MinecraftServer server)
 	{
 		WORLD_DATA_MANAGER = new WorldPosDataManager(server, BetterFarming.MOD_ID + "_cropdata", CropDataBlock::new);
-
+		WORLD_DATA_MANAGER.SetPersistent(true);
 		FastIntervalScheduler.INSTANCE.RegisterRunnable(300, (entry) -> CropDataBlockHandler.UpdateUnloadedEntries(
 				300 / Utils.GeometricDistributionMeanForRandomTicks(BetterFarming.TICK_SPEED)));
 
@@ -80,11 +80,6 @@ public final class CropDataBlockHandler
 			crop.ApplyGrowth(data, season, 0, multiplier);
 		}
 		BetterFarming.LOGGER.info("Updated unloaded BlockData");
-	}
-
-	public static void Save()
-	{
-		WORLD_DATA_MANAGER.Save();
 	}
 
 	public static void TickSapling(CropDataBlock cropDataBlock)

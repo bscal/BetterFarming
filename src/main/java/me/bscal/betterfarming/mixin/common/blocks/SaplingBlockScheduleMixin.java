@@ -31,7 +31,7 @@ import java.util.Random;
 	}
 
 	@Override
-	public void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
+	public void OnPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
 	{
 		if (!world.isClient)
 		{

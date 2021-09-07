@@ -17,7 +17,7 @@ public abstract class DataManager implements IBlockDataManager
 {
 
 	protected final String id;
-	protected final boolean m_persistent;
+	protected boolean m_persistent;
 	public final List<IBlockDataWorld> worlds;
 	public final Supplier<IBlockDataBlock> blockDataFactoryDefault;
 
@@ -27,7 +27,6 @@ public abstract class DataManager implements IBlockDataManager
 		this.id = id;
 		this.worlds = new ArrayList<>(4);
 		this.blockDataFactoryDefault = blockDataFactoryDefault;
-		this.m_persistent = true;
 	}
 
 	@Override
@@ -40,6 +39,12 @@ public abstract class DataManager implements IBlockDataManager
 	public String GetId()
 	{
 		return id;
+	}
+
+	@Override
+	public void SetPersistent(boolean persistent)
+	{
+		m_persistent = persistent;
 	}
 
 	@Override
@@ -125,33 +130,30 @@ public abstract class DataManager implements IBlockDataManager
 	@Override
 	public void OnLoadChunk(ServerWorld world, WorldChunk chunk)
 	{
-		for (var worldData : worlds)
-		{
-			if (worldData.GetServerWorld().equals(world))
-			{
-				worldData.OnLoadChunk(world, chunk);
-				break;
-			}
-		}
+		if (m_persistent)
+			return;
+
+		GetWorld(world).OnLoadChunk(world, chunk.getPos());
 	}
 
 	@Override
 	public void OnUnloadChunk(ServerWorld world, WorldChunk chunk)
 	{
-		for (var worldData : worlds)
-		{
-			if (worldData.GetServerWorld().equals(world))
-			{
-				worldData.OnUnloadChunk(world, chunk);
-				break;
-			}
-		}
+		if (m_persistent)
+			return;
+
+		GetWorld(world).OnUnloadChunk(world, chunk.getPos());
 	}
 
 	@Override
-	public void Save()
+	public void Save(ServerWorld world)
 	{
-		worlds.forEach(IBlockDataWorld::Save);
+		GetWorld(world).Save();
+	}
+
+	public void Load(ServerWorld world)
+	{
+		GetWorld(world).Load();
 	}
 
 	public static long XZToLong(int x, int z)
