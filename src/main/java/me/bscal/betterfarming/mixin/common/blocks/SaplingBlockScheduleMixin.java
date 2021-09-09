@@ -31,7 +31,7 @@ import java.util.Random;
 	}
 
 	@Override
-	public void OnPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
+	public void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
 	{
 		if (!world.isClient)
 		{
@@ -41,8 +41,19 @@ import java.util.Random;
 		}
 	}
 
+	@Inject(method = "grow", at = @At("HEAD"), cancellable = true)
+	public void OnGrow(ServerWorld world, Random random, BlockPos pos, BlockState state, CallbackInfo ci)
+	{
+		HandleGrowthUpdate(state, world, pos, random, ci);
+	}
+
 	@Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
 	public void OnRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci)
+	{
+		HandleGrowthUpdate(state, world, pos, random, ci);
+	}
+
+	private void HandleGrowthUpdate(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci)
 	{
 		var blockData = CropDataBlockHandler.GetManager().GetBlockData(world, pos);
 		if (blockData instanceof CropDataBlock cropDataBlock)

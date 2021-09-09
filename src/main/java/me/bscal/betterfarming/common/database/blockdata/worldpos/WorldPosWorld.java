@@ -56,12 +56,12 @@ public class WorldPosWorld extends DataWorld
 	@Override
 	public IBlockDataBlock Create(ServerWorld world, BlockPos pos, Supplier<IBlockDataBlock> factory)
 	{
-		long key = pos.asLong();
-		IBlockDataChunk chunk = m_chunkToSection.get(new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())).toLong());
+		long chunkKey = new ChunkPos(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ())).toLong();
+		IBlockDataChunk chunk = m_chunkToSection.get(chunkKey);
 		if (chunk == null)
 		{
 			chunk = new WorldPosChunk(this);
-			m_chunkToSection.put(key, chunk);
+			m_chunkToSection.put(chunkKey, chunk);
 		}
 		IBlockDataBlock data = factory.get();
 		chunk.PutBlock(pos, data);

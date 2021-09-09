@@ -22,10 +22,5 @@ public abstract class PlantBlockMixin extends BlockMixin
 	@Override
 	protected void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
 	{
-		OnPlaced(world, pos, state, placer, itemStack, ci);
-	}
-
-	public void OnPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
-	{
 	}
 }

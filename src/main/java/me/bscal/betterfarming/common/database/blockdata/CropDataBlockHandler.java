@@ -71,6 +71,7 @@ public final class CropDataBlockHandler
 			{
 				if (data.GetBlock() instanceof SaplingBlock)
 					TickSapling(data);
+				return;
 			}
 			Biome biome = world.getBiome(pos);
 			int season = Seasons.GetSeasonForBiome(biome, BetterFarming.SEASON_CLOCK.currentSeason);
@@ -87,7 +88,7 @@ public final class CropDataBlockHandler
 		float growth = 1f + cropDataBlock.growthModifier;
 		cropDataBlock.totalGrowthReceived += growth;
 		cropDataBlock.currentAgeGrowthReceived += growth;
-		if (cropDataBlock.totalGrowthReceived > 24000 * 10 / SeasonalCrop.RANDOM_TICK_DEFAULT_AVERAGE)
+		if (cropDataBlock.currentAgeGrowthReceived > 24000 * 10 / SeasonalCrop.RANDOM_TICK_DEFAULT_AVERAGE)
 		{
 			cropDataBlock.age++;
 			cropDataBlock.currentAgeGrowthReceived = 0;

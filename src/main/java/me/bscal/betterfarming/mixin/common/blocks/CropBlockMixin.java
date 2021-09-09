@@ -51,7 +51,7 @@ import java.util.Random;
 	protected abstract int getGrowthAmount(World world);
 
 	@Override
-	public void OnPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
+	public void OnPlacedInject(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, CallbackInfo ci)
 	{
 		SeasonalCrop crop = BetterFarming.CROP_MANAGER.Get(state.getBlock());
 		if (crop != null)
