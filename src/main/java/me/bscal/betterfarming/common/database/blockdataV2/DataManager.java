@@ -28,6 +28,17 @@ public class DataManager
 		m_DataWorld.add(new DataWorld(world, factory));
 	}
 
+	public DataWorld GetWorld(ServerWorld world)
+	{
+		for (DataWorld dataWorld : m_DataWorld)
+		{
+			if (dataWorld.world.getRegistryKey().getValue().equals(world.getRegistryKey().getValue()))
+				return dataWorld;
+		}
+		System.err.println("ServerWorld was not found. Does it not exist or was it not registered?");
+		return null;
+	}
+
 	public void Save()
 	{
 		m_DataWorld.forEach(DataWorld::Serialize);

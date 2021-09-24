@@ -10,6 +10,8 @@ public class CompoundDataBlock implements IDataBlock
 
 	public NbtCompound root;
 
+	public CompoundDataBlock() {}
+
 	@Override
 	public Block GetBlock()
 	{
@@ -24,10 +26,10 @@ public class CompoundDataBlock implements IDataBlock
 		return root;
 	}
 
-	public static IDataBlock NewInstance(NbtCompound nbt)
+	@Override
+	public void FromNbt(NbtCompound nbt)
 	{
-		CompoundDataBlock instance = new CompoundDataBlock();
-		instance.root = nbt;
-		return instance;
+		root = nbt;
 	}
+
 }

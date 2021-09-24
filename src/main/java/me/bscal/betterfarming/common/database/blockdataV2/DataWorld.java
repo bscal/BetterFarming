@@ -10,12 +10,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.ServerWorldProperties;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 public class DataWorld
@@ -29,9 +27,8 @@ public class DataWorld
 	public DataWorld(ServerWorld world, Supplier<IDataBlock> dataFactory)
 	{
 		this.world = world;
-		this.m_SaveFile = new File(DimensionType.getSaveDirectory(world.getRegistryKey(), world.getServer()
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/block_data/" + ((ServerWorldProperties)world.getLevelProperties()).getLevelName());
+		this.m_SaveFile = new File(
+				DimensionType.getSaveDirectory(world.getRegistryKey(), world.getServer().getSavePath(WorldSavePath.ROOT).toFile()) + "/block_data/");
 		this.m_SaveFile.mkdirs();
 		this.m_BlockData = new Long2ObjectOpenHashMap<>(Hash.DEFAULT_INITIAL_SIZE, 1.0f);
 		this.m_DataFactory = dataFactory;
@@ -48,7 +45,7 @@ public class DataWorld
 		IDataBlock dataBlock = m_BlockData.get(posLong);
 		if (dataBlock == null && m_DataFactory != null)
 		{
-			dataBlock = m_DataFactory.get();
+			dataBlock = dataFactory.get();
 			m_BlockData.put(posLong, dataBlock);
 			return dataBlock;
 		}
@@ -122,24 +119,19 @@ public class DataWorld
 		String clazzName = entry.getString("class");
 		try
 		{
-			Method factory = Class.forName(clazzName).getMethod("NewInstance", NbtCompound.class);
-			Object newInstanceOf = factory.invoke(null, entry);
-
-			if (newInstanceOf instanceof IDataBlock)
-			{
-				m_BlockData.put(key, (IDataBlock) newInstanceOf);
-			}
+			IDataBlock newInstanceOf = (IDataBlock) Class.forName(clazzName).getConstructor().newInstance();
+			newInstanceOf.FromNbt(entry);
+			m_BlockData.put(key, newInstanceOf);
 		}
 		catch (NoSuchMethodException e)
 		{
-			System.err.println("[ Error ] Your class " + clazzName + " does not contain a static NewInstance(NbtCompound) method!");
+			System.err.println("[ Error ] Your class " + clazzName + " does not contain a default constructor!");
 			e.printStackTrace();
 		}
-		catch (ClassNotFoundException | InvocationTargetException | IllegalAccessException e)
+		catch (InstantiationException | ClassNotFoundException | InvocationTargetException | IllegalAccessException e)
 		{
 			e.printStackTrace();
 		}
 	}
-
 
 }
