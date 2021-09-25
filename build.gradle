@@ -45,16 +45,14 @@ dependencies {
 
     modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components_version}")
     modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-chunk:${project.cardinal_components_version}")
-    modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-block:${project.cardinal_components_version}")
     modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components_version}")
-    modImplementation include("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-world:${project.cardinal_components_version}")
 
     modImplementation include("io.github.cottonmc:LibGui:${project.libgui_version}")
     modImplementation include("com.oroarmor:oro-config-fabric:${project.oroconfig_version}")
-    modImplementation("net.devtech:arrp:0.4.4")
+    modImplementation("net.devtech:arrp:${project.arrp_version}")
 
-    testImplementation(platform('org.junit:junit-bom:5.7.2'))
-    testImplementation('org.junit.jupiter:junit-jupiter')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
 processResources {

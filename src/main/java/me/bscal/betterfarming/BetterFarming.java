@@ -60,7 +60,7 @@ public class BetterFarming implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-		config = new TestConfig(Utils.GetStringPathInConfig("test_config.json"), new TestConfigBlock());
+		//config = new TestConfig(Utils.GetStringPathInConfig("test_config.json"), new TestConfigBlock());
 
 		RRPCallback.BEFORE_VANILLA.register(pack -> pack.add(Generators.RESOURCE_PACK));
 		ItemRegistry.Register();
@@ -71,8 +71,6 @@ public class BetterFarming implements ModInitializer
 		SEASON_SETTINGS.saveConfigToFile();
 		SeasonCropManager.GenerateDefaults(Utils.GetPathInConfig("seasonal_crops.json").toString());
 		CROP_MANAGER.Load(Utils.GetPathInConfig("seasonal_crops.json").toString());
-
-		//BLOCK_DATA.Load(Utils.GetStringPathInConfig("block_data.json"));
 
 		CommandRegistrationCallback.EVENT.register(new SeasonCommand());
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
@@ -106,9 +104,9 @@ public class BetterFarming implements ModInitializer
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(new ServerEntityCombatListener());
 		ServerTickEvents.END_SERVER_TICK.register(new ServerTickListener());
 
-		LootManagerListener LMListener = new LootManagerListener();
+		//LootManagerListener LMListener = new LootManagerListener();
 		//LootManagerEarlyAssignCallback.EARLY_ASSIGN.register(LMListener);
-		LootTableLoadingCallback.EVENT.register(LMListener);
+		//LootTableLoadingCallback.EVENT.register(LMListener);
 
 		ChunkListeners cl = new ChunkListeners();
 		ServerChunkEvents.CHUNK_LOAD.register(cl);

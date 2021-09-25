@@ -33,7 +33,7 @@ import java.util.List;
 	}
 
 	@Inject(method = "dropLoot", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/loot/LootTable;generateLoot" + "(Lnet/minecraft/loot" + "/context/LootContext;Ljava/util/function/Consumer;)V"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
+			"Lnet/minecraft/loot/LootTable;generateLoot" + "(Lnet/minecraft/loot" + "/context/LootContext;Ljava/util/function/Consumer;)V"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
 	public void OnDropLoot(DamageSource source, boolean causedByPlayer, CallbackInfo ci, Identifier identifier,
 			net.minecraft.loot.LootTable minecraftLootTable, LootContext.Builder builder)
 	{
