@@ -4,6 +4,7 @@ import me.bscal.betterfarming.BetterFarming;
 import me.bscal.betterfarming.client.commands.ClientCommandRegister;
 import me.bscal.betterfarming.client.particles.FallingLeavesParticle;
 import me.bscal.betterfarming.client.seasons.biome.BiomeSeasonHandler;
+import me.bscal.betterfarming.common.utils.zones.BlockIndications;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,15 +13,20 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
+
+import java.util.Set;
 
 @Environment(EnvType.CLIENT) public class BetterFarmingClient implements ClientModInitializer
 {
 
-	public static final ParticleType<BlockStateParticleEffect> FALLING_LEAVES = FabricParticleTypes.complex(BlockStateParticleEffect.PARAMETERS_FACTORY);
-
+	public static final ParticleType<BlockStateParticleEffect> FALLING_LEAVES = FabricParticleTypes.complex(
+			BlockStateParticleEffect.PARAMETERS_FACTORY);
 
 	private static BiomeSeasonHandler SEASON_HANDLER;
 
@@ -42,6 +48,14 @@ import net.minecraft.util.registry.Registry;
 		ClientTickEvents.END_WORLD_TICK.register((world -> {
 			if (!SEASON_HANDLER.receivedSyncPacket) // Instead of sending packet every we tick we can simulate time passing.
 				SEASON_HANDLER.seasonClock.ticksSinceCreation++;
+
+			BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+
+			BlockIndications.DrawBorders(world, Set.of(pos, pos.east(), pos.north(), pos.south(), pos.west()), new Vec3f(0.0f, 0.0f, 1.0f), 1.0f);
+			BlockIndications.DrawBlockOutline(world, pos, new Vec3f(1.0f, 0.0f, 0.0f), 1.0f);
+			BlockIndications.FillBlock(world, pos.east(), 5, new Vec3f(0.0f, 1.0f, 0.0f), 1.0f);
+			BlockIndications.DrawCone(world, pos, MinecraftClient.getInstance().player.getHorizontalFacing(), 5, 1, 2, new Vec3f(.25f, .25f, .25f),
+					1.0f);
 		}));
 
 		ClientCommandRegister.Register();
