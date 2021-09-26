@@ -17,6 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
 
@@ -51,11 +52,13 @@ import java.util.Set;
 
 			BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
 
-			BlockIndications.DrawBorders(world, Set.of(pos, pos.east(), pos.north(), pos.south(), pos.west()), new Vec3f(0.0f, 0.0f, 1.0f), 1.0f);
-			BlockIndications.DrawBlockOutline(world, pos, new Vec3f(1.0f, 0.0f, 0.0f), 1.0f);
-			BlockIndications.FillBlock(world, pos.east(), 5, new Vec3f(0.0f, 1.0f, 0.0f), 1.0f);
-			BlockIndications.DrawCone(world, pos, MinecraftClient.getInstance().player.getHorizontalFacing(), 5, 1, 2, new Vec3f(.25f, .25f, .25f),
-					1.0f);
+			//BlockIndications.DrawBlockBorders(world, Set.of(pos, pos.east(), pos.north(), pos.south(), pos.west()), new Vec3f(0.0f, 0.0f, 1.0f), 1.0f);
+			//BlockIndications.DrawBlockOutline(world, pos, new Vec3f(1.0f, 0.0f, 0.0f), 1.0f);
+			//BlockIndications.FillBlock(world, pos.east(), 5, new Vec3f(0.0f, 1.0f, 0.0f), 1.0f);
+			//BlockIndications.DrawBlockCone(world, pos, MinecraftClient.getInstance().player.getHorizontalFacing(), 5, 1, 2, new Vec3f(.25f, .25f, .25f),
+			//		1.0f);
+			BlockIndications.DrawBlockCircle(world, pos, 5, new Vec3f(0.0f, 0.35f, 0.1f), 1.0f);
+			BlockIndications.DrawCircle(world, Vec3d.of(pos.north().north().north()), 3, 20, new Vec3f(0.0f, 0.5f, 0.5f), 1.0f);
 		}));
 
 		ClientCommandRegister.Register();
