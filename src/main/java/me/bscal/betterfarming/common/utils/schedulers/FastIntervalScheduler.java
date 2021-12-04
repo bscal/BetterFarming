@@ -119,9 +119,8 @@ public final class FastIntervalScheduler
 
 	public void Save(MinecraftServer server)
 	{
-		File scheduleSavePath  = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/schedulables");
+		File scheduleSavePath = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(),
+				server.getSavePath(WorldSavePath.ROOT)).toString(), "schedulables");
 		scheduleSavePath.mkdirs();
 		NbtCompound root = new NbtCompound();
 		NbtList rootList = new NbtList();
@@ -146,9 +145,8 @@ public final class FastIntervalScheduler
 
 	public void Load(MinecraftServer server)
 	{
-		File scheduleSavePath  = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(), server
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/schedulables");
+		File scheduleSavePath = new File(DimensionType.getSaveDirectory(server.getOverworld().getRegistryKey(),
+				server.getSavePath(WorldSavePath.ROOT)).toString(), "schedulables");
 		if (scheduleSavePath.exists())
 		{
 			try

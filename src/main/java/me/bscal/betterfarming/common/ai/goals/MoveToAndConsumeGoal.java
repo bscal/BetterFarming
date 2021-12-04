@@ -63,7 +63,7 @@ public abstract class MoveToAndConsumeGoal extends MoveToTargetPosGoal
 
 		this.mob.getLookControl()
 				.lookAt((double) this.targetPos.getX() + 0.5D, this.targetPos.getY() + 1,
-						(double) this.targetPos.getZ() + 0.5D, 10.0F, (float) this.mob.getLookPitchSpeed());
+						(double) this.targetPos.getZ() + 0.5D, 10.0F, (float) this.mob.getPitch());
 
 		if (this.hasReached() && IsTargetPosConsumable(this.mob.world, this.targetPos, m_cachedState))
 			Success();

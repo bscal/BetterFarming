@@ -16,6 +16,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +34,8 @@ public abstract class DataWorld implements IBlockDataWorld
 	public DataWorld(String id, ServerWorld world)
 	{
 		this.m_world = world;
-		this.m_saveDir = new File(DimensionType.getSaveDirectory(world.getRegistryKey(), world.getServer()
-				.getSavePath(WorldSavePath.ROOT)
-				.toFile()) + "/data/" + id + "/");
+		Path savePath = DimensionType.getSaveDirectory(world.getRegistryKey(), world.getServer().getSavePath(WorldSavePath.ROOT));
+		this.m_saveDir = new File(savePath.toFile(), Path.of("/data/", id, "/").toString());
 		this.m_saveDir.mkdirs();
 		this.m_chunkToSection = new Long2ObjectOpenHashMap<>(Hash.DEFAULT_INITIAL_SIZE, 1f);
 	}

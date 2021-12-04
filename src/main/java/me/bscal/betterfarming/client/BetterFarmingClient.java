@@ -57,8 +57,8 @@ import java.util.Set;
 			//BlockIndications.FillBlock(world, pos.east(), 5, new Vec3f(0.0f, 1.0f, 0.0f), 1.0f);
 			//BlockIndications.DrawBlockCone(world, pos, MinecraftClient.getInstance().player.getHorizontalFacing(), 5, 1, 2, new Vec3f(.25f, .25f, .25f),
 			//		1.0f);
-			BlockIndications.DrawBlockCircle(world, pos, 5, new Vec3f(0.0f, 0.35f, 0.1f), 1.0f);
-			BlockIndications.DrawCircle(world, Vec3d.of(pos.north().north().north()), 3, 20, new Vec3f(0.0f, 0.5f, 0.5f), 1.0f);
+			//BlockIndications.DrawBlockCircle(world, pos, 5, new Vec3f(0.0f, 0.35f, 0.1f), 1.0f);
+			//BlockIndications.DrawCircle(world, Vec3d.of(pos.north().north().north()), 3, 20, new Vec3f(0.0f, 0.5f, 0.5f), 1.0f);
 		}));
 
 		ClientCommandRegister.Register();
